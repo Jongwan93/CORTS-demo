@@ -1,0 +1,180 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <img
+      src="OntarioMOH1.png"
+      alt="Ministry of Health"
+      width="255"
+      height="101"
+    />
+    <img
+      src="ARIS2.gif"
+      alt="ARIS II - Ambulance Response Information System"
+      width="255"
+      height="101"
+    /><br /><br />
+    <img
+      src="CACC-Optionalpic.png"
+      alt="CACC Operational Reports Tracking System"
+      width="605"
+      height="28"
+    />
+    <h3>454 - MIS CACC</h3>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <button mat-raised-button color="primary" routerLink="/" class="navbar">
+      Return to Start Page
+    </button>
+    <button mat-raised-button color="warn" routerLink="/logout" class="navbar">
+      Logout
+    </button>
+  </div>
+
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>CACC Operational Report Query</h1>
+  </div>
+
+  <!-- Query Form -->
+  <div class="container">
+    <div class="query-form">
+      <form
+        id="Query"
+        method="post"
+        action="Search.ASP?WCI=tplSearchQuery&WCE=Submit&WCU="
+        target="_top"
+      >
+        <div class="grid-container">
+          <div class="grid-item">
+            <label>Date Created</label>
+            <div class="inline-checkbox">
+              <input type="checkbox" (click)="EnableDate('objDate')" />
+              <span>All Date</span>
+            </div>
+            <input type="date" id="objDateFrom" name="objDateFrom" />
+            <input type="date" id="objDateTo" name="objDateTo" />
+          </div>
+
+          <div class="grid-item">
+            <label>Date Due</label>
+            <div class="inline-checkbox">
+              <input type="checkbox" (click)="EnableDate('objDateDue')" />
+              <span>All Date</span>
+            </div>
+            <input type="date" id="objDateDueFrom" name="objDateDueFrom" />
+            <input type="date" id="objDateDueTo" name="objDateDueTo" />
+          </div>
+
+          <!-- COR# & Incident (Call) # -->
+          <div class="grid-item">
+            <label>COR #</label>
+            <input type="text" name="txtCorNum" maxlength="7" />
+          </div>
+
+          <div class="grid-item">
+            <label>Incident (Call) #</label>
+            <input type="text" name="txtIncidentNum" maxlength="16" />
+          </div>
+
+          <!-- Creator & Type -->
+          <div class="grid-item">
+            <label>Creator</label>
+            <select name="drpCreator" multiple>
+              <option value="0">(All)</option>
+              <option value="00001">GLEN MILLER - SUP</option>
+              <option value="00101">MATT DRENTERS - SUP</option>
+            </select>
+          </div>
+
+          <div class="grid-item">
+            <label>Type</label>
+            <select name="drpType" multiple>
+              <option value="0">(All)</option>
+              <option value="1">Incident</option>
+              <option value="2">ALS/VSA</option>
+              <option value="3">Complaint/Inquiry</option>
+              <option value="4">CACC Equipment Failure</option>
+              <option value="5">
+                Fleet Equipment Failure & Vehicle Breakdown
+              </option>
+            </select>
+          </div>
+
+          <!-- Status & Routed To -->
+          <div class="grid-item">
+            <label>Status</label>
+            <select name="drpStatus" multiple>
+              <option value="0">(All)</option>
+              <option value="1">Create</option>
+              <option value="2">Closed</option>
+              <option value="3">In Progress</option>
+            </select>
+          </div>
+
+          <div class="grid-item">
+            <label>Routed To</label>
+            <select name="drpAssign" multiple>
+              <option value="0">(All)</option>
+              <option value="00860">LARRY TITUS - COM</option>
+              <option value="00861">SCOTT MACMILLAN - COM</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Full Text Search & Sort By -->
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Full Text Search</label>
+        <input type="text" name="txtFulltext" placeholder="Enter search text" />
+      </div>
+
+      <div class="filter-item">
+        <label>Sort by:</label>
+        <select name="drpSortation">
+          <option value="CORNumber:DESC">COR #</option>
+          <option value="CreateDate:DESC">Date Created</option>
+          <option value="Type:ASC">Type of COR</option>
+          <option value="CADIncidentNum:ASC">Incident (Call) #</option>
+          <option value="Createdby:ASC">Creator</option>
+          <option value="AssignedTo:ASC">Routed To</option>
+          <option value="DueDate:ASC">Date Due</option>
+          <option value="Status:ASC">Status</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit">
+        Search for CORs
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div class="results">
+    <h1>Search Results</h1>
+    <p>No results found. Try again using different search parameters.</p>
+    <div class="pagination">
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="true"
+        (click)="SetDirection('Prev')"
+      >
+        Prev Page
+      </button>
+      <button
+        mat-raised-button
+        color="accent"
+        [disabled]="true"
+        (click)="SetDirection('Next')"
+      >
+        Next Page
+      </button>
+    </div>
+  </div>
+</div>

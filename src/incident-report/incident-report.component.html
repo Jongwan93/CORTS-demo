@@ -1,0 +1,232 @@
+<title>CORTS - COR Entry (New)</title>
+<meta name="save" content="history">
+
+<link rel="stylesheet" type="text/css" href="../corts.css">
+
+<style>
+.RelCors
+{
+  position: relative ;
+  width: 195px;  
+  behavior:url(#default#savehistory);
+}
+</style>
+
+<!-- license Control -->
+<object classid="clsid:5220cb21-c88d-11cf-b347-00aa00a28331" viewastext>
+ <param name="lpkpath" value="../control/datetime.lpk">
+</object>
+
+<div align="center">
+  <img src="OntarioMOH1.png" alt="Ministry of Health" border="0" width="255" height="101">
+  <img src="ARIS2.gif" alt="ARIS II - Ambulance Response Information System" border="0" width="255" height="101"><br>
+  <img src="CACC-Optionalpic.png" alt="CACC Operational Reports Tracking System" border="0" width="605" height="28">
+  <h3>454 - MIS CACC</h3>
+</div>
+
+<div align="center"><!-- <div> tag at left applies to entire page -->
+
+<h1 align="center">CACC Operational Report Entry</h1>
+<!-- Corts Nav Menu -->
+<div align="center">
+<table border="0" class="navbar">
+  <tr>
+    <td>&nbsp;</td>
+
+    <td class="navbar">
+      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
+         <a title="Your CORTs Start page" class="navbar" href="../CORTS_WC_Login/StartPage.asp">&nbsp;&nbsp;Return to Start Page&nbsp;&nbsp;</a></td>
+      </tr></table></td>  
+      <td>&nbsp;</td>
+
+    <td class="navbar_Search">
+      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
+         <a title="Search for CORs"       class="navbar" href="../CORTS_WC_Search/Search.asp"  >&nbsp;&nbsp;Search&nbsp;&nbsp;</a></td>
+      </tr></table></td> 
+      <td class="navbar_Search">&nbsp;</td>
+
+    <td class="navbar">      
+      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
+        <a title="Logout of CORTs"       class="navbar" href="../CORTS_WC_Login/Default.asp"  >&nbsp;&nbsp;Logout&nbsp;&nbsp;</a></td>
+      </tr></table></td>
+      <td>&nbsp;</td>
+  </tr>
+</table>
+</div>
+<!-- End Menu -->
+<h2 align="center">Incident Report</h2>
+<form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
+<input type="hidden" name="txtAction" id="txtAction">
+<input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
+<input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
+<input type="hidden" name="corkey" id="CORMain_CORMainKey" title="CORMainKey" size="15" maxlength="15" value=""/>
+<input type="hidden" name="cortypekey" id="CORMain_CORType_FK" title="CORType_FK" size="15" maxlength="15" value="1"/>
+<input type="hidden" name="CORMain_LastModifiedBy" id="CORMain_LastModifiedBy" title="LastModifiedBy" size="25" maxlength="25" value="29030"/>
+<input type="hidden" name="CORMain_LastModifiedDate" id="CORMain_LastModifiedDate" title="LastModifiedDate" size="15" maxlength="15" value="01/27/2025 11:27:18"/>
+
+<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
+
+<table border="0" align="center" cellpadding="4" cellspacing="0" width="100%" class="greytable">
+  <tr>
+    <th align="right">Created:</th>
+    <td><span class="bordertext">01/27/2025 11:27:18</span></td>
+    <th align="right">COR #:</th>
+    <td><span class="bordertext2"><span class="cornum">New</span></span></td>
+    <td align="right" class="grborder">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <th align="right">COR Type:</th>
+    <td><span class="bordertext">Incident</span></td>
+    <th align="right">Due Date:</th>
+    <td >
+      01/29/2025
+    </td>
+    <td>&nbsp;</td>
+  </tr> 
+  <tr>
+    <th align="right">Creator:</th>
+    <td><span class="bordertext">29030, CASSONDRA FOERTER<br>Communications Officer</span></td>
+    <th align="right">Status:</th>
+    <td><span class="bordertext2">New</span>
+    </td>
+    <td align="right" class="grborder">  
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <th align="right">Route To:</th>
+    <td>
+      <select name="assignto" id="assignto" style="width:265px; behavior:url(#default#savehistory);" onchange="checkroute()" title="Person or Group that should provide information for the COR next." size="1">
+<option class="person" selected value="29030">29030, CASSONDRA FOERTER - COM</option>
+<option class="group" value="Supervisor">Supervisor Group</option></select>
+    </td>
+    <th class="tlborder">Related CORs:</th>
+    <td class="tborder">
+       <input name="newRelatedCOR" id="newRelatedCOR" size="26" class="RelCors" title="Enter COR# to be related">
+    </td>
+    <td align="right" class="trborder">
+      <input type="button" class="stdbtn" value="Add Related COR" name="AddRelCor" id="AddRelCor" OnClick="AddRelatedCOR()" title="Add the COR# entered to the left to the list of related CORs below">
+    </td>
+  </tr>
+  <tr>
+    <th align="right" valign="top">Incident (Call) #:</th>
+    <td valign="top">
+      <input style="behavior:url(#default#savehistory);" onkeyup="VisiCadButton(viewCad)" name="CORMain_CADIncidentNum" id="CORMain_CADIncidentNum" title="The corresponding Incident Number from the CAD system." size="16" maxlength="16" type="text" value=""/>
+      <input type="button" style="visibility:visible" value="View in VisiCAD" name="viewCad" id="viewCad" onclick="ViewIncident()" title="View the Incident # in the VisiCAD system" DISABLED>
+    </td>
+    <th align="right" valign="top" class="blborder">&nbsp;</th>
+    <td class="bborder">
+      <select multiple size="3" class="RelCors" DISABLED id="relatedCOR" name="relatedCOR" ondblclick="OpenRelatedCor()">
+         
+      </select>
+    </td>
+    <td valign="bottom" align="right" class="brborder">
+      <input type="button" class="stdbtn" value="Remove Related COR" name="RemRelCor" id="RemRelCor" OnClick="RemRelatedCOR()" title="Remove the highlighted COR# from the list of related CORs to the left">
+    </td>
+  </tr>
+</table>
+</td></tr></table>
+
+<!-- The variable section of each report -->
+<!-- Incident -->
+<div id="IncludeName" name="ICD"></div>
+<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
+
+<table border="0" cellpadding="2" align="center" class="greytable" width="100%">
+  <tr><td>
+    <h3 align="center">Incident Report</h3>
+  </td></tr>  
+</table>
+<table border="0" cellpadding="2" class="greytable" style="table-layout:fixed" align="left">
+  <colgroup>
+    <col style="width:140px" valign="top" align="right">
+    <col style="width:302px">
+    <col style="width:180px" align="right">
+    <col style="width:200px" align="right">
+  </colgroup>
+
+  <tr valign="middle">
+    <th align="right" class="mandatory">Incident Type:</th>
+    <td>
+       <select name="drpIncidentType" id="Incident_IncidentType_FK" title="Select the incident type." size="1">
+<option value="3">Delay in Response</option>
+<option value="2">MCI</option>
+<option value="4">Other</option>
+<option value="1">Unusual Occurance</option></select>
+    </td>
+    <th align="right" class="mandatory">Date/Time of Incident:</th>
+    <td>
+       <object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the incident occured." align="absmiddle" name="Incident_IncidentDate_Date" id="Incident_IncidentDate_Date">
+    <param name="CurrentDate" value="45684.0000000000000"/>
+    <param name="CustomFormat" value="MM/dd/yyyy"/>
+    <param name="Format" value="3"/>
+</object>
+<object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the incident occured." align="absmiddle" name="Incident_IncidentDate_Time" id="Incident_IncidentDate_Time">    <param name="CurrentDate" value="0"/>
+    <param name="CustomFormat" value="HH:mm:ss"/>
+    <param name="Format" value="3"/>
+    <param name="UpDown" value="-1"/>
+</object>
+     </td>
+  </tr>
+  <tr>
+    <th align="right" class="mandatory" valign="top">Incident Details<br>or Other Info:</th>
+    <td colspan="3">
+      <span style="width:682px">
+        <textarea cols="110" rows="5" name="Incident_IncidentDescription" id="Incident_IncidentDescription" title="Incident Details or Other Info."></textarea>
+      </span> 
+    </td>
+  </tr>
+</table>
+
+</td></tr></table>
+
+
+<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
+
+<table border="0" align="center" cellpadding="2" width="100%" class="greytable">
+  <tr>
+    <td>
+      <h1 align="left" class="greytable">Narrative</h1>
+    </td>
+  </tr>
+</table>
+<table border="0" align="center" cellpadding="2" width="100%" class="greytable"> 
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>User</th>
+      <th>Comments</th>
+    </tr> 
+  </thead>
+  <tbody>
+    <tr class="results" valign="top"><td nowrap >&nbsp;</td><td >&nbsp;</td><td  title="">&nbsp;</td><td >&nbsp;</td></tr>
+    
+  </tbody>        
+</table>
+<table border="0" align="center" cellpadding="2" width="100%" class="greytable"> 
+  <tr> 
+    <td rowspan="3">  
+      <textarea rows="5"  style="margin-left:15px; behavior:url(#default#savehistory);" cols="85" name="Narrative_NarrativeText" id="Narrative_NarrativeText"></textarea>
+    </td>
+    <td align="right" valign="top" class="grborder">
+      <input type="button" value="Reload Page" name="resbutton" id="resbutton" class="stdbtn" onclick="reload()">
+    </td>  
+  </tr>
+  <tr>
+    <td align="right" valign="middle" class="grborder">
+      <input type="button" value="Save Changes" name="save" id="save" class="stdbtn" onclick="setAction('Save')">
+    </td>  
+  </tr>
+  <tr>
+    <td align="right" valign="bottom" class="grborder">
+      <input type="button" value="Save Changes and Exit" name="saveexit" id="saveexit" class="stdbtn" onclick="setAction('Save_Exit')">
+    </td>  
+  </tr>
+</table>  
+</td></tr></table>
+</form>
+
+</div>
