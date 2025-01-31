@@ -1,134 +1,21 @@
-body {
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
-  margin: 0;
-  padding: 0;
+button, input[type="submit"]{
+  width: 10em;
+  background-color: #c3dee9;
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-  background-color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.nav button {
-  padding: 10px 15px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 5px;
+button:hover, input[type="submit"]:hover {
+  background-color: #809299;
   cursor: pointer;
 }
 
-.nav button:hover {
-  background-color: #0056b3;
-}
-
-h1, h2, h3 {
-  font-weight: bold;
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-h1 {
-  font-size: 18pt;
-}
-
-h2 {
-  font-size: 16pt;
-}
-
-h3 {
-  font-size: 14pt;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.form-container{
+  gap:0;
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
-  max-width: 600px;
-  margin: auto;
-  align-items: center;
+  grid-template-columns: auto 1fr;
 }
 
-.grid-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-input, select, textarea {
-  font-size: 12px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 100%;
-}
-
-textarea {
-  resize: vertical;
-}
-
-button, input[type="submit"] {
-  padding: 10px 15px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-}
-
-button.primary {
-  background-color: #007bff;
-  color: white;
-}
-
-button.warn {
-  background-color: #dc3545;
-  color: white;
-}
-
-button:hover {
-  opacity: 0.8;
-}
-
-.navbar {
-  font-size: 12pt;
-  font-weight: bold;
-  color: black;
-  background-color: white;
-}
-
-a.navbar {
-  color: darkblue;
-  background-color: lemonchiffon;
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-}
-
-a.navbar:hover {
-  color: yellow;
-  background-color: blue;
+.grid-item label {
+  white-space: nowrap;
 }

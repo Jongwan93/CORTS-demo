@@ -1,54 +1,63 @@
-<div class="header">
-  <img src="/OntarioMOH1.png" alt="Ontario Logo" width="255" height="101" />
-  <img src="/ARIS2.gif" alt="AIRS2 Logo" width="255" height="101" />
-  <br />
-  <img src="/CACC-Optionalpic.png" alt="titlepic" width="605" height="25" />
-  <p>977 Ontario CACC</p> 
-  <h2>Start Page</h2>
-</div>
+<div class="container">
+  <header align="center">
+    <div name="title">
+      <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
+      <h3>454 - MIS CACC</h3>
+    </div>
+    <div name="nav">
+      <!--Main page has no nav buttons-->
+    </div>
+    <hr>
+    <h2>Start Page</h2>
+  </header>
 
-<div class="form-container">
-  <div class="grid-container">
-    <div class="grid-item">
-      <label for="create-new">Create a New</label>
-      <select id="create-new">
-        <option value="2">ALS/VSA</option>
-        <option value="4">CACC Equipment Failure</option>
-        <option value="3">Complaint/Inquiry</option>
-        <option value="5">Fleet Equipment Failure & Vehicle Breakdown</option>
-        <option value="1">Incident</option>
-      </select>
-      COR
-    </div>
-    <div class="grid-item">
-      <input type="radio" value="NewCOR" checked name="R1">
+  <div class="form-container">
+    <div class="grid-container">
+      <!-- Create a new COR: -->
+      <div class="grid-item">
+        <input type="radio" value="NewCOR" checked name="R1">
+      </div>
+      <div class="grid-item">
+        <label for="create-new">Create a New COR:</label>
+        <select id="create-new">
+          <option value="2">ALS/VSA</option>
+          <option value="4">CACC Equipment Failure</option>
+          <option value="3">Complaint/Inquiry</option>
+          <option value="5">Fleet Equipment Failure & Vehicle Breakdown</option>
+          <option value="1">Incident</option>
+        </select>
+      </div>
+
+      <!--Find an existing COR-->
+      <div class="grid-item">
+        <input type="radio" id="find-cor" value="FindCOR" name="R1">
+      </div>
+      <div class="grid-item">
+        <label for="find-cor">Find an Existing COR</label>
+      </div>
+
+      <!--Logout-->
+      <div class="grid-item">
+        <input type="radio" value="Logout" name="R1">
+      </div>
+      <div class="grid-item">
+        <label>Logout of CORTS</label>
+      </div>
     </div>
 
-    <div class="grid-item">
-      <label>Find an Existing COR</label>
-    </div>
-    <div class="grid-item">
-      <input type="radio" value="FindCOR" name="R1">
-    </div>
-
-    <div class="grid-item">
-      <label>Logout of CORTS</label>
-    </div>
-    <div class="grid-item">
-      <input type="radio" value="Logout" name="R1">
-    </div>
-
-    <div class="grid-item full-width">
+    <!--Proceed Button-->
+    <div class="grid-container">
       <input type="submit" value="Proceed" class="subbtn" (click)="onProceed()">
     </div>
   </div>
+
+  <footer>
+    <hr />
+      <p>
+        Hello <b>77044, Jim Grape</b>, you currently have
+        <b><a [routerLink]="'/query'">1 COR routed to you.</a></b>
+      </p>
+
+      <hr />
+  </footer>
 </div>
-
-<hr />
-
-<p>
-  Hello <b>77044, Jim Grape</b>, you currently have
-  <b><a [routerLink]="'/query'">1 COR routed to you.</a></b> 
-</p>
-
-<hr />
