@@ -14,8 +14,10 @@ button:hover, input[type="submit"]:hover {
 
 .grid-container {
   grid-template-columns: auto 1fr;
+  max-width: 600px;
 }
 
 .grid-item label {
+  font-weight: normal;
   white-space: nowrap;
 }
