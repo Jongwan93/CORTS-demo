@@ -8,9 +8,13 @@ html, body {
   font-size: 1em;
 }
 
+h2{
+  text-align: center;
+}
+
 button, input[type="submit"]{
   text-align: center;
-  min-width: 10em;
+  min-width: 12em;
   background-color: #c3dee9;
   padding: 0.7em;
   margin: 0.7em;
@@ -33,9 +37,10 @@ button:disabled{
   max-width: 1200px;
   margin: 2em;
   padding: 0.5em;
-  background-color: rgb(255, 255, 255);
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0em 0.4em 0.6em rgba(0, 0, 0, 0.1);
+  border-radius: 1em;
+  overflow: hidden;
 }
 
 .form-container {
