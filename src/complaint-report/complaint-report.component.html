@@ -1,0 +1,133 @@
+<div class="header">
+  <img src="OntarioMOH1.png" alt="Ministry of Health" width="255" height="101" />
+  <img src="ARIS2.gif" alt="Ambulance Response Information System" width="255" height="101" />
+  <h3>454 - MIS CACC</h3>
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button routerLink="/" class="nav-btn">Return to Start Page</button>
+  <button routerLink="/search" class="nav-btn">Search</button>
+  <button routerLink="/logout" class="nav-btn">Logout</button>
+</div>
+
+<div class="main-title">
+  <h1>CACC Operational Report Entry</h1>
+  <h2>Complaint/Inquiry Report</h2>
+</div>
+
+<div class="container">
+  <h3 class="section-title">Basic Information</h3>
+
+  <form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
+    <div class="grid-container">
+
+      <div class="grid-item">
+        <label for="created">Created</label>
+        <input type="text" id="created" value="02/03/2025 13:07:32" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="cor-number">COR #</label>
+        <input type="text" id="cor-number" value="New" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="due-date">Due Date</label>
+        <input type="text" id="due-date" value="02/05/2025" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="status">Status</label>
+        <input type="text" id="status" value="New" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="cor-type">COR Type</label>
+        <input type="text" id="cor-type" value="Complaint/Inquiry" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="creator">Creator</label>
+        <input type="text" id="creator" value="29030, CASSONDRA FOERTER - COM" readonly />
+      </div>
+
+      <div class="grid-item">
+        <label for="route-to">Route To</label>
+        <select id="route-to">
+          <option value="29030" selected>29030, CASSONDRA FOERTER - COM</option>
+          <option value="Supervisor">Supervisor Group</option>
+        </select>
+      </div>
+
+      <div class="grid-item">
+        <label for="incident-number">Incident (Call) #</label>
+        <input type="text" id="incident-number" />
+        <button class="view-button">View in VisiCAD</button>
+      </div>
+
+      <div class="grid-item">
+        <label for="related-cors">Related CORs</label>
+        <input type="text" id="related-cors-input" />
+        <textarea rows="5" id="related-cors"></textarea>
+        <button type="button" class="btn.Add">Add Related COR</button>
+        <button type="button" class="btn.Remove">Remove Related COR</button>
+      </div>
+    </div>
+
+    <h3 class="section-title">Complaint Details</h3>
+
+    <div class="grid-container">
+      <div class="grid-item">
+        <label for="complaint-type">Complaint/Inquiry Type</label>
+        <select name="complaintType" id="complaint-type">
+          <option value="6">Conduct</option>
+          <option value="2">Damage to Property</option>
+          <option value="1">Delay</option>
+          <option value="3">General Inquiry</option>
+          <option value="4">Lost Property</option>
+          <option value="5">Media Inquiry</option>
+          <option value="7">Other</option>
+        </select>
+      </div>
+
+      <div class="grid-item">
+        <label for="complaint-date">Date/Time of Complaint</label>
+        <input type="datetime-local" id="complaint-date" name="complaint-date" />
+      </div>
+    </div>
+
+    <h3 class="section-title">Contact Information</h3>
+
+    <div class="grid-container">
+      <div class="grid-item">
+        <label for="last-name">Last Name</label>
+        <input type="text" id="last-name" />
+      </div>
+
+      <div class="grid-item">
+        <label for="first-name">First Name</label>
+        <input type="text" id="first-name" />
+      </div>
+
+      <div class="grid-item">
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" />
+      </div>
+    </div>
+
+    <h3 class="section-title">Narrative</h3>
+
+    <div class="grid-container">
+      <div class="grid-item">
+        <textarea id="narrative" rows="5"></textarea>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button type="button" onclick="reload()">Reload Page</button>
+      <button type="submit">Save Changes</button>
+      <button type="submit" onclick="setAction('Save_Exit')">Save and Exit</button>
+    </div>
+  </form>
+</div>
