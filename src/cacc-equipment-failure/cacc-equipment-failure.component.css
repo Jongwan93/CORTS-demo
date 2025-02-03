@@ -1,282 +1,138 @@
-body
-{
-  font-size: 10pt;
-  font-family: arial,sans serif;
-  background-color: white;
-  color: black
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f9f9f9;
 }
 
-textarea
-{
-  font-size: 10pt;
-  font-family: arial,sans serif;
-  background-color: white;
-  color: black;
-  behavior:url(#default#savehistory);
+.header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-input
-{
-  behavior:url(#default#savehistory);
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-select
-{
-  behavior:url(#default#savehistory);
+.main-title {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-div 
-{
-  margin : 0px;
+.card {
+  padding: 20px;
+  margin: 10px 0;
+  max-width: 1200px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-h1
-{
-  font-size: 16pt;
-  font-weight: bold
-  margin-top: 3px;
-  margin-bottom: 3px;
+textarea, input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
 }
 
-h2
-{
-  font-size: 15pt;
-  font-weight: bold
-  margin-top: 4px;
-  margin-top: 4px;
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 30px;
+  padding: 16px;
 }
 
-h3
-{
-  font-size: 13pt;
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grid-item label {
   font-weight: bold;
-  margin-top: 0px;
-  margin-bottom: 2px;
 }
 
-.greyTextbox
-{
-  background-color:lightgrey;
-  color:gray;
+input, select, textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 12px; 
 }
 
-.greytable 
-{ 
-  background-color:lightgrey 
+button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  width: 275px;
 }
 
-.bordertable 
-{ 
-  background-color:lightgrey 
+.button-group {
+  display: flex;
+  justify-content: left;
+  gap: 20px;
+  margin-top: 10px;
+  margin-left: 17px;
 }
 
-tr.results 
-{ 
-  background-color:white;
-  font-family: arial,sans serif;
-  font-size: 8pt
-}  
-
-td
-{
-  font-size: 10pt
+.navBtn {
+  text-align: center;
+  background-color: #c3dee9;
+  padding: 0.7rem;
+  margin: 0.7rem;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+.navBtn:hover {
+  background-color: #92a6ad;
+  cursor: pointer;
 }
 
-td.system 
-{ 
-  color:darkblue 
+
+.small-btn {
+  width: 100%;
+  margin-top: 5px;
 }
 
-td.pastdue 
-{ 
-  color:red;
-  background-color:gold
+.btn.Add {
+  background-color: #007bff;
+  color: white;
 }
 
-th
-{
-  font-size: 10pt;
+.btn.Remove {
+  background-color: #dc3545;
+  color: white;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.checkbox-container label {
+  display: flex;
+  align-items: center;
   font-weight: bold;
-  color : black
+  gap: 8px;
 }
 
-th.mandatory
-{
-  font-size: 10pt
-  font-weight: bold;
-  color : darkred
-}
-
-
-
-.bordertext 
-{ 
- padding: 5px;
- width: 265px;
- border: 1px solid DimGray
-}
-.bordertext2 
-{ 
- padding: 5px;
- width: 195px;
- border: 1px solid DimGray
-}
-
-.lborder
-{
-  border-collapse : collapse; 
-  border-left : 2px solid black;
-}
-
-.tborder
-{
-  border-collapse : collapse; 
-  border-top : 2px solid black;
-}
-
-.tlborder
-{
-  border-collapse : collapse; 
-  border-top : 2px solid black;
-  border-left : 2px solid black;
-}
-
-.trborder
-{
-  border-collapse : collapse; 
-  border-top : 2px solid black;
-  border-right : 2px solid black;
-}
-
-.rborder
-{
-  border-collapse : collapse; 
-  border-right : 2px solid black;
-}
-
-.grborder
-{
-  border-collapse : collapse; 
-  border-right : 2px solid lightgrey ;
-}
-
-.bborder
-{
-  border-collapse : collapse; 
-  border-bottom : 2px solid black;
-}
-
-.brborder
-{
-  border-collapse : collapse; 
-  border-bottom : 2px solid black;
-  border-right : 2px solid black;
-}
-
-.blborder
-{
-  border-collapse : collapse; 
-  border-bottom : 2px solid black;
-  border-left : 2px solid black;
-}
-
-
-
-.calendar
-{
-  font-size: 9pt;
-  behavior:url(#default#savehistory);
-}
-
-.userDisplayTitle
-{
-  color : darkred;
-  font-size: 10pt
-}
-
-.cornum
-{
-  color : darkblue;
-  font-weight: bold;
-  font-size: 11pt
-}
-
-
-
-input.subbtn
-{
-  padding-left: 5px;
-}
-
-input.stdbtn
-{
-  width : 200px
-}
-
-
-option.group 
-{ 
-  color:darkblue; 
-  background-color:lemonchiffon;
-  font-weight:bold
-}
-
-option.person 
-{
-  color:black 
-}
-
-option.avoidperson 
-{
-  color:darkred 
-}
-
-option.avoidgroup 
-{
-  color:darkred; 
-  background-color:lemonchiffon; 
-  font-weight:bold
-}
-
-
-.navbar
-{
-  font-size: 12pt;
-  font-weight: bold;
-  color : black;
-  background-color : white
-}
-
-.navbar_Search
-{
-  font-size: 12pt;
-  font-weight: bold;
-  color : black;
-  background-color : white
-}
-a:link.navbar 
-{
-  color : darkblue;
-  background-color : lemonChiffon;
-  text-decoration: none
-}
- 
-a.navbar:visited
-{
-  color : darkblue;
-  background-color : lemonChiffon;
-  text-decoration: none
-}
-
-a.navbar:hover 
-{
-  color : yellow;
-  background-color : blue;
-  text-decoration: none
-}
-
-.navbarborder
-{
-  border-collapse : collapse; 
-  border : 2px solid black
+.checkbox-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
