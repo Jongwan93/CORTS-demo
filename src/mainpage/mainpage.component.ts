@@ -6,7 +6,7 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './mainpage.component.html',
   styleUrl: './mainpage.component.css',
   standalone: true,
-  imports: [RouterModule]  // Import RouterModule to use router directives in the template
+  imports: [RouterModule]
 })
 export class MainpageComponent {
   constructor(private router: Router) {}
@@ -22,6 +22,8 @@ export class MainpageComponent {
       this.router.navigate(['/complaint-report'])
     }else if (selectedValue === '4') {
       this.router.navigate(['/cacc-equipment-failure'])
+    } else if (selectedValue === '5') {
+      this.router.navigate(['/fleet-equipment-report'])
     } else {
       alert('Please select the correct option to proceed.');
     }

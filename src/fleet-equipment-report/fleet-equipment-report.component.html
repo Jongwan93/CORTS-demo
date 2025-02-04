@@ -1,0 +1,127 @@
+<div class="container">
+    <!--Header-->
+    <header align="center">
+      <div name="title">
+        <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
+        <h3>454 - MIS CACC</h3>
+      </div>
+      <div name="nav">
+        <button class = "navBtn" routerLink="/mainpage">Start Page</button>
+        <button class = "navBtn" routerLink="/query">Search</button>
+        <button class = "navBtn" routerLink="/logout">Logout</button>
+      </div>
+    </header>
+  </div>
+
+<div class="container">
+    <h2>Fleet Equipment Failure & Vehicle Breakdown Report</h2>
+    <form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
+
+        <input type="hidden" name="txtAction" id="txtAction">
+        <input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
+        <input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
+
+        <h3 class="section-title">Basic Information</h3>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <label>Created:</label>
+                <input type="text" value="02/04/2025 13:24:31" readonly>
+            </div>
+            <div class="grid-item">
+                <label>COR #:</label>
+                <input type="text" value="New" readonly>
+            </div>
+            <div class="grid-item">
+                <label>Due Date:</label>
+                <input type="text" value="02/06/2025" readonly>
+            </div>
+            <div class="grid-item">
+                <label>Status:</label>
+                <input type="text" value="New" readonly>
+            </div>
+            <div class="grid-item">
+                <label>COR Type:</label>
+                <input type="text" value="Fleet Equipment Failure & Vehicle Breakdown" readonly>
+            </div>
+            <div class="grid-item">
+                <label>Creator:</label>
+                <input type="text" value="29030, CASSONDRA FOERTER - COM" readonly>
+            </div>
+            <div class="grid-item">
+                <label>Route To:</label>
+                <select name="assignto" id="assignto">
+                    <option selected value="29030">29030, CASSONDRA FOERTER - COM</option>
+                    <option value="Supervisor">Supervisor Group</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <label>Incident (Call) #:</label>
+                <input type="text">
+            </div>
+            <div class="grid-item full-width">
+                <button class="view-button">View in VisiCAD</button>
+            </div>
+        </div>
+
+        <h3 class="section-title">Breakdown Details</h3>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <label>Breakdown Type:</label>
+                <select id="VehicleFailure_BreakDownType_FK">
+                    <option value="2">Accident</option>
+                    <option value="1">Equipment Failure</option>
+                    <option value="3">Mechanical Failure</option>
+                    <option value="4">Other</option>
+                </select>
+            </div>
+            <div class="grid-item">
+                <label>Description:</label>
+                <textarea id="VehicleFailure_TypeDescription"></textarea>
+            </div>
+            <div class="grid-item">
+                <label>Date/Time of Failure:</label>
+                <input type="datetime-local" id="VehicleFailure_FailureDate_Date">
+            </div>
+            <div class="grid-item">
+                <label>Service/Station:</label>
+                <input type="text" id="VehicleFailure_ServiceInfo">
+            </div>
+            <div class="grid-item">
+                <label>Unit ID:</label>
+                <input type="text" id="VehicleFailure_VehicleNum">
+            </div>
+            <div class="grid-item">
+                <label>Response Delay:</label>
+                <input type="checkbox" id="VehicleFailure_ResponseDelay">
+            </div>
+            <div class="grid-item">
+                <label>Patient on Board:</label>
+                <input type="checkbox" id="VehicleFailure_PatientOnBoard">
+            </div>
+        </div>
+
+        <h3 class="section-title">Failure Breakdown Details</h3>
+
+        <div class="grid-container">
+            <div class="grid-item full-width">
+                <textarea id="VehicleFailure_Description" rows="5"></textarea>
+            </div>
+        </div>
+
+        <h3 class="section-title">Narrative</h3>
+
+        <div class="grid-container">
+            <div class="grid-item full-width">
+                <textarea id="Narrative_NarrativeText" rows="5"></textarea>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button type="button" onclick="reload()">Reload Page</button>
+            <button type="submit">Save Changes</button>
+            <button type="submit" onclick="setAction('Save_Exit')">Save and Exit</button>
+        </div>
+    </form>
+</div>
