@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-incident-report',
   standalone: true,
-  imports: [FormsModule],  // Import FormsModule to use [(ngModel)]
+  imports: [FormsModule, RouterModule],  // Import FormsModule to use [(ngModel)]
   templateUrl: './incident-report.component.html',
   styleUrl: './incident-report.component.css'
 })

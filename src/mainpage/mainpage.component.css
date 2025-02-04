@@ -1,3 +1,20 @@
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-container {
+  align-items: center;
+  margin: auto;
+  gap: 0.5em;
+  padding: 0.5em;
+  grid-template-columns: auto 1fr;
+}
+
+.grid-item {
+  flex-direction: unset;
+}
+
 button, input[type="submit"]{
   width: 10em;
   background-color: #c3dee9;
@@ -10,11 +27,6 @@ button:hover, input[type="submit"]:hover {
 
 .form-container{
   gap:0;
-}
-
-.grid-container {
-  grid-template-columns: auto 1fr;
-  max-width: 600px;
 }
 
 .grid-item label {

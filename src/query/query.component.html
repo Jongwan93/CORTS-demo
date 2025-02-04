@@ -174,9 +174,17 @@
       </tbody>
     </table>
     <div class="pagination">
-      <button disabled>Prev Page</button>
-      <button disabled>Next Page</button>
+      <button
+        [disabled]="true"
+        (click)="SetDirection('Prev')"
+      >
+        Prev Page
+      </button>
+      <button
+        [disabled]="true"
+        (click)="SetDirection('Next')"
+      >
+        Next Page
+      </button>
     </div>
-  </div>
 </div>
-
