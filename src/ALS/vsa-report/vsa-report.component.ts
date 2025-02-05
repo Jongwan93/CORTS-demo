@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-vsa-report',
@@ -10,6 +11,10 @@ import { RouterModule } from '@angular/router';
   styleUrl: './vsa-report.component.css'
 })
 export class vsaReportComponent {
+  constructor(private titleService:Title) {
+    this.titleService.setTitle("CORTS - COR Entry (New)");
+  }
+
   vsaData = {
     vsaType: '',
     vsaDate: '',

@@ -8,12 +8,12 @@ import { ComplaintReportComponent } from '../complaint-report/complaint-report.c
 import { FleetEquipmentReportComponent } from '../fleet-equipment-report/fleet-equipment-report.component';
 
 export const routes: Routes = [
-  { path: '', component: MainpageComponent },
-  { path: 'query', component: QueryComponent },
-  { path: 'incident-report', component: IncidentReportComponent },
-  { path: 'vsa-report', component: vsaReportComponent },
-  { path: 'cacc-equipment-failure', component: caccEquipmentFailureComponent },
-  { path: 'complaint-report', component: ComplaintReportComponent },
-  { path: 'fleet-equipment-report', component: FleetEquipmentReportComponent },
+  { path: '', component: MainpageComponent, data: {title: 'CORTS - Start Page'} },
+  { path: 'query', component: QueryComponent, data: {title: 'CORTS - Query'} },
+  { path: 'incident-report', component: IncidentReportComponent, data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'vsa-report', component: vsaReportComponent, data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'cacc-equipment-failure', component: caccEquipmentFailureComponent, data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'complaint-report', component: ComplaintReportComponent, data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'fleet-equipment-report', component: FleetEquipmentReportComponent, data: {title: 'CORTS - COR entry (new)'} },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
