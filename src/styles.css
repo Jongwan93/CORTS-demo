@@ -2,9 +2,9 @@
 
 html, body {
   height: 100%;
-  margin: 2em;
-  background-color: #c5dcee;
-  font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  margin: 1em;
+  background-color: #CFEDED;
+  font-family: "Raleway";
   font-size: 1em;
 }
 
@@ -19,7 +19,7 @@ h4{
 button, input[type="submit"]{
   text-align: center;
   min-width: 12em;
-  background-color: #c3e4ff;
+  background-color: #DBE9F5;
   padding: 0.7em;
   margin: 0.7em;
   border-radius: 5px;
@@ -28,7 +28,7 @@ button, input[type="submit"]{
 }
 
 button:hover, input[type="submit"]:hover {
-  background-color: #809299;
+  background-color: #00B2E3;
   cursor: pointer;
 }
 
@@ -41,7 +41,7 @@ button:disabled{
   margin: 2em;
   padding: 1.5em;
   background-color: #ffffff;
-  box-shadow: 0em 0.4em 0.6em rgba(0, 0, 0, 0.1);
+  box-shadow: 0em 0.4em 0.6em #0000001a;
   border-radius: 1em;
   overflow: hidden;
 }
@@ -63,7 +63,6 @@ button:disabled{
 }
 
 .grid-item label {
-  font-size: 1.1em;
   font-weight: bold;
 }
 
@@ -87,12 +86,22 @@ textarea {
 }
 
 button.primary {
-  background-color: #1970ce;
+  background-color: #047BC1;
+  color: white;
+}
+
+button.primary:hover {
+  background-color: #054B72;
   color: white;
 }
 
 button.warn {
-  background-color: #da2e3f;
+  background-color: #ED1C24;
+  color: white;
+}
+
+button.warn:hover {
+  background-color: #990000;
   color: white;
 }
 

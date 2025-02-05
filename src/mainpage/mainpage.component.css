@@ -1,6 +1,7 @@
 .form-container {
   display: flex;
   flex-direction: column;
+  gap:0;
 }
 
 .grid-container {
@@ -13,20 +14,6 @@
 
 .grid-item {
   flex-direction: unset;
-}
-
-button, input[type="submit"]{
-  width: 10em;
-  background-color: #c3dee9;
-}
-
-button:hover, input[type="submit"]:hover {
-  background-color: #809299;
-  cursor: pointer;
-}
-
-.form-container{
-  gap:0;
 }
 
 .grid-item label {
