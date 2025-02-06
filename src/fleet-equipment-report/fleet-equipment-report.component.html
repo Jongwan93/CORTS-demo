@@ -13,15 +13,16 @@
     </header>
   </div>
 
-<div class="container">
+<form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
+  <div class="container">
     <h2>Fleet Equipment Failure & Vehicle Breakdown Report</h2>
-    <form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
 
         <input type="hidden" name="txtAction" id="txtAction">
         <input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
         <input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
 
-        <h3 class="section-title">Basic Information</h3>
+        <h3 class="section-title">Basic Information:</h3>
+        <hr>
 
         <div class="grid-container">
             <div class="grid-item">
@@ -63,65 +64,94 @@
                 <button class="view-button">View in VisiCAD</button>
             </div>
         </div>
+      </div>
 
-        <h3 class="section-title">Breakdown Details</h3>
+  <div class="container">
+    <h3 class="section-title">Breakdown Details:</h3>
+    <hr>
 
-        <div class="grid-container">
-            <div class="grid-item">
-                <label>Breakdown Type:</label>
-                <select id="VehicleFailure_BreakDownType_FK">
-                    <option value="2">Accident</option>
-                    <option value="1">Equipment Failure</option>
-                    <option value="3">Mechanical Failure</option>
-                    <option value="4">Other</option>
-                </select>
-            </div>
-            <div class="grid-item">
-                <label>Description:</label>
-                <textarea id="VehicleFailure_TypeDescription"></textarea>
-            </div>
-            <div class="grid-item">
-                <label>Date/Time of Failure:</label>
-                <input type="datetime-local" id="VehicleFailure_FailureDate_Date">
-            </div>
-            <div class="grid-item">
-                <label>Service/Station:</label>
-                <input type="text" id="VehicleFailure_ServiceInfo">
-            </div>
-            <div class="grid-item">
-                <label>Unit ID:</label>
-                <input type="text" id="VehicleFailure_VehicleNum">
-            </div>
-            <div class="grid-item">
-                <label>Response Delay:</label>
-                <input type="checkbox" id="VehicleFailure_ResponseDelay">
-            </div>
-            <div class="grid-item">
-                <label>Patient on Board:</label>
-                <input type="checkbox" id="VehicleFailure_PatientOnBoard">
-            </div>
+    <div class="grid-container">
+        <div class="grid-item">
+            <label>Breakdown Type:</label>
+            <select id="VehicleFailure_BreakDownType_FK">
+                <option value="2">Accident</option>
+                <option value="1">Equipment Failure</option>
+                <option value="3">Mechanical Failure</option>
+                <option value="4">Other</option>
+            </select>
         </div>
-
-        <h3 class="section-title">Failure Breakdown Details</h3>
-
-        <div class="grid-container">
-            <div class="grid-item full-width">
-                <textarea id="VehicleFailure_Description" rows="5"></textarea>
-            </div>
+        <div class="grid-item">
+            <label>Description:</label>
+            <textarea id="VehicleFailure_TypeDescription"></textarea>
         </div>
-
-        <h3 class="section-title">Narrative</h3>
-
-        <div class="grid-container">
-            <div class="grid-item full-width">
-                <textarea id="Narrative_NarrativeText" rows="5"></textarea>
-            </div>
+        <div class="grid-item">
+            <label>Date/Time of Failure:</label>
+            <input type="datetime-local" id="VehicleFailure_FailureDate_Date">
         </div>
-
-        <div class="button-container">
-            <button type="button" onclick="reload()">Reload Page</button>
-            <button type="submit">Save Changes</button>
-            <button type="submit" onclick="setAction('Save_Exit')">Save and Exit</button>
+        <div class="grid-item">
+            <label>Service/Station:</label>
+            <input type="text" id="VehicleFailure_ServiceInfo">
         </div>
-    </form>
-</div>
+        <div class="grid-item">
+            <label>Unit ID:</label>
+            <input type="text" id="VehicleFailure_VehicleNum">
+        </div>
+        <div class="grid-item">
+            <label>Response Delay:</label>
+            <input type="checkbox" id="VehicleFailure_ResponseDelay">
+        </div>
+        <div class="grid-item">
+            <label>Patient on Board:</label>
+            <input type="checkbox" id="VehicleFailure_PatientOnBoard">
+        </div>
+    </div>
+
+    <h3 class="section-title">Failure Breakdown Details:</h3>
+    <hr>
+
+    <div class="grid-container">
+        <div class="grid-item full-width">
+            <textarea id="VehicleFailure_Description" rows="5"></textarea>
+        </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Narrative -->
+    <h3>Narrative:</h3>
+    <hr>
+
+    <!-- Narative Table -->
+    <table width="100%">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>User</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>01/29/2025</td>
+          <td>09:45:41</td>
+          <td>29030</td>
+          <td>New COR Created</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-item">
+      <label>Comments:</label>
+      <textarea rows="5"></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button class="btn primary">Save Changes</button>
+      <button class="btn primary">Save Changes and Exit</button>
+      <button class="btn warn">Reload Page</button>
+    </div>
+  </div>
+</form>
