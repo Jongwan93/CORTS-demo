@@ -1,331 +1,143 @@
-<title>CORTS - COR Entry (New)</title>
-<meta name="save" content="history">
-
-<link rel="stylesheet" type="text/css" href="../corts.css">
-
-<style>
-.RelCors
-{
-  position: relative ;
-  width: 195px;  
-  behavior:url(#default#savehistory);
-}
-</style>
-
-<script language="javascript" type="text/javascript" src="corts.js">
-</script>
-
-<!-- license Control -->
-<object classid="clsid:5220cb21-c88d-11cf-b347-00aa00a28331" viewastext>
- <param name="lpkpath" value="../control/datetime.lpk">
-</object>
-
-<div align="center">
-  <img src="OntarioMOH1.png" alt="Ministry of Health" border="0" width="255" height="101">
-  <img src="ARIS2.gif" alt="ARIS II - Ambulance Response Information System" border="0" width="255" height="101"><br>
-  <img src="CACC-Optionalpic.png" alt="CACC Operational Reports Tracking System" border="0" width="605" height="28">
-  <h3>454 - MIS CACC</h3>
+<div class="container">
+  <header align="center">
+    <div name="title">
+      <h1>
+        CORTS - CACC Operational <br />
+        Reports Tracking System
+      </h1>
+      <h3>454 - MIS CACC</h3>
+    </div>
+    <div name="nav">
+      <button class="navBtn" routerLink="/mainpage">Start Page</button>
+      <button class="navBtn" routerLink="/query">Search</button>
+      <button class="navBtn" routerLink="/logout">Logout</button>
+    </div>
+  </header>
 </div>
 
-<div align="center"><!-- <div> tag at left applies to entire page -->
+<div class="container">
+  <h2>CACC Equipment Failure Report</h2>
+  <hr />
 
-<h1 align="center">CACC Operational Report Entry</h1>
-<!-- Corts Nav Menu -->
-<div align="center">
-<table border="0" class="navbar">
-  <tr>
-    <td>&nbsp;</td>
-
-    <td class="navbar">
-      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
-         <a title="Your CORTs Start page" class="navbar" href="../CORTS_WC_Login/StartPage.asp">&nbsp;&nbsp;Return to Start Page&nbsp;&nbsp;</a></td>
-      </tr></table></td>  
-      <td>&nbsp;</td>
-
-    <td class="navbar_Search">
-      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
-         <a title="Search for CORs"       class="navbar" href="../CORTS_WC_Search/Search.asp"  >&nbsp;&nbsp;Search&nbsp;&nbsp;</a></td>
-      </tr></table></td> 
-      <td class="navbar_Search">&nbsp;</td>
-
-    <td class="navbar">      
-      <table class="navbarborder" border="1" cellspacing="0" cellpadding="2"><tr><td>
-        <a title="Logout of CORTs"       class="navbar" href="../CORTS_WC_Login/Default.asp"  >&nbsp;&nbsp;Logout&nbsp;&nbsp;</a></td>
-      </tr></table></td>
-      <td>&nbsp;</td>
-  </tr>
-</table>
-</div>
-<!-- End Menu -->
-<h2 align="center">CACC Equipment Failure Report</h2>
-<form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
-<input type="hidden" name="txtAction" id="txtAction">
-<input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
-<input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
-<input type="hidden" name="corkey" id="CORMain_CORMainKey" title="CORMainKey" size="15" maxlength="15" value=""/>
-<input type="hidden" name="cortypekey" id="CORMain_CORType_FK" title="CORType_FK" size="15" maxlength="15" value="4"/>
-<input type="hidden" name="CORMain_LastModifiedBy" id="CORMain_LastModifiedBy" title="LastModifiedBy" size="25" maxlength="25" value="29030"/>
-<input type="hidden" name="CORMain_LastModifiedDate" id="CORMain_LastModifiedDate" title="LastModifiedDate" size="15" maxlength="15" value="01/27/2025 13:19:34"/>
-
-<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
-
-<table border="0" align="center" cellpadding="4" cellspacing="0" width="100%" class="greytable">
-  <tr>
-    <th align="right">Created:</th>
-    <td><span class="bordertext">01/27/2025 13:19:34</span></td>
-    <th align="right">COR #:</th>
-    <td><span class="bordertext2"><span class="cornum">New</span></span></td>
-    <td align="right" class="grborder">
-      &nbsp;
-    </td>
-  </tr>
-  <tr>
-    <th align="right">COR Type:</th>
-    <td><span class="bordertext">CACC Equipment Failure</span></td>
-    <th align="right">Due Date:</th>
-    <td >
-      01/29/2025
-    </td>
-    <td>&nbsp;</td>
-  </tr> 
-  <tr>
-    <th align="right">Creator:</th>
-    <td><span class="bordertext">29030, CASSONDRA FOERTER<br>Communications Officer</span></td>
-    <th align="right">Status:</th>
-    <td><span class="bordertext2">New</span>
-    </td>
-    <td align="right" class="grborder">  
-      &nbsp;
-    </td>
-  </tr>
-  <tr>
-    <th align="right">Route To:</th>
-    <td>
-      <select name="assignto" id="assignto" style="width:265px; behavior:url(#default#savehistory);" onchange="checkroute()" title="Person or Group that should provide information for the COR next." size="1">
-<option class="person" selected value="29030">29030, CASSONDRA FOERTER - COM</option>
-<option class="group" value="Supervisor">Supervisor Group</option></select>
-    </td>
-    <th class="tlborder">Related CORs:</th>
-    <td class="tborder">
-       <input name="newRelatedCOR" id="newRelatedCOR" size="26" class="RelCors" title="Enter COR# to be related">
-    </td>
-    <td align="right" class="trborder">
-      <input type="button" class="stdbtn" value="Add Related COR" name="AddRelCor" id="AddRelCor" OnClick="AddRelatedCOR()" title="Add the COR# entered to the left to the list of related CORs below">
-    </td>
-  </tr>
-  <tr>
-    <th align="right" valign="top">Incident (Call) #:</th>
-    <td valign="top">
-      <input style="behavior:url(#default#savehistory);" onkeyup="VisiCadButton(viewCad)" name="CORMain_CADIncidentNum" id="CORMain_CADIncidentNum" title="The corresponding Incident Number from the CAD system." size="16" maxlength="16" type="text" value=""/>
-      <input type="button" style="visibility:visible" value="View in VisiCAD" name="viewCad" id="viewCad" onclick="ViewIncident()" title="View the Incident # in the VisiCAD system" DISABLED>
-    </td>
-    <th align="right" valign="top" class="blborder">&nbsp;</th>
-    <td class="bborder">
-      <select multiple size="3" class="RelCors" DISABLED id="relatedCOR" name="relatedCOR" ondblclick="OpenRelatedCor()">
-         
+  <!-- Basic Information -->
+  <h4>Basic Information:</h4>
+  <div class="grid-container">
+    <div class="grid-item">
+      <label>Created</label>
+      <input type="text" value="01/29/2025 09:45:41" disabled />
+    </div>
+    <div class="grid-item">
+      <label>COR #</label>
+      <input type="text" value="New" disabled />
+    </div>
+    <div class="grid-item">
+      <label>Due Date</label>
+      <input type="text" value="01/31/2025" disabled />
+    </div>
+    <div class="grid-item">
+      <label>Status</label>
+      <input type="text" value="New" disabled />
+    </div>
+    <div class="grid-item">
+      <label>COR Type</label>
+      <input type="text" value="CACC Equipment Failure" disabled />
+    </div>
+    <div class="grid-item">
+      <label>Creator</label>
+      <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
+    </div>
+    <div class="grid-item">
+      <label>Route To</label>
+      <select>
+        <option selected>29030, CASSONDRA FOERTER - COM</option>
+        <option>Supervisor Group</option>
       </select>
-    </td>
-    <td valign="bottom" align="right" class="brborder">
-      <input type="button" class="stdbtn" value="Remove Related COR" name="RemRelCor" id="RemRelCor" OnClick="RemRelatedCOR()" title="Remove the highlighted COR# from the list of related CORs to the left">
-    </td>
-  </tr>
-</table>
-</td></tr></table>
+    </div>
+    <div class="grid-item">
+      <label>Incident (Call) #</label>
+      <input type="text" />
+      <button>View in VisiCAD</button>
+    </div>
+    <div class="grid-item">
+      <label>Related CORs</label>
+      <input type="text" id="related-cors-input" />
+      <textarea rows="5"></textarea>
+      <div class="button-group">
+        <button class="btn primary">Add Related COR</button>
+        <button class="btn warn">Remove Related COR</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- The variable section of each report -->
-<!-- Equipment Failure -->
-<div id="IncludeName" name="EQF"></div>
-<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
+<div class="container">
+  <!-- Incident Report -->
+  <h4>CACC Equipment Failure Report</h4>
+  <hr />
+  <div class="grid-container">
+    <!-- Incident Type -->
+    <div class="grid-item">
+      <label>Equipment Type: </label>
+      <select>
+        <option selected>Admin Vehicles</option>
+        <option>Alarms</option>
+        <option>Comm Unit</option>
+        <option>Dictaphone</option>
+        <option>Facsimile</option>
+        <option>Other</option>
+        <option>Printer</option>
+        <option>Radio</option>
+        <option>Telecom</option>
+        <option>Telephone</option>
+        <option>UPS/Generator</option>
+        <option>Workstation</option>
+      </select>
 
-<table border="0" cellpadding="2" class="greytable" style="table-layout:fixed" align="left">
-  <colgroup>
-    <col style="width:135px" align="right">
-    <col style="width:125px">
-    <col style="width:153px">
-    <col style="width:125px">
-    <col style="width:153px">
-    <col style="width:200px">
-  </colgroup>
+      <label>Location: </label>
+      <select>
+        <option selected>CACC</option>
+        <option>Hospital</option>
+        <option>Other</option>
+        <option>Station</option>
+        <option>Tower</option>
+      </select>
 
-  <tr><td colspan="6">
-    <h3 align="center">CACC Equipment Failure Report</h3>
-  </td></tr>  
-  <tr valign="top">
-    <th align="right" class="mandatory">Equipment Type:</th>
-    <td>      
-       <select name="EquipmentType" style="width:120px" id="EquipmentFailure_EquipmentType_FK" title="Select the type of equipment that failed." size="1">
-<option value="12">Admin Vehicles</option>
-<option value="7">Alarms </option>
-<option value="11">Comm Unit</option>
-<option value="4">Dictaphone</option>
-<option value="6">Facsimile</option>
-<option value="10">Other</option>
-<option value="9">Printer</option>
-<option value="1">Radio</option>
-<option value="3">Telecom</option>
-<option value="2">Telephone</option>
-<option value="8">UPS/Generator</option>
-<option value="5">Workstation </option></select>
-    </td>
-    <td> 
-      <span style="width:147px">
-        <textarea style="width:147px" name="EquipmentFailure_TypeDescription" id="EquipmentFailure_TypeDescription" title="Further details of the equipment type."></textarea>
-      </span>
-    </td>
-    
-    <th align="right">Service<br> Request To:</th>
-    <td>
-      <span style="width:147px">
-        <textarea style="width:147px" onkeyup="EnableDate('EquipmentFailure_RequestDate')" name="EquipmentFailure_ServiceRequestTo" id="EquipmentFailure_ServiceRequestTo" title="The name of the individual or company the service request was sent to."></textarea>
-      </span>
-    </td>
-    <td valign="top"><object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the service request mas made." align="absmiddle" name="EquipmentFailure_RequestDate_Date" id="EquipmentFailure_RequestDate_Date">
-    <param name="CurrentDate" value="45684.0000000000000"/>
-    <param name="CustomFormat" value="MM/dd/yyyy"/>
-    <param name="Format" value="3"/>
-</object>
-<object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the service request mas made." align="absmiddle" name="EquipmentFailure_RequestDate_Time" id="EquipmentFailure_RequestDate_Time">    <param name="CurrentDate" value="0"/>
-    <param name="CustomFormat" value="HH:mm:ss"/>
-    <param name="Format" value="3"/>
-    <param name="UpDown" value="-1"/>
-</object></td>
-  </tr>
-  
-  <tr valign="top">
-    <th align="right" class="mandatory">Location:</th>
-    <td>      
-       <select name="EquipmentLocation" style="width:120px" id="EquipmentFailure_EquipmentLocation_FK" title="Select the location of the equipment." size="1">
-<option value="1">CACC</option>
-<option value="3">Hospital</option>
-<option value="5">Other</option>
-<option value="2">Station</option>
-<option value="4">Tower</option></select>
-    </td>
-    <td>
-      <span style="width:147px">
-        <textarea style="width:147px" name="EquipmentFailure_LocationDescription" id="EquipmentFailure_LocationDescription" title="Further details of the location."></textarea>
-      </span>
-    </td>
-    
-    <th align="right">Service<br> Responded By:</th>
-    <td>
-      <span style="width:147px">
-        <textarea style="width:147px" onkeyup="EnableDate('EquipmentFailure_RespondedDate')" name="EquipmentFailure_ServiceRespondedby" id="EquipmentFailure_ServiceRespondedby" title="The name of the individual or company that responded to the service request."></textarea>
-      </span>
-    </td>
-    <td valign="top"><object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the individual or company who received the service request responded." align="absmiddle" name="EquipmentFailure_RespondedDate_Date" id="EquipmentFailure_RespondedDate_Date">
-    <param name="CurrentDate" value="45684.0000000000000"/>
-    <param name="CustomFormat" value="MM/dd/yyyy"/>
-    <param name="Format" value="3"/>
-</object>
-<object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the individual or company who received the service request responded." align="absmiddle" name="EquipmentFailure_RespondedDate_Time" id="EquipmentFailure_RespondedDate_Time">    <param name="CurrentDate" value="0"/>
-    <param name="CustomFormat" value="HH:mm:ss"/>
-    <param name="Format" value="3"/>
-    <param name="UpDown" value="-1"/>
-</object></td>
+      <label>Failure Date/Time:</label>
+      <input type="date" id="failureDate" class="date-picker">
+      <input type="time" id="failureTime" class="time-picker">
+    </div>
 
-  </tr> 
-  
-  <tr valign="top">
-    <th align="right" class="mandatory">Failure Date/Time:</th>    
-    <td colspan="2"><object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that  the equipment failed." align="absmiddle" name="EquipmentFailure_FailureDate_Date" id="EquipmentFailure_FailureDate_Date">
-    <param name="CurrentDate" value="45684.0000000000000"/>
-    <param name="CustomFormat" value="MM/dd/yyyy"/>
-    <param name="Format" value="3"/>
-</object>
-<object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that  the equipment failed." align="absmiddle" name="EquipmentFailure_FailureDate_Time" id="EquipmentFailure_FailureDate_Time">    <param name="CurrentDate" value="0"/>
-    <param name="CustomFormat" value="HH:mm:ss"/>
-    <param name="Format" value="3"/>
-    <param name="UpDown" value="-1"/>
-</object></td>
+    <!-- Date/Time of Incident -->
+    <div class="grid-item">
+      <label for="pronouncedDateTime">Date/Time of Incident:</label>
+      <input type="datetime-local" id="pronouncedDateTime" />
 
-    <th align="right">Service<br> Completed By:</th>
-    <td>
-      <span style="width:147px">
-        <textarea style="width:147px" onkeyup="EnableDate('EquipmentFailure_CompletedDate')" name="EquipmentFailure_ServiceCompletedby" id="EquipmentFailure_ServiceCompletedby" title="The name of the individual or company that completed the service request."></textarea>
-      </span>
-    </td>
-    <td valign="top"><object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the service was completed." align="absmiddle" name="EquipmentFailure_CompletedDate_Date" id="EquipmentFailure_CompletedDate_Date">
-    <param name="CurrentDate" value="45684.0000000000000"/>
-    <param name="CustomFormat" value="MM/dd/yyyy"/>
-    <param name="Format" value="3"/>
-</object>
-<object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="95" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="The date/time that the service was completed." align="absmiddle" name="EquipmentFailure_CompletedDate_Time" id="EquipmentFailure_CompletedDate_Time">    <param name="CurrentDate" value="0"/>
-    <param name="CustomFormat" value="HH:mm:ss"/>
-    <param name="Format" value="3"/>
-    <param name="UpDown" value="-1"/>
-</object></td>
-  </tr>
-  
-  <tr>
-    <th align="right">Response Delay:</th>
-    <td colspan="5"><input type="checkbox" onclick="EnableDisableDate(frmCOR.EquipmentFailure_ResponseDelay.checked,'EquipmentFailure_ElapsedDelay')" name="EquipmentFailure_ResponseDelay" id="EquipmentFailure_ResponseDelay" title="Whether or not there was any delay in response." size="15" maxlength="15"/>&nbsp;
-                    <object type="VB_DTPicker" class="calendar" onsave="calSave()" onload="calLoad()" height="25" width="75" classid="clsid:20DD1B9E-87C4-11D1-8BE3-0000F8754DA1" codebase="../control/MSCOMCT2.CAB" title="Elapsed time of response delay." align="absmiddle" name="EquipmentFailure_ElapsedDelay_Time" id="EquipmentFailure_ElapsedDelay_Time">
-    <param name="Enabled" value="false">
-    <param name="CurrentDate" value="0"/>
-    <param name="CustomFormat" value="HH:mm"/>
-    <param name="Format" value="3"/>
-    <param name="UpDown" value="-1"/>
-</object>
-    </td>
-  </tr>
-  
-  <tr>
-    <th align="right" class="mandatory" valign="top">Failure Details<br>or Other Info:</th>
-    <td colspan="5">
-      <span style="width:682px">
-        <textarea cols="110" rows="5" name="EquipmentFailure_Description" id="EquipmentFailure_Description" title="Description of the failure."></textarea>
-      </span> 
-    </td>
-  </tr>
-</table>
+      <label for="pronouncedDateTime">Service Responded By:</label>
+      <input type="datetime-local" id="pronouncedDateTime" />
 
-</td></tr></table>
+      <label for="pronouncedDateTime">Service Completed By:</label>
+      <input type="datetime-local" id="pronouncedDateTime" />
+    </div>
+  </div>
+  <div class="grid-item">
+    <label>Failure details or other info</label>
+    <textarea rows="5"></textarea>
+  </div>
+</div>
+<div class="container">
+  <h3 class="section-title">Narrative</h3>
 
-<table border="2" cellpadding="2" width="96%" class="bordertable"><tr><td>
+  <div class="grid-container">
+    <div class="grid-item">
+      <textarea id="narrative" rows="5"></textarea>
+    </div>
+  </div>
 
-<table border="0" align="center" cellpadding="2" width="100%" class="greytable">
-  <tr>
-    <td>
-      <h1 align="left" class="greytable">Narrative</h1>
-    </td>
-  </tr>
-</table>
-<table border="0" align="center" cellpadding="2" width="100%" class="greytable"> 
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>User</th>
-      <th>Comments</th>
-    </tr> 
-  </thead>
-  <tbody>
-    <tr class="results" valign="top"><td nowrap >&nbsp;</td><td >&nbsp;</td><td  title="">&nbsp;</td><td >&nbsp;</td></tr>
-    
-  </tbody>        
-</table>
-<table border="0" align="center" cellpadding="2" width="100%" class="greytable"> 
-  <tr> 
-    <td rowspan="3">  
-      <textarea rows="5"  style="margin-left:15px; behavior:url(#default#savehistory);" cols="85" name="Narrative_NarrativeText" id="Narrative_NarrativeText"></textarea>
-    </td>
-    <td align="right" valign="top" class="grborder">
-      <input type="button" value="Reload Page" name="resbutton" id="resbutton" class="stdbtn" onclick="reload()">
-    </td>  
-  </tr>
-  <tr>
-    <td align="right" valign="middle" class="grborder">
-      <input type="button" value="Save Changes" name="save" id="save" class="stdbtn" onclick="setAction('Save')">
-    </td>  
-  </tr>
-  <tr>
-    <td align="right" valign="bottom" class="grborder">
-      <input type="button" value="Save Changes and Exit" name="saveexit" id="saveexit" class="stdbtn" onclick="setAction('Save_Exit')">
-    </td>  
-  </tr>
-</table>  
-</td></tr></table>
-</form>
-
+  <div class="button-container">
+    <button type="button" onclick="reload()">Reload Page</button>
+    <button type="submit">Save Changes</button>
+    <button type="submit" onclick="setAction('Save_Exit')">
+      Save and Exit
+    </button>
+  </div>
 </div>

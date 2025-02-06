@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import {Title} from "@angular/platform-browser";
+import { Title } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-vsa-report',
@@ -11,8 +11,22 @@ import {Title} from "@angular/platform-browser";
   styleUrl: './vsa-report.component.css'
 })
 export class vsaReportComponent {
-  constructor(private titleService:Title) {
+  constructor(private titleService: Title) {
     this.titleService.setTitle("CORTS - COR Entry (New)");
+  }
+
+  relatedCORInput: string = '';
+  relatedCORs: string[] = [];
+
+  addRelatedCOR() {
+    if (this.relatedCORInput.trim()) {
+      this.relatedCORs.push(this.relatedCORInput.trim());
+      this.relatedCORInput = '';
+    }
+  }
+
+  removeRelatedCOR() {
+    this.relatedCORs.pop();
   }
 
   vsaData = {
