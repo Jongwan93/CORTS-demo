@@ -20,6 +20,7 @@ h4{
 button, input[type="submit"]{
   text-align: center;
   min-width: 12em;
+  max-width: fit-content;
   background-color: #DBE9F5;
   padding: 0.7em;
   margin: 0.7em;
@@ -96,22 +97,22 @@ textarea {
   resize: vertical;
 }
 
-button.primary {
+button.primary, input[type="submit"].primary {
   background-color: #047BC1;
   color: white;
 }
 
-button.primary:hover {
+button.primary:hover input[type="submit"].primary:hover{
   background-color: #054B72;
   color: white;
 }
 
-button.warn {
+button.warn, input[type="submit"].warn {
   background-color: #ED1C24;
   color: white;
 }
 
-button.warn:hover {
+button.warn:hover, input[type="submit"].warn:hover{
   background-color: #990000;
   color: white;
 }
