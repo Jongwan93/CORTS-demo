@@ -2,7 +2,8 @@
 
 html, body {
   height: 100%;
-  margin: 1em;
+  min-width: 500px;
+  margin: 0.5em;
   background-color: #CFEDED;
   font-family: "Raleway", "Arial", "Calibri";
   font-size: 1em;
@@ -38,12 +39,21 @@ button:disabled{
 }
 
 .container {
-  margin: 2em;
+  margin: 1em;
   padding: 1.5em;
   background-color: #ffffff;
   box-shadow: 0em 0.4em 0.6em #0000001a;
   border-radius: 1em;
-  overflow: hidden;
+  overflow: auto;
+  min-width: 500px;
+}
+
+.container::-webkit-scrollbar {
+  border-radius: 1em;
+}
+
+.req-input {
+  color: #990000;
 }
 
 .grid-container {
@@ -68,7 +78,8 @@ button:disabled{
 
 .form-actions {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
   margin-top: 1em;
 }
 
@@ -122,4 +133,30 @@ th, td {
 
 tbody tr {
   border-bottom: 1px solid #ccc;
+}
+
+.time-duration-container{
+  display: flex;
+  align-items: center;
+  gap:0.5em;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.checkbox-container label {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  gap: 0.2em;
+  white-space: nowrap;
+}
+
+input[type="checkbox"] {
+  min-width: 1em;
+  min-height: 1em;
+  cursor: pointer;
 }

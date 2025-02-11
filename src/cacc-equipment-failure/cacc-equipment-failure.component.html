@@ -15,129 +15,173 @@
   </header>
 </div>
 
-<div class="container">
-  <h2>CACC Equipment Failure Report</h2>
-  <hr />
+<form>
+  <div class="container">
+    <h2>CACC Equipment Failure Report</h2>
+    <hr />
 
-  <!-- Basic Information -->
-  <h4>Basic Information:</h4>
-  <div class="grid-container">
-    <div class="grid-item">
-      <label>Created</label>
-      <input type="text" value="01/29/2025 09:45:41" disabled />
-    </div>
-    <div class="grid-item">
-      <label>COR #</label>
-      <input type="text" value="New" disabled />
-    </div>
-    <div class="grid-item">
-      <label>Due Date</label>
-      <input type="text" value="01/31/2025" disabled />
-    </div>
-    <div class="grid-item">
-      <label>Status</label>
-      <input type="text" value="New" disabled />
-    </div>
-    <div class="grid-item">
-      <label>COR Type</label>
-      <input type="text" value="CACC Equipment Failure" disabled />
-    </div>
-    <div class="grid-item">
-      <label>Creator</label>
-      <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
-    </div>
-    <div class="grid-item">
-      <label>Route To</label>
-      <select>
-        <option selected>29030, CASSONDRA FOERTER - COM</option>
-        <option>Supervisor Group</option>
-      </select>
-    </div>
-    <div class="grid-item">
-      <label>Incident (Call) #</label>
-      <input type="text" />
-      <button>View in VisiCAD</button>
-    </div>
-    <div class="grid-item">
-      <label>Related CORs</label>
-      <input type="text" id="related-cors-input" />
-      <textarea rows="5"></textarea>
-      <div class="button-group">
-        <button class="btn primary">Add Related COR</button>
-        <button class="btn warn">Remove Related COR</button>
+    <!-- Basic Information -->
+    <h4>Basic Information:</h4>
+    <div class="grid-container">
+      <div class="grid-item">
+        <label>Created</label>
+        <input type="text" value="01/29/2025 09:45:41" disabled />
+      </div>
+      <div class="grid-item">
+        <label>COR #</label>
+        <input type="text" value="New" disabled />
+      </div>
+      <div class="grid-item">
+        <label>Due Date</label>
+        <input type="text" value="01/31/2025" disabled />
+      </div>
+      <div class="grid-item">
+        <label>Status</label>
+        <input type="text" value="New" disabled />
+      </div>
+      <div class="grid-item">
+        <label>COR Type</label>
+        <input type="text" value="CACC Equipment Failure" disabled />
+      </div>
+      <div class="grid-item">
+        <label>Creator</label>
+        <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
+      </div>
+      <div class="grid-item">
+        <label>Route To</label>
+        <select>
+          <option selected>29030, CASSONDRA FOERTER - COM</option>
+          <option>Supervisor Group</option>
+        </select>
+      </div>
+      <div class="grid-item">
+        <label>Incident (Call) #</label>
+        <input type="text" />
+        <button>View in VisiCAD</button>
+      </div>
+      <div class="grid-item">
+        <label>Related CORs</label>
+        <input type="text" id="related-cors-input" />
+        <textarea rows="5"></textarea>
+        <div class="button-group">
+          <button class="btn primary">Add Related COR</button>
+          <button class="btn warn">Remove Related COR</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="container">
-  <!-- Incident Report -->
-  <h4>CACC Equipment Failure Report</h4>
-  <hr />
-  <div class="grid-container">
-    <!-- Incident Type -->
+  <div class="container">
+    <!-- Incident Report -->
+    <h4>CACC Equipment Failure Report:</h4>
+    <hr />
+    <div class="grid-container">
+      <!-- Incident Type -->
+      <div class="grid-item">
+        <label class="req-input">Equipment Type:*</label>
+        <select>
+          <option selected>Admin Vehicles</option>
+          <option>Alarms</option>
+          <option>Comm Unit</option>
+          <option>Dictaphone</option>
+          <option>Facsimile</option>
+          <option>Other</option>
+          <option>Printer</option>
+          <option>Radio</option>
+          <option>Telecom</option>
+          <option>Telephone</option>
+          <option>UPS/Generator</option>
+          <option>Workstation</option>
+        </select>
+      </div>
+
+      <div class="grid-item">
+        <label class="req-input">Location:*</label>
+        <select>
+          <option selected>CACC</option>
+          <option>Hospital</option>
+          <option>Other</option>
+          <option>Station</option>
+          <option>Tower</option>
+        </select>
+      </div>
+
+      <div class="grid-item">
+        <label class="req-input">Failure Date/Time:*</label>
+        <input type="date" id="failureDate" class="date-picker">
+        <input type="time" id="failureTime" class="time-picker">
+      </div>
+
+      <div class="grid-item">
+        <label for="pronouncedDateTime">Response Delay:</label>
+          <div class="time-duration-container">
+            <input type="checkbox" id="delay" (change)="togglePronouncedBy()"/>
+            <input type="number" id="delay-hours" min="0" max="99" step="1" value="00" [disabled]="!isDelaySelected">
+            <p> : </p>
+            <input type="number" id="delay-minutes" min="0" max="59" step="1" value="00" [disabled]="!isDelaySelected">
+          </div>
+      </div>
+
+      <!-- Date/Time of Incident -->
+      <div class="grid-item">
+        <label for="pronouncedDateTime">Service Request To:</label>
+        <input type="text">
+        <input type="datetime-local" id="pronouncedDateTime" />
+      </div>
+
+      <div class="grid-item">
+        <label for="pronouncedDateTime">Service Responded By:</label>
+        <input type="text">
+        <input type="datetime-local" id="pronouncedDateTime" />
+      </div>
+
+      <div class="grid-item">
+        <label for="pronouncedDateTime">Service Completed By:</label>
+        <input type="text">
+        <input type="datetime-local" id="pronouncedDateTime" />
+      </div>
+    </div>
     <div class="grid-item">
-      <label>Equipment Type: </label>
-      <select>
-        <option selected>Admin Vehicles</option>
-        <option>Alarms</option>
-        <option>Comm Unit</option>
-        <option>Dictaphone</option>
-        <option>Facsimile</option>
-        <option>Other</option>
-        <option>Printer</option>
-        <option>Radio</option>
-        <option>Telecom</option>
-        <option>Telephone</option>
-        <option>UPS/Generator</option>
-        <option>Workstation</option>
-      </select>
+      <label class="req-input">Failure Details or Other Info:*</label>
+      <textarea rows="5"></textarea>
+    </div>
+  </div>
 
-      <label>Location: </label>
-      <select>
-        <option selected>CACC</option>
-        <option>Hospital</option>
-        <option>Other</option>
-        <option>Station</option>
-        <option>Tower</option>
-      </select>
+  <!-- Narrative -->
+  <div class="container">
+    <h4>Narrative:</h4>
+    <hr>
 
-      <label>Failure Date/Time:</label>
-      <input type="date" id="failureDate" class="date-picker">
-      <input type="time" id="failureTime" class="time-picker">
+    <!-- Narative Table -->
+    <table width="100%">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>User</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>01/29/2025</td>
+          <td>09:45:41</td>
+          <td>29030</td>
+          <td>New COR Created</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-item">
+      <label>Comments:</label>
+      <textarea rows="5"></textarea>
     </div>
 
-    <!-- Date/Time of Incident -->
-    <div class="grid-item">
-      <label for="pronouncedDateTime">Date/Time of Incident:</label>
-      <input type="datetime-local" id="pronouncedDateTime" />
-
-      <label for="pronouncedDateTime">Service Responded By:</label>
-      <input type="datetime-local" id="pronouncedDateTime" />
-
-      <label for="pronouncedDateTime">Service Completed By:</label>
-      <input type="datetime-local" id="pronouncedDateTime" />
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button class="btn primary">Save Changes</button>
+      <button class="btn primary">Save Changes and Exit</button>
+      <button class="btn warn">Reload Page</button>
     </div>
   </div>
-  <div class="grid-item">
-    <label>Failure details or other info</label>
-    <textarea rows="5"></textarea>
-  </div>
-</div>
-<div class="container">
-  <h3 class="section-title">Narrative</h3>
-
-  <div class="grid-container">
-    <div class="grid-item">
-      <textarea id="narrative" rows="5"></textarea>
-    </div>
-  </div>
-
-  <div class="button-container">
-    <button type="button" onclick="reload()">Reload Page</button>
-    <button type="submit">Save Changes</button>
-    <button type="submit" onclick="setAction('Save_Exit')">
-      Save and Exit
-    </button>
-  </div>
-</div>
+</form>

@@ -20,7 +20,7 @@
         <input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
         <input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
 
-        <h3 class="section-title">Basic Information:</h3>
+        <h4 class="section-title">Basic Information:</h4>
         <hr>
 
         <div class="grid-container">
@@ -58,37 +58,41 @@
             <div class="grid-item">
                 <label>Incident (Call) #:</label>
                 <input type="text">
-            </div>
-            <div class="grid-item full-width">
                 <button class="view-button">View in VisiCAD</button>
+            </div>
+            <div class="grid-item">
+              <label>Related CORs</label>
+              <input type="text" />
+              <div class="button-group">
+                <button class="btn primary">Add Related COR</button>
+                <button class="btn warn">Remove Related COR</button>
+              </div>
             </div>
         </div>
       </div>
 
   <div class="container">
-    <h3 class="section-title">Breakdown Details:</h3>
+    <h4 class="section-title">Breakdown Details:</h4>
     <hr>
 
     <div class="grid-container">
         <div class="grid-item">
-            <label>Breakdown Type:</label>
+            <label class="req-input">Breakdown Type:*</label>
             <select id="VehicleFailure_BreakDownType_FK">
                 <option value="2">Accident</option>
                 <option value="1">Equipment Failure</option>
                 <option value="3">Mechanical Failure</option>
                 <option value="4">Other</option>
             </select>
-        </div>
-        <div class="grid-item">
-            <label>Description:</label>
             <textarea id="VehicleFailure_TypeDescription"></textarea>
         </div>
+
         <div class="grid-item">
-            <label>Date/Time of Failure:</label>
+            <label class="req-input">Date/Time of Failure:*</label>
             <input type="datetime-local" id="VehicleFailure_FailureDate_Date">
         </div>
         <div class="grid-item">
-            <label>Service/Station:</label>
+            <label class="req-input">Service/Station:*</label>
             <input type="text" id="VehicleFailure_ServiceInfo">
         </div>
         <div class="grid-item">
@@ -96,29 +100,29 @@
             <input type="text" id="VehicleFailure_VehicleNum">
         </div>
         <div class="grid-item">
-            <label>Response Delay:</label>
-            <input type="checkbox" id="VehicleFailure_ResponseDelay">
+          <label for="pronouncedDateTime">Response Delay:</label>
+          <div class="time-duration-container">
+            <input type="checkbox" id="delay" (change)="togglePronouncedBy()"/>
+            <input type="number" id="delay-hours" min="0" max="99" step="1" value="00" [disabled]="!isDelaySelected">
+            <p> : </p>
+            <input type="number" id="delay-minutes" min="0" max="59" step="1" value="00" [disabled]="!isDelaySelected">
+          </div>
         </div>
         <div class="grid-item">
             <label>Patient on Board:</label>
             <input type="checkbox" id="VehicleFailure_PatientOnBoard">
         </div>
     </div>
-
-    <h3 class="section-title">Failure Breakdown Details:</h3>
-    <hr>
-
-    <div class="grid-container">
-        <div class="grid-item full-width">
-            <textarea id="VehicleFailure_Description" rows="5"></textarea>
-        </div>
+    <div class="grid-item">
+      <label class="req-input">Failure Breakdown Details or Other Info:*</label>
+      <textarea id="VehicleFailure_Description" rows="5"></textarea>
     </div>
   </div>
 
   <div class="container">
 
     <!-- Narrative -->
-    <h3>Narrative:</h3>
+    <h4>Narrative:</h4>
     <hr>
 
     <!-- Narative Table -->

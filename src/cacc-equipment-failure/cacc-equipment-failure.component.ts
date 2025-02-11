@@ -17,6 +17,12 @@ export class caccEquipmentFailureComponent {
     caccEquipmentFailureDescription: ''
   };
 
+  isDelaySelected = false;
+
+  togglePronouncedBy() {
+    this.isDelaySelected = !this.isDelaySelected;
+  }
+
   onSubmit(): void {
     console.log('Form submitted:', this.caccEquipmentFailureData);
   }

@@ -19,7 +19,7 @@
   <div class="container">
   <h2>Complaint/Inquiry Report</h2>
   <hr />
-  <h3 class="section-title">Basic Information</h3>
+  <h4 class="section-title">Basic Information:</h4>
 
   <form
     id="frmCOR"
@@ -90,11 +90,11 @@
 </div>
 
 <div class="container">
-  <h3 class="section-title">Complaint Details</h3>
+  <h4 class="section-title">Complaint Details:</h4>
 
   <div class="grid-container">
     <div class="grid-item">
-      <label for="complaint-type">Complaint/Inquiry Type</label>
+      <label class="req-input" for="complaint-type">Complaint/Inquiry*</label>
       <select name="complaintType" id="complaint-type">
         <option value="6">Conduct</option>
         <option value="2">Damage to Property</option>
@@ -107,12 +107,17 @@
     </div>
 
     <div class="grid-item">
-      <label for="complaint-date">Date/Time of Complaint</label>
+      <label class="req-input" for="complaint-date">Date/Time of Complaint*</label>
       <input type="datetime-local" id="complaint-date" name="complaint-date" />
     </div>
   </div>
 
-  <h3 class="section-title">Contact Information</h3>
+  <div class="grid-item">
+    <label class="req-input">Complaint Details or Other Info:*</label>
+    <textarea rows="5"></textarea>
+  </div>
+
+  <h4 class="section-title">Contact Information:</h4>
 
   <div class="grid-container">
     <div class="grid-item">
@@ -133,15 +138,41 @@
 </div>
 
 <div class="container">
-  <h3 class="section-title">Narrative</h3>
+
+  <!-- Narrative -->
+  <h4>Narrative:</h4>
+  <hr>
+
+  <!-- Narative Table -->
+  <table width="100%">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>User</th>
+        <th>Comments</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>01/29/2025</td>
+        <td>09:45:41</td>
+        <td>29030</td>
+        <td>New COR Created</td>
+      </tr>
+    </tbody>
+  </table>
+
   <div class="grid-item">
-    <textarea id="narrative" rows="5"></textarea>
+    <label>Comments:</label>
+    <textarea rows="5"></textarea>
   </div>
-  <div class="button-container">
-    <button type="button" onclick="reload()">Reload Page</button>
-    <button type="submit">Save Changes</button>
-    <button type="submit" onclick="setAction('Save_Exit')">
-      Save and Exit
-    </button>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button class="btn primary">Save Changes</button>
+    <button class="btn primary">Save Changes and Exit</button>
+    <button class="btn warn">Reload Page</button>
   </div>
 </div>
+

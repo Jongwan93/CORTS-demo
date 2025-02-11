@@ -18,7 +18,7 @@
     <hr>
 
     <!-- Basic Information -->
-    <h3>Basic Information:</h3>
+    <h4>Basic Information:</h4>
 
     <div class="grid-container">
         <div class="grid-item">
@@ -71,24 +71,27 @@
 
   <div class="container">
     <!-- ALS/VSA Report -->
-    <h3>ALS/VSA Report:</h3>
+    <h4>ALS/VSA Report:</h4>
 
-    <div class="checkbox-container">
-      <label for="als-intervention">
-        <input type="checkbox" id="als-intervention" /> ALS Intervention
-      </label>
-      <label for="vsa">
-        <input type="checkbox" id="vsa" (change)="togglePronouncedBy()" /> VSA
-      </label>
+    <div class="grid-item">
+      <div class="checkbox-container">
+        <label class="req-input">Report Type:*</label>
+        <label for="als-intervention">
+          <input type="checkbox" id="als-intervention" /> ALS Intervention
+        </label>
+        <label for="vsa">
+          <input type="checkbox" id="vsa" (change)="togglePronouncedBy()" /> VSA
+        </label>
+      </div>
     </div>
 
     <div class="grid-container">
       <div class="grid-item">
-        <label for="pronouncedBy">Pronounced By</label>
+        <label class="vsa-req-input" for="pronouncedBy">Pronounced By</label>
         <input type="text" id="pronouncedBy" [disabled]="!isVSASelected" />
       </div>
       <div class="grid-item">
-        <label for="pronouncedDateTime">Pronounced Date/Time</label>
+        <label class="vsa-req-input" for="pronouncedDateTime">Pronounced Date/Time</label>
         <input type="datetime-local" id="pronouncedDateTime" />
       </div>
       <div class="grid-item">
@@ -101,19 +104,18 @@
         </select>
       </div>
     </div>
-  </div>
 
-  <div class="container">
-    <!-- Additional Information -->
-    <h3>Additional Information:</h3>
-    <div class="checkbox-container">
-      <label for="ar-instructions">
-        <input type="checkbox" id="ar-instructions" /> A/R Instructions Given
-      </label>
-      <label for="cpr-instructions">
-        <input type="checkbox" id="cpr-instructions" /> CPR Instructions Given
-      </label>
+    <div class="grid-item">
+      <div class="checkbox-container">
+        <label for="ar-instructions">
+          <input type="checkbox" id="ar-instructions" /> A/R Instructions Given
+        </label>
+        <label for="cpr-instructions">
+          <input type="checkbox" id="cpr-instructions" /> CPR Instructions Given
+        </label>
+      </div>
     </div>
+
     <div class="grid-item">
       <label>ALS/VSA Details</label>
       <textarea rows="5"></textarea>
@@ -123,7 +125,7 @@
   <div class="container">
 
     <!-- Narrative -->
-    <h3>Narrative:</h3>
+    <h4>Narrative:</h4>
     <hr>
 
     <!-- Narative Table -->
