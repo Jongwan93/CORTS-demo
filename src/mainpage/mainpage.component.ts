@@ -19,17 +19,29 @@ export class MainpageComponent{
       document.getElementById('create-new') as HTMLSelectElement
     ).value;
 
-    if (selectedValue === '1') {
-      this.router.navigate(['/incident-report']);
-    } else if (selectedValue === '2') {
-      this.router.navigate(['/vsa-report']);
-    } else if (selectedValue === '3') {
-      this.router.navigate(['/complaint-report']);
-    } else if (selectedValue === '4') {
-      this.router.navigate(['/cacc-equipment-failure']);
-    } else if (selectedValue === '5') {
-      this.router.navigate(['/fleet-equipment-report']);
-    } else {
+    const radioValue = (
+      document.querySelector('input[name="R1"]:checked') as HTMLInputElement
+    ).value;
+
+    if (radioValue === 'NewCOR'){
+      if (selectedValue === '1') {
+        this.router.navigate(['/incident-report']);
+      } else if (selectedValue === '2') {
+        this.router.navigate(['/vsa-report']);
+      } else if (selectedValue === '3') {
+        this.router.navigate(['/complaint-report']);
+      } else if (selectedValue === '4') {
+        this.router.navigate(['/cacc-equipment-failure']);
+      } else if (selectedValue === '5') {
+        this.router.navigate(['/fleet-equipment-report']);
+      } else {
+        alert('Please select the correct option to proceed.');
+      }
+    } else if (radioValue === 'FindCOR') {
+      this.router.navigate(['/query'])
+    } else if (radioValue === 'Logout'){
+      this.router.navigate(['/login'])
+    }else {
       alert('Please select the correct option to proceed.');
     }
   }

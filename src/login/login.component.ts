@@ -12,7 +12,7 @@ import {Title} from "@angular/platform-browser";
 
 export class LoginComponent {
   constructor(private titleService:Title) {
-    this.titleService.setTitle("CORTS - Start Page");
+    this.titleService.setTitle("CORTS - Login");
   }
 
 }

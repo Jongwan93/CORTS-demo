@@ -13,4 +13,10 @@ export class FleetEquipmentReportComponent {
   constructor(private titleService:Title) {
     this.titleService.setTitle("CORTS - COR Entry (New)");
   }
+
+  isDelaySelected = false;
+
+  togglePronouncedBy() {
+    this.isDelaySelected = !this.isDelaySelected;
+  }
 }
