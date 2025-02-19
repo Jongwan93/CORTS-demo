@@ -4,7 +4,6 @@ import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgFor, CommonModule } from '@angular/common';
 import { AuthService } from '../app/services/auth.service';
-import { StatusService } from '../app/services/status.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -18,6 +17,8 @@ export class IncidentReportComponent implements OnInit {
   constructor(private titleService: Title, private router: Router) {
     this.titleService.setTitle('CORTS - COR Entry (New)');
   }
+
+  private http = inject(HttpClient);
 
   corNumber: string = 'New'; // COR# (New as default value)
   isCorNumberGenerated: boolean = false;
@@ -36,13 +37,11 @@ export class IncidentReportComponent implements OnInit {
 
   // -------------------------------Basic Information---------------------------
   // fetching auth service to use user info
-  private authService = inject(AuthService); // AuthService를 inject
-  private http = inject(HttpClient);
-  private statusService = inject(StatusService);
+  private authService = inject(AuthService); // AuthService inject
   userName: string = ''; // user's name is stored
 
   // generate random cor#
-  generateCorNumber(): string{
+  generateCorNumber(): string {
     const randomNum = Math.floor(1000000 + Math.random() * 9000000);
     return `454-${randomNum}`;
   }
@@ -82,7 +81,6 @@ export class IncidentReportComponent implements OnInit {
   incidentType: string = ''; // dropdown menu
   previousIncidentType: string = ''; // to detect change
   incidentDateTime = '';
-  incidentRecords: { incidentType: string; date: string; time: string }[] = [];
   incidentCommentText: string = ''; // incident details input
 
   getIncidentTypeText(value: string): string {
@@ -107,26 +105,28 @@ export class IncidentReportComponent implements OnInit {
 
   // save changes button
   saveChanges() {
-    console.log('Incident Type:', this.incidentType);
-    console.log('Date/Time of Incident', this.incidentDateTime);
-
-
-    if (!this.incidentCommentText.trim() || !this.incidentType || this.incidentType === '' || !this.incidentDateTime || this.incidentDateTime.trim() === '') {
+    // incident detail, type, date cannot be empty
+    if (
+      !this.incidentCommentText.trim() ||
+      !this.incidentType ||
+      this.incidentType === '' ||
+      !this.incidentDateTime ||
+      this.incidentDateTime.trim() === ''
+    ) {
       alert('Please complete all the required fields.');
       return;
     }
 
-    if (!this.isCorNumberGenerated){
+    if (!this.isCorNumberGenerated) {
       this.corNumber = this.generateCorNumber();
       this.isCorNumberGenerated = true;
       localStorage.setItem('cornumber', this.corNumber);
     }
 
-    if (this.status == 'New'){
+    if (this.status == 'New') {
       this.status = 'Created';
       localStorage.setItem('corStatus', this.status);
     }
-
 
     //incident type is changed
     if (this.previousIncidentType !== this.incidentType) {
@@ -149,7 +149,7 @@ export class IncidentReportComponent implements OnInit {
     // narrative comment logic
     if (this.narrativeCommentText.trim()) {
       const now = new Date();
-      this.combinedEntries = [                                          
+      this.combinedEntries = [
         ...this.combinedEntries,
         {
           date: this.formatDate(now),
@@ -177,6 +177,71 @@ export class IncidentReportComponent implements OnInit {
       ];
       this.incidentCommentText = '';
     }
+
+    // -------------------create incident API request--------------------------
+    // change info
+    const userParts = this.userName.split(', ');
+    const createdByInitials = userParts[1]
+      ? userParts[1]
+          .split(' ')
+          .map((w) => w[0])
+          .join('')
+      : 'UK';
+
+    // API reqeust
+    // get the token
+    const token = localStorage.getItem('login-token');
+
+    if (!token) {
+      alert('Authentication token is missing. Please log in again.');
+      return;
+    }
+
+    // need fix 
+    const requestBody = {
+      narratives: this.combinedEntries.map((entry) => ({
+        narrativeKey: 0,
+        corFk: 0,
+        timeStamp: new Date().toISOString(),
+        systemGenerated: true,
+        createdBy: this.userName,
+        createdByInitials: createdByInitials,
+        narrativeText: entry.comment,
+      })),
+      cadIncidentNum: this.corNumber,
+      corType: 1,
+      corStatus: this.status === 'Created' ? 1 : 0,
+      userGroup: 0,
+      createdby: this.userName,
+      createDate: new Date().toISOString(),
+      assignedTo: this.userName,
+      assignedToGroup: false,
+      relatedCors: this.relatedCORs,
+      incidenType: Number(this.incidentType),
+      incidentDateTime: this.incidentDateTime,
+      incidentDetails: this.incidentCommentText,
+    };
+
+    console.log('Request Body:', requestBody);
+
+    // API reuqest (POST)
+    this.http
+      .post('api/reports/incident-report/create', requestBody, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .subscribe({
+        next: (response) => {
+          alert('Incident Report successfully created!');
+          console.log('API Response:', response);
+        },
+        error: (error) => {
+          alert('Error creating Incident Report.');
+          console.error('API Error:', error);
+        },
+      });
   } // --------- end of save changes function
 
   //-------------------------------UTILITY------------------------------------
@@ -227,4 +292,6 @@ export class IncidentReportComponent implements OnInit {
   saveAndExit(): void {
     console.log('Changes saved and exited');
   }
+
+  //-------------------------create incident API request----------------------------
 }

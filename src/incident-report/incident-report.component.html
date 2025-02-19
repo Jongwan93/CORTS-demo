@@ -69,7 +69,7 @@
       <div class="grid-item">
         <!-- how do I fetch the current user information?-->
         <label>Creator</label>
-        <input type="text" [value]="incidentData.creator" disabled />
+        <input type="text" [value]="userName" disabled />
       </div>
 
       <!-- Route To -->
@@ -77,7 +77,7 @@
         <label>Route To</label>
         <!-- how do I fetch the current user information?-->
         <select>
-          <option selected>29030, CASSONDRA FOERTER - COM</option>
+          <option selected>{{ userName }}</option>
           <option>Supervisor Group</option>
         </select>
       </div>
@@ -141,20 +141,19 @@
       <!-- Incident Type -->
       <div class="grid-item">
         <label class="req-input">Incident Type*</label>
-        <select [(ngModel)]="incidentType">
-          <option selected value="1">Delay in Response</option>
+        <select [(ngModel)]="incidentType" name="incidentType" required>
+          <option value="">-- Select Incident Type --</option> <!-- 기본값 추가 -->
+          <option value="1">Delay in Response</option>
           <option value="2">MCI</option>
           <option value="3">Other</option>
-          <option value="4">Unusual Occurance</option>
+          <option value="4">Unusual Occurrence</option>
         </select>
       </div>
 
       <!-- Date/Time of Incident -->
       <div class="grid-item">
-        <label class="req-input" for="pronouncedDateTime"
-          >Date/Time of Incident*</label
-        >
-        <input type="datetime-local" id="pronouncedDateTime" />
+        <label class="req-input" for="DateTimeofIncident">Date/Time of Incident*</label>
+        <input type="datetime-local" id="DateTimeofIncident" [(ngModel)]="incidentDateTime" name="incidentDateTime" required />
       </div>
 
       <!-- Incident Details -->
