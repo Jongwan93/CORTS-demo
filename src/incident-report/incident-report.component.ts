@@ -219,4 +219,12 @@ export class IncidentReportComponent implements OnInit {
     dueDateCalc.setDate(dueDateCalc.getDate() + 2);
     this.dueDate = this.formatDate(dueDateCalc);
   }
+
+  reloadPage(): void {
+    window.location.reload();
+  }
+
+  saveAndExit(): void {
+    console.log('Changes saved and exited');
+  }
 }

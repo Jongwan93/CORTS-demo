@@ -1,5 +1,9 @@
+<!-- Code for ALS/VSA Report -->
+
+<!-- Header -->
 <div class="container">
   <header align="center">
+    <!-- Title -->
     <div name="title">
       <h1>
         CORTS - CACC Operational <br />
@@ -7,6 +11,8 @@
       </h1>
       <h3>454 - MIS CACC</h3>
     </div>
+
+    <!-- Navigation Buttons -->
     <div name="nav">
       <button class="navBtn" routerLink="/mainpage">Start Page</button>
       <button class="navBtn" routerLink="/query">Search</button>
@@ -16,38 +22,52 @@
 </div>
 
 <form id="VSAReport" method="post" action="/vsa-report">
+  <!-- Basic Information -->
   <div class="container">
     <h2>ALS/VSA Report</h2>
     <hr />
 
-    <!-- Basic Information -->
     <h4>Basic Information:</h4>
 
+    <!-- Basic Information Content -->
     <div class="grid-container">
+      <!-- Created -->
       <div class="grid-item">
         <label>Created</label>
         <input type="text" value="01/29/2025 09:45:41" disabled />
       </div>
+
+      <!-- COR # -->
       <div class="grid-item">
         <label>COR #</label>
         <input type="text" value="New" disabled />
       </div>
+
+      <!-- Due Date -->
       <div class="grid-item">
         <label>Due Date</label>
         <input type="text" value="01/31/2025" disabled />
       </div>
+
+      <!-- Status -->
       <div class="grid-item">
         <label>Status</label>
         <input type="text" value="New" disabled />
       </div>
+
+      <!-- COR Type -->
       <div class="grid-item">
         <label>COR Type</label>
         <input type="text" value="ALS/VSA" disabled />
       </div>
+
+      <!-- Creator -->
       <div class="grid-item">
         <label>Creator</label>
         <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
       </div>
+
+      <!-- Route To -->
       <div class="grid-item">
         <label>Route To</label>
         <select>
@@ -55,6 +75,8 @@
           <option>Supervisor Group</option>
         </select>
       </div>
+
+      <!-- Incidet (Call) # -->
       <div class="grid-item">
         <label for="incident-number" class="req-input"
           >Incident (Call) #*</label
@@ -62,33 +84,40 @@
         <input type="text" name="incident-number" required />
         <button>View in VisiCAD</button>
       </div>
+
+      <!-- Related CORs -->
       <div class="grid-item">
         <label>Related CORs</label>
         <input type="text" id="related-cors-input" />
         <textarea rows="5"></textarea>
-        <div class="button-group">
+        <div class="form-actions">
           <button class="btn primary">Add Related COR</button>
           <button class="btn warn">Remove Related COR</button>
         </div>
       </div>
-    </div>
-  </div>
+    </div> <!-- End of Basic Information Content -->
+  </div> <!-- End of Basic Information (White Card) -->
 
+  <!----------------------------------------------------------------->
+
+  <!-- ALS/VSA Report -->
   <div class="container">
-    <!-- ALS/VSA Report -->
     <h4>ALS/VSA Report:</h4>
+    <hr />
 
+    <!-- ALS/VSA Report Content -->
+
+    <!-- Report Type -->
+    <!-- At least one or both options needs to be selected -->
     <div class="grid-item">
       <div class="checkbox-container">
         <label class="req-input">Report Type:*</label>
+        <!-- ALS Checkbox -->
         <label for="als-intervention">
-          <input
-            type="checkbox"
-            id="als-intervention"
-            (change)="toggleReportType('als')"
-          />
+          <input type="checkbox" id="als" (change)="toggleReportType('als')" />
           ALS Intervention
         </label>
+        <!-- VSA Checkbox -->
         <label for="vsa">
           <input type="checkbox" id="vsa" (change)="toggleReportType('vsa')" />
           VSA
@@ -96,15 +125,23 @@
       </div>
     </div>
 
+    <!-- ALS/VSA Report Grid Start-->
     <div class="grid-container">
+      <!-- Pronounced By -->
       <div class="grid-item">
         <label class="vsa-req-input" for="pronouncedBy">Pronounced By</label>
         <input type="text" id="pronouncedBy" [disabled]="!isVSASelected" />
       </div>
+
+      <!-- Pronounced Date -->
       <div class="grid-item">
-        <label class="vsa-req-input" for="pronouncedDateTime">Pronounced Date/Time</label>
+        <label class="vsa-req-input" for="pronouncedDateTime"
+          >Pronounced Date/Time</label
+        >
         <input type="datetime-local" id="pronouncedDateTime" />
       </div>
+
+      <!-- DNR -->
       <div class="grid-item">
         <label for="dnr">DNR</label>
         <select id="dnr">
@@ -114,10 +151,15 @@
           <option>DNR signed but not available</option>
         </select>
       </div>
-    </div>
 
-    <div class="grid-item">
-      <div class="checkbox-container">
+      <!-- ALS/VSA Details -->
+      <div class="grid-item">
+        <label>ALS/VSA Details</label>
+        <textarea rows="5"></textarea>
+      </div>
+
+      <!-- A/R Intruction & CPR Instruction -->
+      <div class="details-checkbox-container">
         <label for="ar-instructions">
           <input type="checkbox" id="ar-instructions" /> A/R Instructions Given
         </label>
@@ -125,16 +167,13 @@
           <input type="checkbox" id="cpr-instructions" /> CPR Instructions Given
         </label>
       </div>
-    </div>
+    </div> <!-- End of ALS/VSA Report Content -->
+  </div> <!-- End of ALS/VSA Report (White Card) -->
 
-    <div class="grid-item">
-      <label>ALS/VSA Details</label>
-      <textarea rows="5"></textarea>
-    </div>
-  </div>
+  <!----------------------------------------------------------------->
 
+  <!-- Narrative -->
   <div class="container">
-    <!-- Narrative -->
     <h4>Narrative:</h4>
     <hr />
 
@@ -158,18 +197,26 @@
       </tbody>
     </table>
 
-    <div class="grid-item">
-      <label>Comments:</label>
-      <textarea rows="5"></textarea>
-    </div>
+    <!-- Narrative Container for content under the table -->
+    <div class="narrative-container">
 
-    <!-- Action Buttons -->
-    <div class="form-actions">
-      <button class="btn primary" (click)="saveChanges()">Save Changes</button>
-      <button class="btn primary" (click)="saveAndExit()">
-        Save Changes and Exit
-      </button>
-      <button class="btn warn">Reload Page</button>
-    </div>
-  </div>
+      <!-- Narrative Comments -->
+      <div class="grid-item">
+        <label>Comments</label>
+        <textarea rows="5"></textarea>
+      </div>
+
+      <!-- Form Action Buttons -->
+      <div class="form-actions">
+        <button class="btn primary" (click)="saveChanges()">
+          Save Changes
+        </button>
+        <button class="btn primary" (click)="saveAndExit()">
+          Save Changes and Exit
+        </button>
+        <button class="btn warn" (click)="reloadPage()">Reload Page</button>
+      </div>
+
+    </div> <!-- End Narrative Container -->
+  </div> <!-- End of Narrative (White Card)-->
 </form>

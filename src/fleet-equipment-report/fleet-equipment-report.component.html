@@ -1,127 +1,225 @@
-<div class="container">
-    <header align="center">
-      <div name="title">
-        <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
-        <h3>454 - MIS CACC</h3>
-      </div>
-      <div name="nav">
-        <button class = "navBtn" routerLink="/mainpage">Start Page</button>
-        <button class = "navBtn" routerLink="/query">Search</button>
-        <button class = "navBtn" routerLink="/logout">Logout</button>
-      </div>
-    </header>
-  </div>
+<!-- Code for the Fleet Equipment Failure & Vehicle Breakdown Report Page -->
 
-<form id="frmCOR" method="post" action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU=" target="_top" onsubmit="beforeSubmit()">
+<!-- Header -->
+<div class="container">
+  <header align="center">
+
+    <!-- Title -->
+    <div name="title">
+      <h1>
+        CORTS - CACC Operational <br />
+        Reports Tracking System
+      </h1>
+      <h3>454 - MIS CACC</h3>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div name="nav">
+      <button class="navBtn" routerLink="/mainpage">Start Page</button>
+      <button class="navBtn" routerLink="/query">Search</button>
+      <button class="navBtn" routerLink="/logout">Logout</button>
+    </div>
+  </header>
+</div>
+
+<!----------------------------------------------------------------->
+
+<form
+  id="frmCOR"
+  method="post"
+  action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU="
+  target="_top"
+  onsubmit="beforeSubmit()"
+>
+  <!-- Basic Information -->
   <div class="container">
     <h2>Fleet Equipment Failure & Vehicle Breakdown Report</h2>
 
-        <input type="hidden" name="txtAction" id="txtAction">
-        <input type="hidden" name="txtDuplicateKey" id="txtDuplicateKey" value="0">
-        <input type="hidden" name="txtCADIncidentKey" id="txtCADIncidentKey" value="0">
+    <!-- Hidden Fields -->
+    <input type="hidden" name="txtAction" id="txtAction" />
+    <input
+      type="hidden"
+      name="txtDuplicateKey"
+      id="txtDuplicateKey"
+      value="0"
+    />
+    <input
+      type="hidden"
+      name="txtCADIncidentKey"
+      id="txtCADIncidentKey"
+      value="0"
+    />
+    <!-- End of Hidden Fields -->
 
-        <h4 class="section-title">Basic Information:</h4>
-        <hr>
+    <h4 class="section-title">Basic Information</h4>
+    <hr />
 
-        <div class="grid-container">
-            <div class="grid-item">
-                <label>Created:</label>
-                <input type="text" value="02/04/2025 13:24:31" readonly>
-            </div>
-            <div class="grid-item">
-                <label>COR #:</label>
-                <input type="text" value="New" readonly>
-            </div>
-            <div class="grid-item">
-                <label>Due Date:</label>
-                <input type="text" value="02/06/2025" readonly>
-            </div>
-            <div class="grid-item">
-                <label>Status:</label>
-                <input type="text" value="New" readonly>
-            </div>
-            <div class="grid-item">
-                <label>COR Type:</label>
-                <input type="text" value="Fleet Equipment Failure & Vehicle Breakdown" readonly>
-            </div>
-            <div class="grid-item">
-                <label>Creator:</label>
-                <input type="text" value="29030, CASSONDRA FOERTER - COM" readonly>
-            </div>
-            <div class="grid-item">
-                <label>Route To:</label>
-                <select name="assignto" id="assignto">
-                    <option selected value="29030">29030, CASSONDRA FOERTER - COM</option>
-                    <option value="Supervisor">Supervisor Group</option>
-                </select>
-            </div>
-            <div class="grid-item">
-                <label>Incident (Call) #:</label>
-                <input type="text">
-                <button class="view-button">View in VisiCAD</button>
-            </div>
-            <div class="grid-item">
-              <label>Related CORs</label>
-              <input type="text" />
-              <div class="button-group">
-                <button class="btn primary">Add Related COR</button>
-                <button class="btn warn">Remove Related COR</button>
-              </div>
-            </div>
-        </div>
+    <!-- Basic Information Content-->
+    <div class="grid-container">
+
+      <!-- Created -->
+      <div class="grid-item">
+        <label>Created</label>
+        <input type="text" value="02/04/2025 13:24:31" readonly />
       </div>
 
+      <!-- COR # -->
+      <div class="grid-item">
+        <label>COR #</label>
+        <input type="text" value="New" readonly />
+      </div>
+
+      <!-- Due Date -->
+      <div class="grid-item">
+        <label>Due Date</label>
+        <input type="text" value="02/06/2025" readonly />
+      </div>
+
+      <!-- Status -->
+      <div class="grid-item">
+        <label>Status</label>
+        <input type="text" value="New" readonly />
+      </div>
+
+      <!-- COR Type -->
+      <div class="grid-item">
+        <label>COR Type</label>
+        <input
+          type="text"
+          value="Fleet Equipment Failure & Vehicle Breakdown"
+          readonly
+        />
+      </div>
+
+      <!-- Creator -->
+      <div class="grid-item">
+        <label>Creator</label>
+        <input type="text" value="29030, CASSONDRA FOERTER - COM" readonly />
+      </div>
+
+      <!-- Route To -->
+      <div class="grid-item">
+        <label>Route To</label>
+        <select name="assignto" id="assignto">
+          <option selected value="29030">29030, CASSONDRA FOERTER - COM</option>
+          <option value="Supervisor">Supervisor Group</option>
+        </select>
+      </div>
+
+      <!-- Incident (Call) # -->
+      <div class="grid-item">
+        <label>Incident (Call) #</label>
+        <input type="text" />
+        <button class="view-button">View in VisiCAD</button>
+      </div>
+
+      <!-- Related CORs -->
+      <div class="grid-item">
+        <label>Related CORs</label>
+        <input type="text" />
+        <div class="form-actions">
+          <button class="btn primary">Add Related COR</button>
+          <button class="btn warn">Remove Related COR</button>
+        </div>
+      </div>
+    </div> <!-- End of Basic Information Content -->
+  </div> <!-- End of Basic Information (White Card) -->
+
+  <!----------------------------------------------------------------->
+
+  <!-- Breakdown Details -->
   <div class="container">
-    <h4 class="section-title">Breakdown Details:</h4>
-    <hr>
+    <h4>Breakdown Details:</h4>
+    <hr />
 
+
+    <!-- Breakdown Details Content -->
     <div class="grid-container">
-        <div class="grid-item">
-            <label class="req-input">Breakdown Type:*</label>
-            <select id="VehicleFailure_BreakDownType_FK">
-                <option value="2">Accident</option>
-                <option value="1">Equipment Failure</option>
-                <option value="3">Mechanical Failure</option>
-                <option value="4">Other</option>
-            </select>
-            <textarea id="VehicleFailure_TypeDescription"></textarea>
-        </div>
 
-        <div class="grid-item">
-            <label class="req-input">Date/Time of Failure:*</label>
-            <input type="datetime-local" id="VehicleFailure_FailureDate_Date">
-        </div>
-        <div class="grid-item">
-            <label class="req-input">Service/Station:*</label>
-            <input type="text" id="VehicleFailure_ServiceInfo">
-        </div>
-        <div class="grid-item">
-            <label>Unit ID:</label>
-            <input type="text" id="VehicleFailure_VehicleNum">
-        </div>
+      <!-- Breakdown Type* -->
+      <div class="grid-item">
+        <label class="req-input">Breakdown Type*</label>
+        <select id="VehicleFailure_BreakDownType_FK" required>
+          <option value="2">Accident</option>
+          <option value="1">Equipment Failure</option>
+          <option value="3">Mechanical Failure</option>
+          <option value="4">Other</option>
+        </select>
+        <textarea id="VehicleFailure_TypeDescription"></textarea>
+      </div>
+
+      <!-- Date/Time of Failure* -->
+      <div class="grid-item">
+        <label class="req-input">Date/Time of Failure*</label>
+        <input type="datetime-local" id="VehicleFailure_FailureDate_Date" required/>
+      </div>
+
+      <!-- Service/Station* -->
+      <div class="grid-item">
+        <label class="req-input">Service/Station*</label>
+        <input type="text" id="VehicleFailure_ServiceInfo" required/>
+      </div>
+
+      <!-- Failure Details or Other Info* -->
+      <div class="grid-item">
+        <label class="req-input"
+          >Failure Details or Other Info*</label
+        >
+        <textarea id="VehicleFailure_Description" rows="5" required></textarea>
+      </div>
+
+      <!-- Unit ID -->
+      <div class="grid-item">
+        <label>Unit ID</label>
+        <input type="text" id="VehicleFailure_VehicleNum" />
+      </div>
+
+      <!-- Container for Checkbox Fields. Wraps Fields as screen size changes -->
+      <div class="grid-flow">
+
+        <!-- Response Delay -->
         <div class="grid-item">
           <label for="pronouncedDateTime">Response Delay:</label>
           <div class="time-duration-container">
-            <input type="checkbox" id="delay" (change)="togglePronouncedBy()"/>
-            <input type="number" id="delay-hours" min="0" max="99" step="1" value="00" [disabled]="!isDelaySelected">
-            <p> : </p>
-            <input type="number" id="delay-minutes" min="0" max="59" step="1" value="00" [disabled]="!isDelaySelected">
+            <input type="checkbox" id="delay" (change)="toggleDelayTime()" />
+            <!-- Hours -->
+            <input
+              type="number"
+              id="delay-hours"
+              min="0"
+              max="99"
+              step="1"
+              value="00"
+              [disabled]="!isDelaySelected"
+            />
+            <p>:</p>
+            <!-- Minutes -->
+            <input
+              type="number"
+              id="delay-minutes"
+              min="0"
+              max="59"
+              step="1"
+              value="00"
+              [disabled]="!isDelaySelected"
+            />
           </div>
         </div>
+
+        <!-- Patient on Board -->
         <div class="grid-item">
-            <label>Patient on Board:</label>
-            <input type="checkbox" id="VehicleFailure_PatientOnBoard">
+          <label>Patient on Board:</label>
+          <input type="checkbox" id="VehicleFailure_PatientOnBoard" />
         </div>
-    </div>
-    <div class="grid-item">
-      <label class="req-input">Failure Breakdown Details or Other Info:*</label>
-      <textarea id="VehicleFailure_Description" rows="5"></textarea>
-    </div>
-  </div>
+      </div> <!-- End of container-flow -->
 
+    </div> <!-- End of Breakdown Details Content-->
+  </div> <!-- End of Breakdown Details (White Card) -->
+
+  <!----------------------------------------------------------------->
+
+  <!-- Narrative -->
   <div class="container">
-
-    <!-- Narrative -->
     <h4>Narrative:</h4>
     <hr>
 
@@ -145,16 +243,24 @@
       </tbody>
     </table>
 
-    <div class="grid-item">
-      <label>Comments:</label>
-      <textarea rows="5"></textarea>
-    </div>
+    <!-- Narrative Container for content under the table -->
+    <div class="narrative-container">
 
-    <!-- Action Buttons -->
-    <div class="form-actions">
-      <button class="btn primary">Save Changes</button>
-      <button class="btn primary">Save Changes and Exit</button>
-      <button class="btn warn">Reload Page</button>
-    </div>
-  </div>
+      <!-- Narrative Comments -->
+      <div class="grid-item">
+        <label>Comments</label>
+        <textarea rows="5"></textarea>
+      </div>
+
+      <!-- Form Action Buttons -->
+      <div class="form-actions">
+        <button class="btn primary" (click)="saveChanges()">Save Changes</button>
+        <button class="btn primary" (click)="saveAndExit()">
+          Save Changes and Exit
+        </button>
+        <button class="btn warn" (click)="reloadPage()">Reload Page</button>
+      </div>
+
+    </div> <!-- End Narrative Container -->
+  </div> <!-- End of Narrative (White Card)-->
 </form>
