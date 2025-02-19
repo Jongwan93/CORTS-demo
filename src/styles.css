@@ -3,7 +3,7 @@
 html, body {
   height: 100%;
   min-width: 500px;
-  margin: 0.5em;
+  margin: 1em;
   background-color: #CFEDED;
   font-family: "Raleway", "Arial", "Calibri";
   font-size: 1em;
@@ -17,6 +17,7 @@ h4{
   font-size: 1.2em;
 }
 
+/* Deafult button style */
 button, input[type="submit"]{
   text-align: center;
   min-width: 12em;
@@ -39,49 +40,26 @@ button:disabled{
   cursor: auto;
 }
 
-.container {
-  margin: 1em;
-  padding: 1.5em;
-  background-color: #ffffff;
-  box-shadow: 0em 0.4em 0.6em #0000001a;
-  border-radius: 1em;
-  overflow: auto;
-  min-width: 500px;
+/* Blue button color */
+button.primary, input[type="submit"].primary {
+  background-color: #047BC1;
+  color: white;
 }
 
-.container::-webkit-scrollbar {
-  border-radius: 1em;
+button.primary:hover input[type="submit"].primary:hover{
+  background-color: #054B72;
+  color: white;
 }
 
-.req-input {
-  color: #990000;
+/* Red button color */
+button.warn, input[type="submit"].warn {
+  background-color: #ED1C24;
+  color: white;
 }
 
-.grid-container {
-  grid-template-columns: repeat(2, 1fr);
-  display: grid;
-  gap: 2.5em;
-  padding: 1.5em;
-  align-items: start;
-}
-
-.grid-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5em;
-  min-height: 2.5em;
-}
-
-.grid-item label {
-  font-weight: bold;
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  margin-top: 1em;
+button.warn:hover, input[type="submit"].warn:hover{
+  background-color: #990000;
+  color: white;
 }
 
 input, select, textarea {
@@ -97,24 +75,10 @@ textarea {
   resize: vertical;
 }
 
-button.primary, input[type="submit"].primary {
-  background-color: #047BC1;
-  color: white;
-}
-
-button.primary:hover input[type="submit"].primary:hover{
-  background-color: #054B72;
-  color: white;
-}
-
-button.warn, input[type="submit"].warn {
-  background-color: #ED1C24;
-  color: white;
-}
-
-button.warn:hover, input[type="submit"].warn:hover{
-  background-color: #990000;
-  color: white;
+input[type="checkbox"] {
+  min-width: 1em;
+  min-height: 1em;
+  cursor: pointer;
 }
 
 table {
@@ -136,12 +100,82 @@ tbody tr {
   border-bottom: 1px solid #ccc;
 }
 
+/* Main large white container/card */
+.container {
+  margin: 2em;
+  padding: 2.5em;
+  background-color: #ffffff;
+  box-shadow: 0em 0.4em 0.6em #0000001a;
+  border-radius: 1em;
+  overflow: auto;
+  min-width: 500px;
+}
+
+.container::-webkit-scrollbar {
+  border-radius: 1em;
+}
+
+/* Used on Required Inputs (Makes labels red) */
+.req-input {
+  color: #990000;
+}
+
+/* Default container for forms */
+.grid-container {
+  grid-template-columns: repeat(3, 1fr);
+  display: grid;
+  gap: 3.5em;
+  padding: 1em;
+  align-items: start;
+}
+
+/* Two column container (Used in query) */
+.grid-container-2c {
+  grid-template-columns: repeat(2, 1fr);
+  display: grid;
+  gap: 3.5em;
+  padding: 1.5em;
+  align-items: start;
+}
+
+/* Allows content with this class to wrap as the screen size changes */
+.grid-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-evenly;
+  gap: 1em;
+}
+
+/* Container for holding content within the grid-container */
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 2.5em;
+}
+
+.grid-item label {
+  font-weight: bold;
+}
+
+/* Used for the buttons inside the form */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-top: 1em;
+}
+
+/* Used for the response delay fields */
 .time-duration-container{
   display: flex;
   align-items: center;
   gap:0.5em;
 }
 
+/* Used for Checkbox Fields */
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -156,8 +190,11 @@ tbody tr {
   white-space: nowrap;
 }
 
-input[type="checkbox"] {
-  min-width: 1em;
-  min-height: 1em;
-  cursor: pointer;
+/* Used for the narrative comments box and buttons */
+.narrative-container{
+  grid-template-columns: repeat(2, 1fr);
+  display: grid;
+  gap: 4em;
+  padding: 0.5em;
+  align-items: start;
 }

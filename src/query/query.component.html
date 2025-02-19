@@ -26,7 +26,7 @@
     <div class="grid-container">
       <!-- Date Created -->
       <div class="grid-item">
-        <label>Date Created:</label>
+        <label>Date Created</label>
         <div class="date-field">
           <label class="date-label">From:</label>
           <input type="date" id="objDateFrom" name="objDateFrom" />
@@ -43,7 +43,7 @@
 
       <!-- Date Due -->
       <div class="grid-item">
-        <label>Date Due:</label>
+        <label>Date Due</label>
         <div class="date-field">
           <label class="date-label">From:</label>
           <input type="date" id="objDateDueFrom" name="objDateDueFrom" />
@@ -118,8 +118,10 @@
     </div>
   </form>
 
+  <hr>
+
   <!-- Full Text Search -->
-  <div class="grid-container">
+  <div class="grid-container-2c">
     <div class="grid-item">
       <label>Full Text Search</label>
       <input type="text" name="txtFulltext" placeholder="Enter search text" />
@@ -127,7 +129,7 @@
 
     <!-- Sort By -->
     <div class="grid-item">
-      <label>Sort by:</label>
+      <label>Sort by</label>
       <select name="drpSortation">
         <option value="CORNumber:DESC">COR #</option>
         <option value="CreateDate:DESC">Date Created</option>
@@ -141,6 +143,7 @@
     </div>
   </div>
 
+  <!-- Search Button -->
   <div class="form-actions" align="center">
     <button mat-raised-button color="primary" type="submit">
       Search for CORs
@@ -172,6 +175,8 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination -->
     <div class="pagination">
       <button
         [disabled]="true"

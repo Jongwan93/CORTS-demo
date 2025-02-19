@@ -10,25 +10,15 @@ import { Title } from '@angular/platform-browser';
   templateUrl: './vsa-report.component.html',
   styleUrl: './vsa-report.component.css',
 })
+
 export class vsaReportComponent {
   constructor(private titleService: Title, private router:Router) {
     this.titleService.setTitle('CORTS - COR Entry (New)');
   }
 
+  // Variables
   relatedCORInput: string = '';
   relatedCORs: string[] = [];
-
-  addRelatedCOR() {
-    if (this.relatedCORInput.trim()) {
-      this.relatedCORs.push(this.relatedCORInput.trim());
-      this.relatedCORInput = '';
-    }
-  }
-
-  removeRelatedCOR() {
-    this.relatedCORs.pop();
-  }
-
   vsaData = {
     vsaType: '',
     vsaDate: '',
@@ -43,30 +33,20 @@ export class vsaReportComponent {
   isVSASelected = false;
   isALSSelected = false;
 
-  vsaTypeCheck(): boolean {
-    if (this.isALSSelected || this.isVSASelected) {
-      console.log('Report type selected');
-      return true;
-    } else {
-      console.error('You must select either ALS, VSA or both.');
-      window.alert('Error: You must select either ALS, VSA or both.');
-      return false;
+  // Method for adding related CORs
+  addRelatedCOR() {
+    if (this.relatedCORInput.trim()) {
+      this.relatedCORs.push(this.relatedCORInput.trim());
+      this.relatedCORInput = '';
     }
   }
 
-  validateReqFields(): boolean {
-    const reqFields = document.querySelectorAll('[required]');
-    for (let field of reqFields) {
-      const inputField = field as HTMLInputElement;
-      if (!inputField.value) {
-        console.error('Required field not filled:', field);
-        window.alert('Error: Not all required fields are filled in.');
-        return false;
-      }
-    }
-    return true;
+  // Method for removing related CORs
+  removeRelatedCOR() {
+    this.relatedCORs.pop();
   }
 
+  // Method for triggering vsaReqInput if VSA type is selected
   toggleReportType(reportType: string): void {
     if (reportType === 'vsa') {
       this.isVSASelected = !this.isVSASelected;
@@ -76,6 +56,7 @@ export class vsaReportComponent {
     }
   }
 
+  // If VSA is selected then Pronounced By and Pronounced Dates become required fields
   vsaReqInput(): void {
     if (this.isVSASelected) {
       for (let i = 0; i < this.reqVSAElements.length; i++) {
@@ -90,6 +71,32 @@ export class vsaReportComponent {
         vsaElement.removeAttribute('required');
       }
     }
+  }
+
+  // Method verifies of the Report Type is selected
+  vsaTypeCheck(): boolean {
+    if (this.isALSSelected || this.isVSASelected) {
+      console.log('Report type selected');
+      return true;
+    } else {
+      console.error('You must select either ALS, VSA, or both.');
+      window.alert('Error: You must select either ALS, VSA or both.');
+      return false;
+    }
+  }
+
+  // Method verifies if all Required Fields are filled in
+  validateReqFields(): boolean {
+    const reqFields = document.querySelectorAll('[required]');
+    for (let field of reqFields) {
+      const inputField = field as HTMLInputElement;
+      if (!inputField.value) {
+        console.error('Required field not filled:', field);
+        window.alert('Error: Not all required fields are filled in.');
+        return false;
+      }
+    }
+    return true;
   }
 
   onSubmit(): void {

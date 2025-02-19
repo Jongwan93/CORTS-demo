@@ -213,4 +213,12 @@ export class IncidentReportComponent implements OnInit {
       this.selectedRelatedCOR = '';
     }
   }
+
+  reloadPage(): void {
+    window.location.reload();
+  }
+
+  saveAndExit(): void {
+    console.log('Changes saved and exited');
+  }
 }
