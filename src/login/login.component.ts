@@ -52,6 +52,7 @@ export class LoginComponent {
         next: (response) => {
 
           localStorage.setItem('login-token', response.data.accessToken); // save token
+          localStorage.setItem('loginUserName', response.data.userPrincipal.username);
 
           this.authService.setUser(
             response.data.userPrincipal,

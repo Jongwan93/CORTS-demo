@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, CommonModule } from '@angular/common';
 import { AuthService } from '../app/services/auth.service';
 import { Title } from '@angular/platform-browser';
@@ -22,11 +22,13 @@ export class IncidentReportComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService); // AuthService inject
   userName: string = ''; // user's name is stored
+  loginUserName: string = '';
   groupCode: string = ''; // user's functionality group code
   routedToGroup: string = ''; // Routed To group full name
   groupCodeID: number = 0; // group code ID for create incident report API request body
   corTypeKey: number = 0; // COR Type Key
   corType: string = ''; // COR Type (Display Name)
+  //incidentTypeID = ''; // incident type ID
 
   ngOnInit() {
     this.setCurrentTime();
@@ -61,6 +63,9 @@ export class IncidentReportComponent implements OnInit {
         this.groupCodeID = matchedGroup.userGroupKey;
       }
     }
+
+    this.loginUserName = localStorage.getItem('loginUsername') || '';
+
 
     this.setInitialCorStatus();
   } // end of ngOnInit()
@@ -138,7 +143,6 @@ export class IncidentReportComponent implements OnInit {
   }
 
   // ---------------------------------Incident Report-----------------------------
-  incidentData: any = {}; // Object to store fetched incident details
   incidentType: string = ''; // dropdown menu
   previousIncidentType: string = ''; // to detect change
   incidentDateTime = '';
@@ -229,6 +233,53 @@ export class IncidentReportComponent implements OnInit {
 
     // COR Status change to "OPEN"
     this.setStatusToOpen();
+
+    //-----------------------create incident API call--------------------------------
+    const requestBody = {
+      assignedTo: this.routedToGroup,
+      assignedToGroup: 'true',
+      cadIncidentNum: '454-Z023046766', // hard coded for now
+      corStatus: this.statusID,
+      corType: this.corTypeKey,
+      createDate:  new Date(this.fullDateTime).toISOString(),
+      createdby: this.loginUserName,
+      incidenType: this.incidentType,
+      incidentDateTime: this.incidentDateTime,
+      incidentDetails: this.incidentCommentText,
+      userGroup: this.groupCodeID,
+      narratives: [
+        {
+          corFk: 0,
+          timeStamp: new Date().toISOString(),
+          systemGenerated: false,
+          createdBy: this.userName,
+          createdByInitials: this.loginUserName,
+          narrativeText: this.narrativeCommentText || 'New Incident Created',
+        },
+      ],
+      relatedCors: [],
+    };
+
+    console.log('Request Body:', requestBody);
+
+    //bring token
+    const token = localStorage.getItem('login-token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    this.http.post('/api/reports/incident-report/create', requestBody, { headers })
+      .subscribe(
+        (response) => {
+          console.log('Response:', response);
+          alert('Incident Report Successfully Created');
+        },
+        (error) => {
+          console.error('Error:', error);
+          alert('Failed to Create Incident Report');
+        }
+      );
+
   } // --------- end of save changes function
 
   //-------------------------------UTILITY------------------------------------
