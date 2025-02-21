@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import {Title} from "@angular/platform-browser";
+import { Title } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-mainpage',
@@ -25,15 +25,15 @@ export class MainpageComponent{
 
     if (radioValue === 'NewCOR'){
       if (selectedValue === '1') {
-        this.router.navigate(['/incident-report']);
+        this.router.navigate(['/incident-report', { corTypeKey: selectedValue }]);
       } else if (selectedValue === '2') {
-        this.router.navigate(['/vsa-report']);
+        this.router.navigate(['/vsa-report', { corTypeKey: selectedValue }]);
       } else if (selectedValue === '3') {
-        this.router.navigate(['/complaint-report']);
+        this.router.navigate(['/complaint-report', { corTypeKey: selectedValue }]);
       } else if (selectedValue === '4') {
-        this.router.navigate(['/cacc-equipment-failure']);
+        this.router.navigate(['/cacc-equipment-failure', { corTypeKey: selectedValue }]);
       } else if (selectedValue === '5') {
-        this.router.navigate(['/fleet-equipment-report']);
+        this.router.navigate(['/fleet-equipment-report', { corTypeKey: selectedValue }]);
       } else {
         alert('Please select the correct option to proceed.');
       }

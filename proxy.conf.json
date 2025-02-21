@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://ehsxiyfwkds202.ehsa2.ca:8080",
+    "target": "http://ehsxiyfwkds202.ehsa2.ca:8080/",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
