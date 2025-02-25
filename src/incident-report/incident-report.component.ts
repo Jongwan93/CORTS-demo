@@ -5,6 +5,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, CommonModule } from '@angular/common';
 import { AuthService } from '../app/services/auth.service';
 import { Title } from '@angular/platform-browser';
+import { IncidentService } from '../app/services/incident-report.service';
+import { LookupService } from '../app/services/lookup.service';
 
 @Component({
   selector: 'app-incident-report',
@@ -21,6 +23,9 @@ export class IncidentReportComponent implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService); // AuthService inject
+  private incidentService = inject(IncidentService);
+  private lookupService = inject(LookupService);
+
   userName: string = ''; // user's name is stored
   loginUserName: string = '';
   groupCode: string = ''; // user's functionality group code
@@ -28,10 +33,11 @@ export class IncidentReportComponent implements OnInit {
   groupCodeID: number = 0; // group code ID for create incident report API request body
   corTypeKey: number = 0; // COR Type Key
   corType: string = ''; // COR Type (Display Name)
-  //incidentTypeID = ''; // incident type ID
+  tempIncidentComment: string = '';
+  tempNarrativeComment: string = '';
+  incidentTypeList: any[] = [];
 
   ngOnInit() {
-    this.setCurrentTime();
     this.userName = this.authService.getUserName(); // fetch user info
     this.groupCode = this.authService.getGroupCode(); // fetch group code (COM)
 
@@ -64,10 +70,19 @@ export class IncidentReportComponent implements OnInit {
       }
     }
 
-    this.loginUserName = localStorage.getItem('loginUsername') || '';
-
+    this.loginUserName = localStorage.getItem('loginUserName') || '';
 
     this.setInitialCorStatus();
+
+    // update time of created
+    if (this.status == 'Initial Assignment') {
+      this.setCurrentTime();
+    }
+
+    const incidentData = this.lookupService.getLookupData('incident-type');
+    if (incidentData && incidentData.data){
+      this.incidentTypeList = incidentData.data;
+    }
   } // end of ngOnInit()
 
   // -------------------------------Basic Information---------------------------
@@ -101,13 +116,23 @@ export class IncidentReportComponent implements OnInit {
     if (CORstatus) {
       const parsedStatus = JSON.parse(CORstatus);
 
+      // status = Initial Assignment
       if (this.corNumber === 'New') {
+        
         this.statusID = 4;
+
         const initialAssignment = parsedStatus.data.find(
           (status: any) => status.cORStatusKey === 4
         );
-
         this.status = initialAssignment.displayName;
+      }
+      // status = Open
+      else {
+        this.statusID = 1;
+        const open = parsedStatus.data.find(
+          (status: any) => status.cORStatusKey === 1
+        );
+        this.status = open.displayName;
       }
     }
   }
@@ -148,15 +173,23 @@ export class IncidentReportComponent implements OnInit {
   incidentDateTime = '';
   incidentCommentText: string = ''; // incident details input
 
+  // need incident type name for html
   getIncidentTypeText(value: string): string {
-    const incidentTypes: { [key: string]: string } = {
-      '3': 'Delay in Response',
-      '2': 'MCI',
-      '4': 'Other',
-      '1': 'Unusual Occurrence',
-    };
-    return incidentTypes[value] || 'Unknown';
+    const findIncidentType = this.incidentTypeList.find(
+      (type) => type.incidentTypeKey === Number(value)
+    );
+    return findIncidentType ? findIncidentType.displayName : 'Unknown';
   }
+
+  // find the key to send API
+  getIncidentTypeKey(displayName: string): number | null {
+    const findIncidentType = this.incidentTypeList.find(
+      (type) => type.displayName === displayName
+    );
+    return findIncidentType ? findIncidentType.incidentTypeKey : null;
+  }
+  
+  
 
   // ---------------------------------Narrative------------------------------------
   narrativeCommentText: string = ''; // narrative commnet input
@@ -203,6 +236,7 @@ export class IncidentReportComponent implements OnInit {
 
     // narrative comment logic
     if (this.narrativeCommentText.trim()) {
+      const tempNarrativeComment = this.narrativeCommentText;
       this.combinedEntries = [
         ...this.combinedEntries,
         {
@@ -213,11 +247,13 @@ export class IncidentReportComponent implements OnInit {
           type: 'narrative',
         },
       ];
+      this.tempNarrativeComment = tempNarrativeComment;
       this.narrativeCommentText = '';
     }
 
     // incident comment logic
     if (this.incidentCommentText.trim()) {
+      const tempIncidentComment = this.incidentCommentText;
       this.combinedEntries = [
         ...this.combinedEntries,
         {
@@ -228,33 +264,31 @@ export class IncidentReportComponent implements OnInit {
           type: 'incident',
         },
       ];
+      this.tempIncidentComment = tempIncidentComment;
       this.incidentCommentText = '';
     }
 
-    // COR Status change to "OPEN"
-    this.setStatusToOpen();
-
     //-----------------------create incident API call--------------------------------
     const requestBody = {
-      assignedTo: this.routedToGroup,
+      assignedTo: 'Supervisor', // hard coded for now
       assignedToGroup: 'true',
       cadIncidentNum: '454-Z023046766', // hard coded for now
       corStatus: this.statusID,
       corType: this.corTypeKey,
-      createDate:  new Date(this.fullDateTime).toISOString(),
+      createDate: this.fullDateTime,
       createdby: this.loginUserName,
       incidenType: this.incidentType,
-      incidentDateTime: this.incidentDateTime,
-      incidentDetails: this.incidentCommentText,
+      incidentDateTime: new Date(this.incidentDateTime).toISOString(),
+      incidentDetails: this.tempIncidentComment,
       userGroup: this.groupCodeID,
       narratives: [
         {
           corFk: 0,
           timeStamp: new Date().toISOString(),
-          systemGenerated: false,
+          systemGenerated: true,
           createdBy: this.userName,
           createdByInitials: this.loginUserName,
-          narrativeText: this.narrativeCommentText || 'New Incident Created',
+          narrativeText: this.tempNarrativeComment || 'New Incident Created',
         },
       ],
       relatedCors: [],
@@ -265,12 +299,17 @@ export class IncidentReportComponent implements OnInit {
     //bring token
     const token = localStorage.getItem('login-token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
-    this.http.post('/api/reports/incident-report/create', requestBody, { headers })
+    this.http
+      .post('/api/reports/incident-report/create', requestBody, { headers })
       .subscribe(
         (response) => {
+          this.incidentService.setIncidentResponse(response);
+
+          this.corNumber = this.incidentService.getCorNumber();
+
           console.log('Response:', response);
           alert('Incident Report Successfully Created');
         },
@@ -280,11 +319,17 @@ export class IncidentReportComponent implements OnInit {
         }
       );
 
+    // only update created, due-date time when status is not initial assignment
+    if (this.status == 'Initial Assignment') {
+      this.setCurrentTime();
+    }
+
+    this.setInitialCorStatus();
   } // --------- end of save changes function
 
   //-------------------------------UTILITY------------------------------------
-  fullDateTime: string = ''; // Current date + time
-  dueDate: string = ''; // Due date (two days after)
+  fullDateTime: string = 'New'; // Current date + time
+  dueDate: string = 'New'; // Due date (two days after)
 
   // formatting the date
   formatDate(date: Date): string {
@@ -309,18 +354,38 @@ export class IncidentReportComponent implements OnInit {
       .replace(',', '');
   }
 
+  // ISO 8601 format to MM/DD/YYYY HH:mm:ss
+  formatDisplayDateTime(isoString: string): string {
+    const date = new Date(isoString);
+
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
   // calculate current time and due date (+2 days)
   setCurrentTime() {
     const now = new Date();
+    this.fullDateTime = now.toISOString();
     this.createdDate = this.formatDate(now);
     this.createdTime = this.formatTime(now);
-    this.fullDateTime = `${this.createdDate} ${this.createdTime}`;
 
     const dueDateCalc = new Date(now);
     dueDateCalc.setDate(dueDateCalc.getDate() + 2);
     this.dueDate = this.formatDate(dueDateCalc);
   }
 
+  /* not working
   // change status to OPEN when save change button is clicked
   setStatusToOpen() {
     const CORstatus = localStorage.getItem('lookup-corts-status');
@@ -333,8 +398,8 @@ export class IncidentReportComponent implements OnInit {
 
       if (openStatus) {
         this.status = openStatus.displayName;
-        console.log(`🔹 COR Status updated to: ${this.status}`);
+        console.log(`COR Status updated to: ${this.status}`);
       }
     }
-  }
+  }*/
 }

@@ -41,7 +41,7 @@
       <!-- Created -->
       <div class="grid-item">
         <label>Created</label>
-        <input type="text" [value]="fullDateTime" disabled />
+        <input type="text" [value]="formatDisplayDateTime(fullDateTime)" disabled />
       </div>
 
       <!-- COR # -->
@@ -146,10 +146,9 @@
         <label class="req-input">Incident Type*</label>
         <select [(ngModel)]="incidentType" name="incidentType" required>
           <option value="">-- Select Incident Type --</option>
-          <option value="1">Delay in Response</option>
-          <option value="2">MCI</option>
-          <option value="3">Other</option>
-          <option value="4">Unusual Occurrence</option>
+          <option *ngFor="let type of incidentTypeList" [value]="type.incidentTypeKey">
+            {{ type.displayName }}
+          </option>
         </select>
       </div>
 
