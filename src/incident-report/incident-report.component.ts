@@ -16,18 +16,19 @@ import { LookupService } from '../app/services/lookup.service';
   styleUrl: './incident-report.component.css',
 })
 export class IncidentReportComponent implements OnInit {
-  constructor(private titleService: Title, private router: Router) {
-    this.titleService.setTitle('CORTS - COR Entry (New)');
+  constructor(private titleService: Title) {
+    this.titleService.setTitle('CORTS - COR Entry (New)'); // browser title name
   }
 
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
-  private authService = inject(AuthService); // AuthService inject
+  // services
+  private authService = inject(AuthService);
   private incidentService = inject(IncidentService);
   private lookupService = inject(LookupService);
 
-  userName: string = ''; // user's name is stored
-  loginUserName: string = '';
+  userName: string = ''; // user's real name
+  loginUserName: string = ''; // login ID
   groupCode: string = ''; // user's functionality group code
   routedToGroup: string = ''; // Routed To group full name
   groupCodeID: number = 0; // group code ID for create incident report API request body
@@ -126,14 +127,6 @@ export class IncidentReportComponent implements OnInit {
         );
         this.status = initialAssignment.displayName;
       }
-      // status = Open
-      else {
-        this.statusID = 1;
-        const open = parsedStatus.data.find(
-          (status: any) => status.cORStatusKey === 1
-        );
-        this.status = open.displayName;
-      }
     }
   }
 
@@ -166,6 +159,8 @@ export class IncidentReportComponent implements OnInit {
       this.selectedRelatedCOR = '';
     }
   }
+
+
 
   // ---------------------------------Incident Report-----------------------------
   incidentType: string = ''; // dropdown menu
@@ -200,6 +195,7 @@ export class IncidentReportComponent implements OnInit {
     comment: string;
     type: string;
   }[] = [];
+
 
   // save changes button
   saveChanges() {
@@ -268,9 +264,9 @@ export class IncidentReportComponent implements OnInit {
       this.incidentCommentText = '';
     }
 
-    //-----------------------create incident API call--------------------------------
+    //-----------------------create incident API call-------------------------        -----------------
     const requestBody = {
-      assignedTo: 'Supervisor', // hard coded for now
+      assignedTo: this.routedToGroup,
       assignedToGroup: 'true',
       cadIncidentNum: '454-Z023046766', // hard coded for now
       corStatus: this.statusID,
@@ -324,7 +320,8 @@ export class IncidentReportComponent implements OnInit {
       this.setCurrentTime();
     }
 
-    this.setInitialCorStatus();
+    this.setStatusToCreate();
+    
   } // --------- end of save changes function
 
   //-------------------------------UTILITY------------------------------------
@@ -385,21 +382,21 @@ export class IncidentReportComponent implements OnInit {
     this.dueDate = this.formatDate(dueDateCalc);
   }
 
-  /* not working
   // change status to OPEN when save change button is clicked
-  setStatusToOpen() {
+  setStatusToCreate() {
     const CORstatus = localStorage.getItem('lookup-corts-status');
+
     if (CORstatus) {
       const parsedStatus = JSON.parse(CORstatus);
 
       const openStatus = parsedStatus.data.find(
-        (status: any) => status.displayName === 'OPEN'
+        (status: any) => status.displayName === 'Create'
       );
+      this.statusID = openStatus.cORStatusKey;
 
       if (openStatus) {
         this.status = openStatus.displayName;
-        console.log(`COR Status updated to: ${this.status}`);
       }
     }
-  }*/
+  }
 }
