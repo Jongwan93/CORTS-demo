@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, CommonModule } from '@angular/common';
 import { AuthService } from '../app/services/auth.service';
@@ -16,7 +16,9 @@ import { LookupService } from '../app/services/lookup.service';
   styleUrl: './incident-report.component.css',
 })
 export class IncidentReportComponent implements OnInit {
-  constructor(private titleService: Title) {
+  private titleService = inject(Title);
+
+  constructor() {
     this.titleService.setTitle('CORTS - COR Entry (New)'); // browser title name
   }
 
@@ -87,8 +89,6 @@ export class IncidentReportComponent implements OnInit {
   } // end of ngOnInit()
 
   // -------------------------------Basic Information---------------------------
-  // fetching auth service to use user info
-
   createdDate: string = 'New'; // Current date
   createdTime: string = ''; // Current time
   corNumber = 'New'; // COR#
@@ -162,7 +162,7 @@ export class IncidentReportComponent implements OnInit {
 
 
 
-  // ---------------------------------Incident Report-----------------------------
+  // ------------------------Incident Report-----------------------------
   incidentType: string = ''; // dropdown menu
   previousIncidentType: string = ''; // to detect change
   incidentDateTime = '';
@@ -215,6 +215,20 @@ export class IncidentReportComponent implements OnInit {
 
     //incident type is changed
     if (this.previousIncidentType !== this.incidentType) {
+      if (this.combinedEntries.length < 1){
+        console.log("Entry of new COR created");
+        this.combinedEntries = [
+          {
+            date: this.formatDate(now),
+            time: this.formatTime(now),
+            user: this.userName.split(', ')[0] || 'Unknown',
+            comment: "New COR Created",
+            type: 'incident',
+          },
+          ...this.combinedEntries,
+        ];
+      }
+      
       this.combinedEntries = [
         ...this.combinedEntries,
         {
@@ -226,32 +240,16 @@ export class IncidentReportComponent implements OnInit {
           )}`,
           type: 'incident',
         },
+        ...this.combinedEntries,
       ];
       this.previousIncidentType = this.incidentType;
-    }
-
-    // narrative comment logic
-    if (this.narrativeCommentText.trim()) {
-      const tempNarrativeComment = this.narrativeCommentText;
-      this.combinedEntries = [
-        ...this.combinedEntries,
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: this.narrativeCommentText.trim(),
-          type: 'narrative',
-        },
-      ];
-      this.tempNarrativeComment = tempNarrativeComment;
-      this.narrativeCommentText = '';
     }
 
     // incident comment logic
     if (this.incidentCommentText.trim()) {
       const tempIncidentComment = this.incidentCommentText;
+      
       this.combinedEntries = [
-        ...this.combinedEntries,
         {
           date: this.formatDate(now),
           time: this.formatTime(now),
@@ -259,9 +257,27 @@ export class IncidentReportComponent implements OnInit {
           comment: this.incidentCommentText.trim(),
           type: 'incident',
         },
+        ...this.combinedEntries,
       ];
       this.tempIncidentComment = tempIncidentComment;
       this.incidentCommentText = '';
+    }
+
+    // narrative comment logic
+    if (this.narrativeCommentText.trim()) {
+      const tempNarrativeComment = this.narrativeCommentText;
+      this.combinedEntries = [
+        {
+          date: this.formatDate(now),
+          time: this.formatTime(now),
+          user: this.userName.split(', ')[0] || 'Unknown',
+          comment: this.narrativeCommentText.trim(),
+          type: 'narrative',
+        },
+        ...this.combinedEntries,
+      ];
+      this.tempNarrativeComment = tempNarrativeComment;
+      this.narrativeCommentText = '';
     }
 
     //-----------------------create incident API call-------------------------        -----------------
@@ -290,7 +306,7 @@ export class IncidentReportComponent implements OnInit {
       relatedCors: [],
     };
 
-    console.log('Request Body:', requestBody);
+    console.log('Request Body:', requestBody); // print request body
 
     //bring token
     const token = localStorage.getItem('login-token');
@@ -305,8 +321,7 @@ export class IncidentReportComponent implements OnInit {
           this.incidentService.setIncidentResponse(response);
 
           this.corNumber = this.incidentService.getCorNumber();
-
-          console.log('Response:', response);
+          console.log('Response:', response); // print response
           alert('Incident Report Successfully Created');
         },
         (error) => {
@@ -382,7 +397,7 @@ export class IncidentReportComponent implements OnInit {
     this.dueDate = this.formatDate(dueDateCalc);
   }
 
-  // change status to OPEN when save change button is clicked
+  // change status to CREATE when save change button is clicked
   setStatusToCreate() {
     const CORstatus = localStorage.getItem('lookup-corts-status');
 

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -12,6 +12,8 @@ export class AuthService {
     const fullUserData = { ...userData, personnel: personnelData };
     localStorage.setItem('user-data', JSON.stringify(fullUserData));
     this.userSubject.next(fullUserData);
+
+    console.log("User Data stored: " + JSON.stringify(fullUserData));
   }
 
   getUser() {
