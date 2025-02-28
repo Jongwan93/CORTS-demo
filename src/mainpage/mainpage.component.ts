@@ -40,7 +40,7 @@ export class MainpageComponent{
     } else if (radioValue === 'FindCOR') {
       this.router.navigate(['/query'])
     } else if (radioValue === 'Logout'){
-      this.router.navigate(['/login'])
+      this.router.navigate(['/logout'])
     }else {
       alert('Please select the correct option to proceed.');
     }

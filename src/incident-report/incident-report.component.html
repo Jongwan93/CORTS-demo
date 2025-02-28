@@ -79,9 +79,11 @@
       <div class="grid-item">
         <label>Route To</label>
         <!-- how do I fetch the current user information?-->
-        <select>
-          <option selected>{{ userName }}</option>
-          <option>{{ routedToGroup }}</option>
+         <!--tow way binding. set routedToSelction default-->
+        <select (change)="routedToSelectionChange($event)">
+          <option selected>select routed to option</option>
+          <option [value]="userName">{{ userName }}</option>
+          <option [value]="routedToGroup">{{ routedToGroup }}</option>
         </select>
       </div>
 

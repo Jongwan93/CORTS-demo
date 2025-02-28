@@ -38,7 +38,11 @@ export class IncidentReportComponent implements OnInit {
   corType: string = ''; // COR Type (Display Name)
   tempIncidentComment: string = '';
   tempNarrativeComment: string = '';
+  isAssignedtoGroup: boolean = true;
   incidentTypeList: any[] = [];
+  routedToSelection: string = '';
+  previousRoutedTo: string = '';
+  isSystemCreated: boolean = true;
 
   ngOnInit() {
     this.userName = this.authService.getUserName(); // fetch user info
@@ -83,7 +87,7 @@ export class IncidentReportComponent implements OnInit {
     }
 
     const incidentData = this.lookupService.getLookupData('incident-type');
-    if (incidentData && incidentData.data){
+    if (incidentData && incidentData.data) {
       this.incidentTypeList = incidentData.data;
     }
   } // end of ngOnInit()
@@ -119,7 +123,6 @@ export class IncidentReportComponent implements OnInit {
 
       // status = Initial Assignment
       if (this.corNumber === 'New') {
-        
         this.statusID = 4;
 
         const initialAssignment = parsedStatus.data.find(
@@ -160,7 +163,27 @@ export class IncidentReportComponent implements OnInit {
     }
   }
 
+  // Routed To selection detecting &&
+  // find if report is assigned to group
+  routedToSelectionChange(event: Event): void {
+    const selection = event.target as HTMLSelectElement;
+    this.routedToSelection = selection.value;
+    console.log('selected Routed To is: ' + this.routedToSelection);
 
+    const userGroups = localStorage.getItem('lookup-user-group');
+    if (userGroups) {
+      const parsedUserGroups = JSON.parse(userGroups);
+      // loop through the userGroup object
+      const matchedGroup = parsedUserGroups.data.find(
+        (group: any) => group.displayName === this.routedToSelection
+      );
+      if (matchedGroup) {
+        this.isAssignedtoGroup = true;
+      } else {
+        this.isAssignedtoGroup = false;
+      }
+    }
+  }
 
   // ------------------------Incident Report-----------------------------
   incidentType: string = ''; // dropdown menu
@@ -183,8 +206,6 @@ export class IncidentReportComponent implements OnInit {
     );
     return findIncidentType ? findIncidentType.incidentTypeKey : null;
   }
-  
-  
 
   // ---------------------------------Narrative------------------------------------
   narrativeCommentText: string = ''; // narrative commnet input
@@ -195,7 +216,6 @@ export class IncidentReportComponent implements OnInit {
     comment: string;
     type: string;
   }[] = [];
-
 
   // save changes button
   saveChanges() {
@@ -211,31 +231,57 @@ export class IncidentReportComponent implements OnInit {
       return;
     }
 
+    if (this.routedToSelection === '') {
+      alert('Please select Route To option');
+      return;
+    }
+
     const now = new Date();
 
-    //incident type is changed
-    if (this.previousIncidentType !== this.incidentType) {
-      if (this.combinedEntries.length < 1){
-        console.log("Entry of new COR created");
-        this.combinedEntries = [
-          {
-            date: this.formatDate(now),
-            time: this.formatTime(now),
-            user: this.userName.split(', ')[0] || 'Unknown',
-            comment: "New COR Created",
-            type: 'incident',
-          },
-          ...this.combinedEntries,
-        ];
-      }
-      
+    // incident comment logic
+    if (this.combinedEntries.length === 0) {
+      this.previousRoutedTo = this.routedToSelection;
       this.combinedEntries = [
-        ...this.combinedEntries,
         {
           date: this.formatDate(now),
           time: this.formatTime(now),
           user: this.userName.split(', ')[0] || 'Unknown',
-          comment: `"Incident type" was changed to: ${this.getIncidentTypeText(
+          comment: `Routed To ${this.routedToSelection}`,
+          type: 'incident',
+        },
+        {
+          date: this.formatDate(now),
+          time: this.formatTime(now),
+          user: this.userName.split(', ')[0] || 'Unknown',
+          comment: 'New COR Created',
+          type: 'incident',
+        },
+
+        ...this.combinedEntries, // always first index
+      ];
+    }
+
+    if (this.previousRoutedTo !== this.routedToSelection) {
+      this.combinedEntries = [
+        {
+          date: this.formatDate(now),
+          time: this.formatTime(now),
+          user: this.userName.split(', ')[0] || 'Unknown',
+          comment: `Routed To ${this.routedToSelection}`,
+          type: 'incident',
+        },
+        ...this.combinedEntries,
+      ];
+    }
+
+    const tempIncidentComment = this.incidentCommentText;
+    if (this.previousIncidentType !== this.incidentType) {
+      this.combinedEntries = [
+        {
+          date: this.formatDate(now),
+          time: this.formatTime(now),
+          user: this.userName.split(', ')[0] || 'Unknown',
+          comment: `Incident type was updated to: ${this.getIncidentTypeText(
             this.incidentType
           )}`,
           type: 'incident',
@@ -245,10 +291,7 @@ export class IncidentReportComponent implements OnInit {
       this.previousIncidentType = this.incidentType;
     }
 
-    // incident comment logic
     if (this.incidentCommentText.trim()) {
-      const tempIncidentComment = this.incidentCommentText;
-      
       this.combinedEntries = [
         {
           date: this.formatDate(now),
@@ -282,8 +325,8 @@ export class IncidentReportComponent implements OnInit {
 
     //-----------------------create incident API call-------------------------        -----------------
     const requestBody = {
-      assignedTo: this.routedToGroup,
-      assignedToGroup: 'true',
+      assignedTo: this.routedToSelection,
+      assignedToGroup: this.isAssignedtoGroup,
       cadIncidentNum: '454-Z023046766', // hard coded for now
       corStatus: this.statusID,
       corType: this.corTypeKey,
@@ -336,7 +379,6 @@ export class IncidentReportComponent implements OnInit {
     }
 
     this.setStatusToCreate();
-    
   } // --------- end of save changes function
 
   //-------------------------------UTILITY------------------------------------
