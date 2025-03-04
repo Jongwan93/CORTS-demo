@@ -8,6 +8,7 @@ export class IncidentService {
 
   setIncidentResponse(response: any) {
     this.incidentResponse = response;
+    console.log("response: " + JSON.stringify(response))
   }
 
   getIncidentResponse() {
@@ -15,11 +16,14 @@ export class IncidentService {
   }
 
   getTimestamp(): string {
-    console.log("this is:" + this.incidentResponse.timestamp)
     return this.incidentResponse?.timestamp || '';
   }
 
   getCorNumber(): string{
     return this.incidentResponse?.data.corMain?.corNumber || 'New';
+  }
+
+  getcorMainKey(): string{
+    return this.incidentResponse?.data.corMain?.corMainKey || '';
   }
 }

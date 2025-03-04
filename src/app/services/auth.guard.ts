@@ -10,10 +10,13 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(): boolean {
-    if (this.authService.isLoggedIn()) {
+    const isLoggedIn = this.authService.isLoggedIn();
+    const hasUserData = !!localStorage.getItem('user-data');
+    if (isLoggedIn && hasUserData) {
       return true;
     } else {
-      console.warn('Unauthorized access - redirecting to /login');
+      console.warn('Unauthorized access - redirecting to login page');
+      localStorage.clear();
       this.router.navigate(['/login']);
       return false;
     }

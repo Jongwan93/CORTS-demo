@@ -37,12 +37,11 @@ export class IncidentReportComponent implements OnInit {
   corTypeKey: number = 0; // COR Type Key
   corType: string = ''; // COR Type (Display Name)
   tempIncidentComment: string = '';
-  tempNarrativeComment: string = '';
   isAssignedtoGroup: boolean = true;
   incidentTypeList: any[] = [];
   routedToSelection: string = '';
   previousRoutedTo: string = '';
-  isSystemCreated: boolean = true;
+  isSystemGenerated: boolean = true;
 
   ngOnInit() {
     this.userName = this.authService.getUserName(); // fetch user info
@@ -168,7 +167,6 @@ export class IncidentReportComponent implements OnInit {
   routedToSelectionChange(event: Event): void {
     const selection = event.target as HTMLSelectElement;
     this.routedToSelection = selection.value;
-    console.log('selected Routed To is: ' + this.routedToSelection);
 
     const userGroups = localStorage.getItem('lookup-user-group');
     if (userGroups) {
@@ -236,95 +234,88 @@ export class IncidentReportComponent implements OnInit {
       return;
     }
 
-    const now = new Date();
-
     // incident comment logic
-    if (this.combinedEntries.length === 0) {
-      this.previousRoutedTo = this.routedToSelection;
-      this.combinedEntries = [
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: `Routed To ${this.routedToSelection}`,
-          type: 'incident',
-        },
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: 'New COR Created',
-          type: 'incident',
-        },
-
-        ...this.combinedEntries, // always first index
-      ];
+    if (
+      !this.incidentType ||
+      this.incidentType === '' ||
+      !this.incidentDateTime ||
+      this.incidentDateTime.trim() === ''
+    ) {
+      alert('Please complete all the required fields.');
+      return;
     }
 
-    if (this.previousRoutedTo !== this.routedToSelection) {
-      this.combinedEntries = [
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: `Routed To ${this.routedToSelection}`,
-          type: 'incident',
-        },
-        ...this.combinedEntries,
-      ];
+    if (this.routedToSelection === '') {
+      alert('Please select Route To option');
+      return;
     }
 
-    const tempIncidentComment = this.incidentCommentText;
-    if (this.previousIncidentType !== this.incidentType) {
-      this.combinedEntries = [
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: `Incident type was updated to: ${this.getIncidentTypeText(
-            this.incidentType
-          )}`,
-          type: 'incident',
-        },
-        ...this.combinedEntries,
-      ];
-      this.previousIncidentType = this.incidentType;
+    const now = new Date();
+    const currentTimestamp = now.toISOString();
+    const isNewReport = this.corNumber === 'New';
+
+    this.combinedEntries = [...this.combinedEntries];
+
+    const narrativesArray: {
+      narrativeKey: number;
+      corFk: number;
+      timeStamp: string;
+      systemGenerated: boolean;
+      createdBy: string;
+      createdByInitials: string;
+      narrativeText: string;
+    }[] = [];    
+
+    const addNarrativeEntry = (comment: string) => {
+      this.combinedEntries.unshift({
+        date: this.formatDate(now),
+        time: this.formatTime(now),
+        user: this.userName.split(', ')[0] || 'Unknown',
+        comment: comment,
+        type: 'narrative',
+      });
+
+      narrativesArray.push({
+        narrativeKey: 0,
+        corFk: 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: this.isSystemGenerated,
+        createdBy: this.userName,
+        createdByInitials: this.loginUserName,
+        narrativeText: comment,
+      });
+    };
+
+    if (isNewReport) {
+      // "new incident report created" added
+      addNarrativeEntry('New Incident Report is Created!');
+
+      // "Routed To..." message added
+      addNarrativeEntry(`Routed To ${this.routedToSelection}`);
     }
 
+    // user's incident comment added
+    let incidentCommentValue = '';
     if (this.incidentCommentText.trim()) {
-      this.combinedEntries = [
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: this.incidentCommentText.trim(),
-          type: 'incident',
-        },
-        ...this.combinedEntries,
-      ];
-      this.tempIncidentComment = tempIncidentComment;
-      this.incidentCommentText = '';
+      this.combinedEntries.unshift({
+        date: this.formatDate(now),
+        time: this.formatTime(now),
+        user: this.userName.split(', ')[0] || 'Unknown',
+        comment: this.incidentCommentText.trim(),
+        type: 'incident',
+      });
+      incidentCommentValue = this.incidentCommentText.trim();
     }
 
-    // narrative comment logic
+    // user's narrative comment now added
+    let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      const tempNarrativeComment = this.narrativeCommentText;
-      this.combinedEntries = [
-        {
-          date: this.formatDate(now),
-          time: this.formatTime(now),
-          user: this.userName.split(', ')[0] || 'Unknown',
-          comment: this.narrativeCommentText.trim(),
-          type: 'narrative',
-        },
-        ...this.combinedEntries,
-      ];
-      this.tempNarrativeComment = tempNarrativeComment;
-      this.narrativeCommentText = '';
+      addNarrativeEntry(this.narrativeCommentText.trim());
+      narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-    //-----------------------create incident API call-------------------------        -----------------
-    const requestBody = {
+    //-----------------------create incident API call-------------------------
+    const createRequestBody = {
       assignedTo: this.routedToSelection,
       assignedToGroup: this.isAssignedtoGroup,
       cadIncidentNum: '454-Z023046766', // hard coded for now
@@ -334,22 +325,52 @@ export class IncidentReportComponent implements OnInit {
       createdby: this.loginUserName,
       incidenType: this.incidentType,
       incidentDateTime: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: this.tempIncidentComment,
+      incidentDetails: incidentCommentValue,
       userGroup: this.groupCodeID,
-      narratives: [
-        {
-          corFk: 0,
-          timeStamp: new Date().toISOString(),
-          systemGenerated: true,
-          createdBy: this.userName,
-          createdByInitials: this.loginUserName,
-          narrativeText: this.tempNarrativeComment || 'New Incident Created',
-        },
-      ],
+      narratives: narrativesArray,
       relatedCors: [],
     };
 
-    console.log('Request Body:', requestBody); // print request body
+    this.incidentCommentText = '';
+    this.narrativeCommentText = '';
+
+    console.log('Request Body:', createRequestBody); // print request body
+
+    const updateRequestBody = {
+      corMainKey: parseInt(this.incidentService.getcorMainKey(), 10) || 0,
+      vorNumber: 'string',
+      createDate: this.fullDateTime,
+      cortsType: this.corTypeKey,
+      createdby: this.loginUserName,
+      userGroup: this.groupCodeID,
+      assignedTo: this.routedToSelection,
+      assignedDate: this.fullDateTime,
+      cadIncidentNum: '454-Z023046766',
+      cortStatus: this.statusID,
+      dueDate: this.dueDate,
+      lastAssignedTo: this.routedToSelection,
+      assignedToGroup: this.isAssignedtoGroup,
+      lastModifiedBy: this.loginUserName,
+      lastModifiedDate: new Date().toISOString(),
+      closedby: '',
+      closeDate: '',
+      lastAssignedDate: this.fullDateTime,
+      relatedCors: [],
+      incidenType: this.incidentType,
+      incidentDate: new Date(this.incidentDateTime).toISOString(),
+      incidentDetails: this.incidentCommentText,
+      narratives: [
+        {
+          narrativeKey: 0,
+          corFk: parseInt(this.incidentService.getcorMainKey(), 10) || 0,
+          timeStamp: new Date().toISOString(),
+          systemGenerated: this.isSystemGenerated,
+          createdBy: this.userName,
+          createdByInitials: this.loginUserName,
+          narrativeText: this.narrativeCommentText,
+        },
+      ],
+    };
 
     //bring token
     const token = localStorage.getItem('login-token');
@@ -357,21 +378,43 @@ export class IncidentReportComponent implements OnInit {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     });
-    this.http
-      .post('/api/reports/incident-report/create', requestBody, { headers })
-      .subscribe(
-        (response) => {
-          this.incidentService.setIncidentResponse(response);
 
-          this.corNumber = this.incidentService.getCorNumber();
-          console.log('Response:', response); // print response
-          alert('Incident Report Successfully Created');
-        },
-        (error) => {
-          console.error('Error:', error);
-          alert('Failed to Create Incident Report');
-        }
-      );
+    if (this.corNumber === 'New') {
+      this.http
+        .post('/api/reports/incident-report/create', createRequestBody, {
+          headers,
+        })
+        .subscribe(
+          (response) => {
+            this.incidentService.setIncidentResponse(response);
+
+            this.corNumber = this.incidentService.getCorNumber();
+            console.log('Response:', response); // print response
+            alert('Incident Report Successfully Created');
+          },
+          (error) => {
+            console.error('Error:', error);
+            alert('Failed to Create Incident Report');
+          }
+        );
+    } else {
+      this.http
+        .put(
+          `/api/reports/incident-report/update/${this.corNumber}`,
+          updateRequestBody,
+          { headers }
+        )
+        .subscribe(
+          (response) => {
+            console.log('Response:', response);
+            alert('Incident Report Successfully Updated');
+          },
+          (error) => {
+            console.error('Error:', error);
+            alert('Failed to Update Incident Report');
+          }
+        );
+    }
 
     // only update created, due-date time when status is not initial assignment
     if (this.status == 'Initial Assignment') {

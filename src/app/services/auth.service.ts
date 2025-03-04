@@ -36,15 +36,13 @@ export class AuthService {
   }
 
   logout() {
-    console.log('User logged out due to inactivity');
     this.clearUser();
     this.router.navigate(['/login']); 
   }
 
   clearUser() {
     this.userSubject.next(null);
-    localStorage.removeItem('user-data'); // delete user info
-    localStorage.removeItem('login-token'); // delete token
+    localStorage.clear();
   }
 
   isLoggedIn(): boolean {
