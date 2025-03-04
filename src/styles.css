@@ -100,6 +100,13 @@ tbody tr {
   border-bottom: 1px solid #ccc;
 }
 
+/* Used on Required Inputs (Makes labels red) */
+.req-input {
+  color: #990000;
+}
+
+/* ----- CONTAINERS ----- */
+
 /* Main large white container/card */
 .container {
   margin: 2em;
@@ -113,11 +120,6 @@ tbody tr {
 
 .container::-webkit-scrollbar {
   border-radius: 1em;
-}
-
-/* Used on Required Inputs (Makes labels red) */
-.req-input {
-  color: #990000;
 }
 
 /* Default container for forms */
