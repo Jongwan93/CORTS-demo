@@ -4,7 +4,7 @@
 <div class="container">
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
@@ -24,125 +24,18 @@
   </header>
 </div>
 
+  <!-- Basic Information Content -->
+  <app-basic-information
+  [corNumber]="corNumber"
+  [routedToSelection]="routedToSelection"
+  (routedToSelectionChangeDetect)="updateRoutedToSelection($event)"
+  (statusIDChange)="updateStatusID($event)">
+  </app-basic-information>
+
 <!----------------------------------------------------------------->
 
 <form id="IncidentReport">
-
-  <!-- Basic Information -->
-  <div class="container">
-    <h2>Incident Report</h2>
-    <hr />
-
-    <h4>Basic Information:</h4>
-
-    <!-- Basic Information Content -->
-    <div class="grid-container">
-
-      <!-- Created -->
-      <div class="grid-item">
-        <label>Created</label>
-        <input type="text" [value]="formatDisplayDateTime(fullDateTime)" disabled />
-      </div>
-
-      <!-- COR # -->
-      <div class="grid-item">
-        <label>COR #</label>
-        <input type="text" [value]="corNumber" disabled />
-      </div>
-
-      <!-- Due Date -->
-      <div class="grid-item">
-        <label>Due Date</label>
-        <input type="text" [value]="dueDate" disabled />
-      </div>
-
-      <!-- Status -->
-      <div class="grid-item">
-        <label>Status</label>
-        <input type="text" [value]="status" disabled />
-      </div>
-
-      <!-- COR Type -->
-      <div class="grid-item">
-        <label>COR Type</label>
-        <input type="text" [value]="corType" disabled />
-      </div>
-
-      <!-- Creator -->
-      <div class="grid-item">
-        <!-- how do I fetch the current user information?-->
-        <label>Creator</label>
-        <input type="text" [value]="userName" disabled />
-      </div>
-
-      <!-- Route To -->
-      <div class="grid-item">
-        <label>Route To</label>
-        <!-- how do I fetch the current user information?-->
-         <!--tow way binding. set routedToSelction default-->
-        <select (change)="routedToSelectionChange($event)">
-          <option selected>select routed to option</option>
-          <option [value]="userName">{{ userName }}</option>
-          <option [value]="routedToGroup">{{ routedToGroup }}</option>
-        </select>
-      </div>
-
-      <!-- Incident (Call) # -->
-      <div class="grid-item">
-        <label>Incident (Call) #</label>
-        <input type="text" />
-        <button>View in VisiCAD</button>
-      </div>
-
-      <!-- Related CORs -->
-      <div class="grid-item">
-        <label>Related CORs</label>
-        <input
-          type="text"
-          [(ngModel)]="relatedCORsInput"
-          name="relatedCORsInput"
-        />
-        <!-- Enter related COR number -->
-        <select
-          size="5"
-          [(ngModel)]="selectedRelatedCOR"
-          name="selectedRelatedCOR"
-        >
-          <option *ngFor="let cor of relatedCORs" [value]="cor">
-            {{ cor }}
-          </option>
-        </select>
-        <!-- Related COR Buttons -->
-        <div class="form-actions">
-          <button
-            class="btn primary"
-            (click)="addRelatedCOR($event)"
-            type="button"
-          >
-            Add Related COR
-          </button>
-          <button
-            class="btn warn"
-            (click)="removeSelectedCOR($event)"
-            type="button"
-          >
-            Remove Related COR
-          </button>
-        </div> <!-- End of Related COR Buttons-->
-      </div> <!-- End of Related CORs-->
-
-    </div> <!-- End of Basic Information Content -->
-
-    <!-- Duplicate and Close COR buttons -->
-    <!-- Only shows on existing/open CORs -->
-    <hr>
-    <div class="grid-item">
-      <div class="form-actions">
-        <button>Duplicate COR</button>
-        <button>Close COR</button>
-      </div>
-    </div>
-  </div> <!-- End of Basic Information (White Card) -->
+  <!--Cut Line-->
 
   <!----------------------------------------------------------------->
 
@@ -153,13 +46,20 @@
 
     <!-- Incident Report Content -->
     <div class="grid-container">
-
       <!-- Incident Type -->
       <div class="grid-item">
         <label class="req-input">Incident Type*</label>
-        <select [(ngModel)]="incidentType" name="incidentType" required>
+        <select
+          [(ngModel)]="incidentTypeKey"
+          name="incidentType"
+          (change)="incidentTypeChange(incidentTypeKey)"
+          required
+        >
           <option value="">-- Select Incident Type --</option>
-          <option *ngFor="let type of incidentTypeList" [value]="type.incidentTypeKey">
+          <option
+            *ngFor="let type of incidentTypeList"
+            [value]="type.incidentTypeKey"
+          >
             {{ type.displayName }}
           </option>
         </select>
@@ -167,8 +67,16 @@
 
       <!-- Date/Time of Incident -->
       <div class="grid-item">
-        <label class="req-input" for="DateTimeofIncident">Date/Time of Incident*</label>
-        <input type="datetime-local" id="DateTimeofIncident" [(ngModel)]="incidentDateTime" name="incidentDateTime" required />
+        <label class="req-input" for="DateTimeofIncident"
+          >Date/Time of Incident*</label
+        >
+        <input
+          type="datetime-local"
+          id="DateTimeofIncident"
+          [(ngModel)]="incidentDateTime"
+          name="incidentDateTime"
+          required
+        />
       </div>
 
       <!-- Incident Details -->
@@ -181,8 +89,10 @@
           name="incidentCommentText"
         ></textarea>
       </div>
-    </div> <!-- End of Incident Report Details -->
-  </div> <!-- End of Incident Report (White Card)-->
+    </div>
+    <!-- End of Incident Report Details -->
+  </div>
+  <!-- End of Incident Report (White Card)-->
 
   <!----------------------------------------------------------------->
 
@@ -237,9 +147,7 @@
         <button class="btn primary" (click)="saveChanges()">
           Save Changes
         </button>
-        <button class="btn primary">
-          Save Changes and Exit
-        </button>
+        <button class="btn primary">Save Changes and Exit</button>
         <button class="btn warn">Reload Page</button>
       </div>
     </div>
@@ -247,3 +155,5 @@
   </div>
   <!-- End of Narrative (White Card)-->
 </form>
+
+

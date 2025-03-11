@@ -15,19 +15,19 @@
   </header>
 
   <!-- Login Form -->
-  <div class="form-container">
+  <form class="form-container" (ngSubmit)="login()">
     <div class="grid-container">
       <div class="grid-item">
         <label>Login as:</label>
-        <input type="text" [(ngModel)]="username" name="username" required (keydown.enter)="login()">
+        <input type="text" [(ngModel)]="username" name="username">
       </div>
       <div class="grid-item">
         <label>Password:</label>
-        <input type="password" [(ngModel)]="password" name="password" required (keydown.enter)="login()">
+        <input type="password" [(ngModel)]="password" name="password">
       </div>
       <div class="grid-item">
-        <label>CAD:</label>
-        <input type="number" [(ngModel)]="caccId" name="caccId" required (keydown.enter)="login()">
+        <label>CAD:</label> 
+        <input type="number" [(ngModel)]="caccId" name="caccId">
       </div>
     </div>
 
@@ -36,5 +36,5 @@
         <button (click)="login()">Login</button>
       </div>
     </div>
-  </div> <!-- End of Login Form -->
+  </form> <!-- End of Login Form -->
 </div> <!-- End of Container-->
