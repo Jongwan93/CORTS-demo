@@ -1,82 +1,112 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterModule, Router } from '@angular/router';
+import { NgFor, CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { LookupService } from '../../app/services/lookup.service';
+import { BasicInformationComponent } from '../../app/basic-information/basic-information.component';
 
 @Component({
   selector: 'app-vsa-report',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [
+    FormsModule,
+    RouterModule,
+    NgFor,
+    CommonModule,
+    BasicInformationComponent,
+  ],
   templateUrl: './vsa-report.component.html',
-  styleUrl: './vsa-report.component.css',
+  styleUrls: ['./vsa-report.component.css'],
 })
+export class vsaReportComponent implements OnInit {
+  @ViewChild(BasicInformationComponent)
+  basicInfoComponent!: BasicInformationComponent;
 
-export class vsaReportComponent {
-  constructor(private titleService: Title, private router:Router) {
+  ngAfterViewInit(): void {
+    this.statusID = this.basicInfoComponent.statusID;
+    this.corType = this.basicInfoComponent.corType;
+    this.corTypeKey = this.basicInfoComponent.corTypeKey;
+  }
+
+  constructor() {
     this.titleService.setTitle('CORTS - COR Entry (New)');
   }
+
+  // services
+  private titleService = inject(Title);
+  private lookupService = inject(LookupService); // might use it?
+  private router = inject(Router);
+
+  //(DO NOT TOUCH)--------------------------------------------------------
+  loginUserName: string = ''; // login ID                                |
+  corNumber = 'New'; // COR#                                             |
+  corTypeKey: number = 0; // COR Type Key for API                        |
+  corType: string = ''; // COR Type (Display Name)                       |
+  routedToSelection: string = ''; // user choice of routed to            |
+  previousRoutedTo: string = ''; // if user chose new Routed To          |
+  statusID: number = 0; // status translated to ID for API call          |
+  //(DO NOT TOUCH)--------------------------------------------------------
 
   // Variables
   relatedCORInput: string = '';
   relatedCORs: string[] = [];
-  vsaData = {
-    vsaType: '',
-    vsaDate: '',
-    vsaTime: '',
-    vsaDescription: '',
-  };
 
-  reqVSAElements = document.getElementsByClassName(
-    'vsa-req-input'
-  ) as HTMLCollectionOf<HTMLElement>;
+  dnrTypeList: any[] = [];
+  narrativesArray: any[] = []; // temp
 
+  corMainKey: string = ''; // Primary key to find the exisitng report
+
+  ngOnInit() {
+    this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
+
+    const dnrData = this.lookupService.getLookupData('dnr-status');
+    if (dnrData && dnrData.data) {
+      this.dnrTypeList = dnrData.data;
+    }
+  }
+
+  // ----------------------------ALS/VSA Report----------------------------------
   isVSASelected = false;
   isALSSelected = false;
 
-  // Method for adding related CORs
-  addRelatedCOR() {
-    if (this.relatedCORInput.trim()) {
-      this.relatedCORs.push(this.relatedCORInput.trim());
-      this.relatedCORInput = '';
-    }
-  }
+  dnrTypeKey: string = ''; // key from the dropdown menu
+  previousDnrTypeKey: string = ''; // to detect change
+  alsDateTime = '';
+  alsCommentText: string = ''; // als details input
+  pronouncedBy: string = '';
 
-  // Method for removing related CORs
-  removeRelatedCOR() {
-    this.relatedCORs.pop();
-  }
+  // using NodeListOf<HTMLElement>, select all the class that has 'vsa-req-input'
+  reqVSAElements: NodeListOf<HTMLElement> =
+    document.querySelectorAll('.vsa-req-input');
 
-  // Method for triggering vsaReqInput if VSA type is selected
-  toggleReportType(reportType: string): void {
+  // toggle 'isVSASelected' if 'vsa' is selected and call vsaReInput()
+  // toggle 'isALSSelected' if 'als' is selected
+  // reportType - 'vsa' or 'als'
+  toggleReportType(reportType: string, event: any): void {
     if (reportType === 'vsa') {
-      this.isVSASelected = !this.isVSASelected;
-      this.vsaReqInput();
+      this.isVSASelected = event.target.checked;
+      this.vsaReqInput();  // VSA 선택 시 실행되는 함수
     } else if (reportType === 'als') {
-      this.isALSSelected = !this.isALSSelected;
+      this.isALSSelected = event.target.checked;
     }
   }
 
-  // If VSA is selected then Pronounced By and Pronounced Dates become required fields
+  // change status depend on VSA input field
+  // depend on isVSASelected, add/remove 'req-input' class
+  // decide 'required' element
   vsaReqInput(): void {
-    if (this.isVSASelected) {
-      for (let i = 0; i < this.reqVSAElements.length; i++) {
-        const reqVSAElement = this.reqVSAElements[i];
-        reqVSAElement.classList.add('req-input');
-        reqVSAElement.setAttribute('required', '');
-      }
-    } else {
-      for (let i = 0; i < this.reqVSAElements.length; i++) {
-        const vsaElement = this.reqVSAElements[i];
-        vsaElement.classList.remove('req-input');
-        vsaElement.removeAttribute('required');
-      }
-    }
+    this.reqVSAElements.forEach((element) => {
+      element.classList.toggle('req-input', this.isVSASelected);
+      this.isVSASelected
+        ? element.setAttribute('required', '')
+        : element.removeAttribute('required');
+    });
   }
 
   // Method verifies of the Report Type is selected
   vsaTypeCheck(): boolean {
     if (this.isALSSelected || this.isVSASelected) {
-      console.log('Report type selected');
       return true;
     } else {
       console.error('You must select either ALS, VSA, or both.');
@@ -85,45 +115,229 @@ export class vsaReportComponent {
     }
   }
 
-  // Method verifies if all Required Fields are filled in
-  validateReqFields(): boolean {
-    const reqFields = document.querySelectorAll('[required]');
-    for (let field of reqFields) {
-      const inputField = field as HTMLInputElement;
-      if (!inputField.value) {
-        console.error('Required field not filled:', field);
-        window.alert('Error: Not all required fields are filled in.');
-        return false;
+  
+
+  // -------------------------Narrative--------------------------------
+  /**
+   * March 19th problem
+   * isNewReport is boolean depending on corNumber
+   * if corNumber stays 'New' isNewReport stays 'false'
+   * which cause duplicate of system generated messages.
+   * corNumber is generated and sent by API.
+   * Require API to fix this matter.
+   */
+  narrativeCommentText: string = ''; // narrative commnet input
+  combinedEntries: any[] = [];
+  isSaved: boolean = false;
+
+  saveChanges() {
+    // if (this.isSaved) return;
+    // this.isSaved = true;
+
+    console.log("combinedEntires: ", this.combinedEntries);
+
+    if (!this.routedToSelection) {
+      alert('please select Routed To option');
+      this.isSaved = false;
+      return;
+    }
+
+    if (!this.basicInfoComponent.incidentCallNumber){
+      alert('please fill in all the required fields');
+      this.isSaved = false;
+      return;
+    }
+
+    if (!this.isVSASelected && !this.isALSSelected) {
+      alert('Please select one/both of the checkboxes.');
+      this.isSaved = false;
+      return;
+    }
+
+    const now = new Date();
+    const currentTimestamp = now.toISOString();
+    /* corNumber is generated/assigned by API.
+     *  currently ALS/VSA API isn't ready so corNumber is not being updated.
+     *  therefore, isNewReport is always true.
+     *  causing malfunctioning on ALS/VSA comments and Narrative comments
+     */
+    const isNewReport = this.basicInfoComponent.corNumber === 'New';
+
+    this.combinedEntries = [...this.combinedEntries];
+
+    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+      this.combinedEntries.unshift({
+        date: this.basicInfoComponent.formatDate(now),
+        time: this.basicInfoComponent.formatTime(now),
+        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+        comment: comment,
+        type: 'narrative',
+      });
+      this.narrativesArray.push({
+        narrativeKey: 0,
+        corFk: 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: systemGenerated,
+        createdBy: this.basicInfoComponent.userName,
+        createdByInitials: this.loginUserName,
+        narrativeText: comment,
+      });
+    };
+
+    // New - Routed To, dnr Type
+    if (isNewReport) {
+      const msgTemplateCreate =
+        this.lookupService.getSystemMessageByCode('CREATE');
+      const msgTemplateReassign =
+        this.lookupService.getSystemMessageByCode('REASSIGN');
+
+      // "new ALS/VSA report created" added
+      if (msgTemplateCreate) {
+        addNarrativeEntry(msgTemplateCreate, true);
       }
+
+      // "Routed To..." message added
+      if (msgTemplateReassign) {
+        addNarrativeEntry(
+          msgTemplateReassign.replace('%1', this.routedToSelection),
+          true
+        );
+      }
+      this.previousRoutedTo = this.routedToSelection;
+
+      // show the duplicate and close COR button
+      this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
-    return true;
-  }
 
-  onSubmit(): void {
-    console.log('Form submitted:', this.vsaData);
-  }
+    const msgTemplateChange =
+      this.lookupService.getSystemMessageByCode('CHANGE');
+    // Update - when Routed To is changed
+    if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Routed To')
+            .replace('%2', this.routedToSelection)
+            .replace('%3', this.previousRoutedTo),
+          true
+        );
+      }
+      this.previousRoutedTo = this.routedToSelection;
+    }
 
-  reloadPage(): void {
-    window.location.reload();
-  }
+    // Update - when DNR Type is changed
+    if (!isNewReport && this.previousDnrTypeKey !== this.dnrTypeKey) {
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'DNR Type')
+            .replace('%2', this.dnrTypeKey)
+            .replace('%3', this.previousDnrTypeKey),
+          true
+        );
+      }
+      this.previousDnrTypeKey = this.dnrTypeKey;
+    }
 
-  saveChanges(): void {
-    if (this.vsaTypeCheck() && this.validateReqFields()) {
-      console.log('Changes Saved', this.vsaData);
-      window.alert('Changes Saved')
+    // user's ALS/VSA comment added
+    if (this.alsCommentText.trim()) {
+      this.combinedEntries.unshift({
+        date: this.basicInfoComponent.formatDate(now),
+        time: this.basicInfoComponent.formatTime(now),
+        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+        comment: this.alsCommentText.trim(),
+        type: 'incident',
+      });
+    }
+
+    // user's narrative comment added
+    let narrativeCommentValue = '';
+    if (this.narrativeCommentText.trim()) {
+      addNarrativeEntry(this.narrativeCommentText.trim(), false);
+      narrativeCommentValue = this.narrativeCommentText.trim();
+    }
+
+    // TODO: API implementation
+    /*
+    const createRequestBody = {
+
+    }    
+    */
+
+    this.alsCommentText = '';
+    this.narrativeCommentText = '';
+
+    // TODO: API implementation
+    /*
+    const updateRequestBody = {
+
+    }
+    */
+
+    // API call
+    /*if (this.corNumber === 'New') {
+      this.incidentService.createIncident(createRequestBody).subscribe(
+        (response) => {
+          this.incidentService.setIncidentResponse(response);
+          this.corNumber = this.incidentService.getCorNumber();
+          this.corMainKey = this.incidentService.getcorMainKey();
+
+          alert('Incident Report Successfully Created');
+        },
+        (error) => {
+          console.error('Error:', error);
+          alert('Failed to Create Incident Report');
+        }
+      );
     } else {
-      console.error('Error Submitting');
-    }
-  }
+      this.incidentService.updateIncident(updateRequestBody).subscribe(
+        (response) => {
+          this.incidentService.setIncidentResponse(response);
 
-  saveAndExit(): void {
-    if (this.vsaTypeCheck() && this.validateReqFields()) {
-      console.log('Changes saved and exited');
-      window.alert('Changes Saved')
+          alert('Incident Report Successfully Updated');
+        },
+        (error) => {
+          console.error('Error:', error);
+          alert('Failed to Update Incident Report');
+        }
+      );
+    }*/
+
+    this.basicInfoComponent.setStatusToCreate();
+  } // <=== end of saveChanges()
+
+  // button Save Changes and Exit
+  saveChangesExit() {
+    if (!this.isSaved) {
+      this.saveChanges();
+    }
+
+    // wait for API to save the data
+    setTimeout(() => {
+      this.isSaved = false;
+      window.alert('Changes Saved');
       this.router.navigate(['/mainpage']);
-    } else {
-      console.error('Error Submitting');
-    }
+    }, 500);
+  }
 
+  // button Reload Page
+  reload() {
+    const userChoice = window.confirm('Do you want to refresh the page?');
+    if (userChoice) {
+      location.reload();
+    }
+  }
+  //========================UTILITY===========================
+  updateRoutedToSelection(newSelection: string) {
+    this.routedToSelection = newSelection;
+  }
+
+  updateStatusID(newStatusID: number) {
+    this.statusID = newStatusID;
+  }
+
+  getDnrTypeText(value: string): string {
+    const findDnrType = this.dnrTypeList.find((type) => type.code === value);
+    return findDnrType ? findDnrType.displayName : 'Unknown';
   }
 }

@@ -3,9 +3,8 @@
 <!-- Header -->
 <div class="container">
   <header align="center">
-
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
@@ -28,92 +27,15 @@
 <!----------------------------------------------------------------->
 
 <form>
-
   <!-- Basic Information -->
-  <div class="container">
-    <h2>CACC Equipment Failure Report</h2>
-    <hr />
-
-    <h4>Basic Information:</h4>
-
-    <!-- Basic Information Content -->
-    <div class="grid-container">
-
-      <!-- Created -->
-      <div class="grid-item">
-        <label>Created</label>
-        <input type="text" value="01/29/2025 09:45:41" disabled />
-      </div>
-
-      <!-- COR # -->
-      <div class="grid-item">
-        <label>COR #</label>
-        <input type="text" value="New" disabled />
-      </div>
-
-      <!-- Due Date -->
-      <div class="grid-item">
-        <label>Due Date</label>
-        <input type="text" value="01/31/2025" disabled />
-      </div>
-
-      <!-- Status -->
-      <div class="grid-item">
-        <label>Status</label>
-        <input type="text" value="New" disabled />
-      </div>
-
-      <!-- COR Type -->
-      <div class="grid-item">
-        <label>COR Type</label>
-        <input type="text" value="CACC Equipment Failure" disabled />
-      </div>
-
-      <!-- Creator -->
-      <div class="grid-item">
-        <label>Creator</label>
-        <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
-      </div>
-
-      <!-- Route To -->
-      <div class="grid-item">
-        <label>Route To</label>
-        <select>
-          <option selected>29030, CASSONDRA FOERTER - COM</option>
-          <option>Supervisor Group</option>
-        </select>
-      </div>
-
-      <!-- Incident (Call) # -->
-      <div class="grid-item">
-        <label>Incident (Call) #</label>
-        <input type="text" />
-        <button>View in VisiCAD</button>
-      </div>
-
-      <!-- Related CORs -->
-      <div class="grid-item">
-        <label>Related CORs</label>
-        <input type="text" id="related-cors-input" />
-        <textarea rows="5"></textarea>
-        <div class="form-actions">
-          <button class="btn primary">Add Related COR</button>
-          <button class="btn warn">Remove Related COR</button>
-        </div>
-      </div>
-    </div> <!-- End of Basic Information Content -->
-
-    <!-- Duplicate and Close COR buttons -->
-    <!-- Only shows on existing/open CORs -->
-    <hr>
-    <div class="grid-item">
-      <div class="form-actions">
-        <button>Duplicate COR</button>
-        <button>Close COR</button>
-      </div>
-    </div>
-
-  </div> <!-- End of Basic Information (White Card) -->
+  <app-basic-information
+    [corNumber]="corNumber"
+    [routedToSelection]="routedToSelection"
+    (routedToSelectionChangeDetect)="updateRoutedToSelection($event)"
+    (statusIDChange)="updateStatusID($event)"
+  >
+  </app-basic-information>
+  <!-- End of Basic Information (White Card) -->
 
   <!----------------------------------------------------------------->
 
@@ -124,63 +46,99 @@
 
     <!-- CACC Equipment Failure Report Content -->
     <div class="grid-container">
-
       <!-- Equipment Type -->
       <div class="grid-item">
         <label class="req-input">Equipment Type*</label>
-        <select required>
-          <option selected>Admin Vehicles</option>
-          <option>Alarms</option>
-          <option>Comm Unit</option>
-          <option>Dictaphone</option>
-          <option>Facsimile</option>
-          <option>Other</option>
-          <option>Printer</option>
-          <option>Radio</option>
-          <option>Telecom</option>
-          <option>Telephone</option>
-          <option>UPS/Generator</option>
-          <option>Workstation</option>
+        <select
+          [(ngModel)]="equipmentTypeKey"
+          name="equipmentType"
+          (change)="equipmentTypeChange(equipmentTypeKey)"
+          required
+        >
+          <option value="">-- Select Equipment Type --</option>
+          <option
+            *ngFor="let type of equipmentTypeList"
+            [value]="type.equipmentTypeKey"
+          >
+            {{ type.displayName }}
+          </option>
         </select>
       </div>
 
       <!-- Location -->
       <div class="grid-item">
         <label class="req-input">Location*</label>
-        <select required>
-          <option selected>CACC</option>
-          <option>Hospital</option>
-          <option>Other</option>
-          <option>Station</option>
-          <option>Tower</option>
+        <select
+          [(ngModel)]="equipmentLocationKey"
+          name="equipmentLocation"
+          (change)="equipmentLocationChange(equipmentLocationKey)"
+          required
+        >
+          <option value="">-- Select Equipment Location</option>
+          <option
+            *ngFor="let type of equipmentLocationList"
+            [value]="type.equipmentLocationKey"
+          >
+            {{ type.displayName }}
+          </option>
         </select>
       </div>
 
       <!-- Failure Date/Time -->
       <div class="grid-item">
         <label class="req-input">Failure Date/Time*</label>
-        <input type="datetime-local" id="failureDateTime" class="date-picker" required>
+        <input
+          type="datetime-local"
+          id="failureDateTime"
+          class="date-picker"
+          [(ngModel)]="failureDateTime"
+          name="failureDateTime"
+          (change)="failureDateTimeChange(failureDateTime)"
+          required
+        />
       </div>
 
       <!-- Service Request To -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Request To</label>
-        <input type="text">
-        <input type="datetime-local" id="pronouncedDateTime" />
+        <input type="text" [(ngModel)]="requestComment" name="requestComment" />
+        <input
+          type="datetime-local"
+          id="pronouncedDateTime"
+          [(ngModel)]="requestDateTime"
+          name="requestDateTime"
+          (change)="requestDateTimeChange(requestDateTime)"
+        />
       </div>
 
       <!-- Service Responded By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Responded By</label>
-        <input type="text">
-        <input type="datetime-local" id="pronouncedDateTime" />
+        <input type="text" [(ngModel)]="respondComment" name="respondComment" />
+        <input
+          type="datetime-local"
+          id="pronouncedDateTime"
+          [(ngModel)]="respondDateTime"
+          name="respondDateTime"
+          (change)="respondedDateTimeChange(respondDateTime)"
+        />
       </div>
 
       <!-- Service Completed By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Completed By</label>
-        <input type="text">
-        <input type="datetime-local" id="pronouncedDateTime" />
+        <input
+          type="text"
+          [(ngModel)]="completedComment"
+          name="completedComment"
+        />
+        <input
+          type="datetime-local"
+          id="pronouncedDateTime"
+          [(ngModel)]="completedDateTime"
+          name="completedDateTime"
+          (change)="completedDateTimeChange(completedDateTime)"
+        />
       </div>
 
       <!-- Failure Details or Other Info -->
@@ -194,45 +152,70 @@
         <label for="responseDelay">Response Delay</label>
         <!-- Response Delay Checkbox -->
         <div class="time-duration-container">
-          <input type="checkbox" id="delay" (change)="toggleDelayTime()"/>
-          <input type="number" id="delay-hours" min="0" max="99" step="1" value="00" [disabled]="!isDelaySelected">
-          <p> : </p>
-          <input type="number" id="delay-minutes" min="0" max="59" step="1" value="00" [disabled]="!isDelaySelected">
+          <input type="checkbox" id="delay" (change)="toggleDelayTime()" />
+          <input
+            type="number"
+            id="delay-hours"
+            min="0"
+            max="99"
+            step="1"
+            value="00"
+            [disabled]="!isDelaySelected"
+          />
+          <p>:</p>
+          <input
+            type="number"
+            id="delay-minutes"
+            min="0"
+            max="59"
+            step="1"
+            value="00"
+            [disabled]="!isDelaySelected"
+          />
         </div>
       </div>
-    </div> <!-- End of CACC Equipment Failure Report Content -->
-  </div>  <!-- End of CACC Equipment Failure Report (White Card) -->
+    </div>
+    <!-- End of CACC Equipment Failure Report Content -->
+  </div>
+  <!-- End of CACC Equipment Failure Report (White Card) -->
 
   <!----------------------------------------------------------------->
 
   <!-- Narrative -->
   <div class="container">
     <h4>Narrative:</h4>
-    <hr>
+    <hr />
 
     <!-- Narative Table -->
     <table width="100%">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>User</th>
+          <th width="10%">Date</th>
+          <th width="13%">Time</th>
+          <th width="10%">User</th>
           <th>Comments</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>01/29/2025</td>
-          <td>09:45:41</td>
-          <td>29030</td>
-          <td>New COR Created</td>
+        <tr *ngFor="let entry of combinedEntries">
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.time }}</td>
+          <td>{{ entry.user }}</td>
+          <td
+            [ngClass]="{
+              'incident-comment': entry.type === 'incident',
+              'narrative-comment': entry.type === 'narrative'
+            }"
+            name="incidentComment"
+          >
+            {{ entry.comment }}
+          </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Narrative Container for content under the table -->
     <div class="narrative-container">
-
       <!-- Narrative Comments -->
       <div class="grid-item">
         <label>Comments</label>
@@ -241,13 +224,16 @@
 
       <!-- Form Action Buttons -->
       <div class="form-actions">
-        <button class="btn primary" (click)="saveChanges()">Save Changes</button>
-        <button class="btn primary" (click)="saveAndExit()">
+        <button class="btn primary" (click)="saveChanges()">
+          Save Changes
+        </button>
+        <button class="btn primary" (click)="saveChangesExit()">
           Save Changes and Exit
         </button>
-        <button class="btn warn" (click)="reloadPage()">Reload Page</button>
+        <button class="btn warn" (click)="reload()">Reload Page</button>
       </div>
-
-    </div> <!-- End Narrative Container -->
-  </div> <!-- End of Narrative (White Card)-->
+    </div>
+    <!-- End Narrative Container -->
+  </div>
+  <!-- End of Narrative (White Card)-->
 </form>

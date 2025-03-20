@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { IncidentService } from '../app/services/incident-report.service';
@@ -20,26 +20,26 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
   templateUrl: './incident-report.component.html',
   styleUrls: ['./incident-report.component.css'],
 })
-
 export class IncidentReportComponent implements OnInit {
   // now you can use function in basic-information component
-  @ViewChild(BasicInformationComponent) basicInfoComponent!: BasicInformationComponent;
-  
+  @ViewChild(BasicInformationComponent)
+  basicInfoComponent!: BasicInformationComponent;
+
   ngAfterViewInit(): void {
     this.statusID = this.basicInfoComponent.statusID;
     this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
   }
 
-  private titleService = inject(Title);
-
   constructor() {
     this.titleService.setTitle('CORTS - COR Entry (New)'); // browser title name
   }
 
   // services
+  private titleService = inject(Title);
   private incidentService = inject(IncidentService);
   private lookupService = inject(LookupService);
+  private router = inject(Router);
 
   //(DO NOT TOUCH)--------------------------------------------------------
   loginUserName: string = ''; // login ID                                |
@@ -52,9 +52,9 @@ export class IncidentReportComponent implements OnInit {
   //(DO NOT TOUCH)--------------------------------------------------------
 
   incidentTypeList: any[] = []; // to send it to html
-  isSystemGenerated: boolean = true; // "Routed To.." "New Report Created"
-  isDupCloseCorButtonsVisible: boolean = false; // default not showing buttons
   corMainKey: string = ''; // Primary key to find the exisitng report
+
+  narrativesArray: any[] = []; // temp
 
   ngOnInit() {
     this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
@@ -68,29 +68,12 @@ export class IncidentReportComponent implements OnInit {
 
   // -------------------------------Basic Information---------------------------
   // Moved to Basic-information.component.ts
-  
 
   // ------------------------Incident Report-----------------------------
   incidentTypeKey: string = ''; // dropdown menu
   previousIncidentTypeKey: string = ''; // to detect change
   incidentDateTime = '';
   incidentCommentText: string = ''; // incident details input
-
-  // need incident type name for html
-  getIncidentTypeText(value: string): string {
-    const findIncidentType = this.incidentTypeList.find(
-      (type) => type.incidentTypeKey === Number(value)
-    );
-    return findIncidentType ? findIncidentType.displayName : 'Unknown';
-  }
-
-  // find the key to send API
-  getIncidentTypeKey(displayName: string): number | null {
-    const findIncidentType = this.incidentTypeList.find(
-      (type) => type.displayName === displayName
-    );
-    return findIncidentType ? findIncidentType.incidentTypeKey : null;
-  }
 
   // detect incident type change
   incidentTypeChange(newIncidentTypeKey: string) {
@@ -105,9 +88,12 @@ export class IncidentReportComponent implements OnInit {
   // ---------------------------------Narrative------------------------------------
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
+  isSaved: boolean = false;
 
   // save changes button
   saveChanges() {
+    console.log("combinedEntries: ", this.combinedEntries);
+
     // incident detail, type, date cannot be empty
     if (
       !this.incidentCommentText.trim() ||
@@ -131,9 +117,7 @@ export class IncidentReportComponent implements OnInit {
 
     this.combinedEntries = [...this.combinedEntries];
 
-    const narrativesArray: any[] = [];
-
-    const addNarrativeEntry = (comment: string) => {
+    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
         time: this.basicInfoComponent.formatTime(now),
@@ -141,12 +125,11 @@ export class IncidentReportComponent implements OnInit {
         comment: comment,
         type: 'narrative',
       });
-
-      narrativesArray.push({
+      this.narrativesArray.push({
         narrativeKey: 0,
         corFk: 0,
         timeStamp: currentTimestamp,
-        systemGenerated: this.isSystemGenerated,
+        systemGenerated: systemGenerated,
         createdBy: this.basicInfoComponent.userName,
         createdByInitials: this.loginUserName,
         narrativeText: comment,
@@ -155,42 +138,60 @@ export class IncidentReportComponent implements OnInit {
 
     // New - Routed To, Incident Type
     if (isNewReport) {
+      const msgTemplateCreate =
+        this.lookupService.getSystemMessageByCode('CREATE');
+      const msgTemplateReassign =
+        this.lookupService.getSystemMessageByCode('REASSIGN');
+
       // "new incident report created" added
-      addNarrativeEntry('New Incident Report is Created!');
+      if (msgTemplateCreate) {
+        addNarrativeEntry(msgTemplateCreate, true);
+      }
 
-      // "incident type message added"
-      addNarrativeEntry(
-        `Incident Type is [${this.getIncidentTypeText(this.incidentTypeKey)}]`
-      );
-
-      // "Routed To..." message added
-      addNarrativeEntry(`Routed To [${this.routedToSelection}]`);
+      // "COR Routed To..." message added
+      if (msgTemplateReassign) {
+        addNarrativeEntry(
+          msgTemplateReassign.replace('%1', this.routedToSelection),
+          true
+        );
+      }
       this.previousRoutedTo = this.routedToSelection;
 
       // show the duplicate and close COR button
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
 
+    const msgTemplateChange =
+      this.lookupService.getSystemMessageByCode('CHANGE');
     // Update - when Routed To is changed
     if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
-      addNarrativeEntry(
-        `Routed To is Updated from [${this.previousRoutedTo}] to [${this.routedToSelection}]`
-      );
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Routed To')
+            .replace('%2', this.routedToSelection)
+            .replace('%3', this.previousRoutedTo),
+          true
+        );
+      }
       this.previousRoutedTo = this.routedToSelection;
     }
 
     // Update - when incident Type is changed
     if (!isNewReport && this.previousIncidentTypeKey !== this.incidentTypeKey) {
-      addNarrativeEntry(
-        `Inicdent Type is updated from [${this.getIncidentTypeText(
-          this.previousIncidentTypeKey
-        )}] to [${this.getIncidentTypeText(this.incidentTypeKey)}]`
-      );
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Incident Type')
+            .replace('%2', this.incidentTypeKey)
+            .replace('%3', this.previousIncidentTypeKey),
+          true
+        );
+      }
       this.previousIncidentTypeKey = this.incidentTypeKey;
     }
 
     // user's incident comment added
-    let incidentCommentValue = '';
     if (this.incidentCommentText.trim()) {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
@@ -199,13 +200,12 @@ export class IncidentReportComponent implements OnInit {
         comment: this.incidentCommentText.trim(),
         type: 'incident',
       });
-      incidentCommentValue = this.incidentCommentText.trim();
     }
 
     // user's narrative comment added
     let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      addNarrativeEntry(this.narrativeCommentText.trim());
+      addNarrativeEntry(this.narrativeCommentText.trim(), false);
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
@@ -221,21 +221,18 @@ export class IncidentReportComponent implements OnInit {
       createdby: this.loginUserName,
       incidenType: this.incidentTypeKey,
       incidentDateTime: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: incidentCommentValue,
+      incidentDetails: this.incidentCommentText.trim(),
       userGroup: this.basicInfoComponent.groupCodeID,
-      narratives: narrativesArray,
+      narratives: this.narrativesArray,
       relatedCors: [],
     };
 
-    console.log("create request body: ", createRequestBody);
-
-    this.incidentCommentText = '';
-    this.narrativeCommentText = '';
+    console.log('create request body: ', createRequestBody);
 
     // Update body
     const updateRequestBody = {
       corMainKey: this.corMainKey,
-      vorNumber: this.corNumber, // not a misspell
+      corNumber: this.corNumber,
       createDate: this.basicInfoComponent.fullDateTime,
       cortsType: this.corTypeKey,
       createdby: this.loginUserName,
@@ -256,7 +253,7 @@ export class IncidentReportComponent implements OnInit {
       incidenType: this.incidentTypeKey,
       incidentDate: new Date(this.incidentDateTime).toISOString(),
       incidentDetails: this.incidentCommentText,
-      narratives: narrativesArray,
+      narratives: this.narrativesArray,
     };
 
     // API call
@@ -266,6 +263,9 @@ export class IncidentReportComponent implements OnInit {
           this.incidentService.setIncidentResponse(response);
           this.corNumber = this.incidentService.getCorNumber();
           this.corMainKey = this.incidentService.getcorMainKey();
+
+          this.incidentCommentText = '';
+          this.narrativeCommentText = '';
 
           alert('Incident Report Successfully Created');
         },
@@ -278,6 +278,10 @@ export class IncidentReportComponent implements OnInit {
       this.incidentService.updateIncident(updateRequestBody).subscribe(
         (response) => {
           this.incidentService.setIncidentResponse(response);
+          console.log('request body: ', updateRequestBody);
+
+          this.incidentCommentText = '';
+          this.narrativeCommentText = '';
 
           alert('Incident Report Successfully Updated');
         },
@@ -291,6 +295,28 @@ export class IncidentReportComponent implements OnInit {
     this.basicInfoComponent.setStatusToCreate();
   } // --------- end of save changes function
 
+  // button Save Changes and Exit
+  saveChangesExit() {
+    if (!this.isSaved) {
+      this.saveChanges();
+    }
+
+    // wait for API to save the data
+    setTimeout(() => {
+      this.isSaved = false;
+      window.alert('Changes Saved');
+      this.router.navigate(['/mainpage']);
+    }, 500);
+  }
+
+  // button Reload Page
+  reload() {
+    const userChoice = window.confirm('Do you want to refresh the page?');
+    if (userChoice) {
+      location.reload();
+    }
+  }
+
   //==============================UTILITY==================================
   updateRoutedToSelection(newSelection: string) {
     this.routedToSelection = newSelection;
@@ -298,5 +324,21 @@ export class IncidentReportComponent implements OnInit {
 
   updateStatusID(newStatusID: number) {
     this.statusID = newStatusID;
+  }
+
+  // finding incident type name according to the incident type key
+  getIncidentTypeText(value: string): string {
+    const findIncidentType = this.incidentTypeList.find(
+      (type) => type.incidentTypeKey === Number(value)
+    );
+    return findIncidentType ? findIncidentType.displayName : 'Unknown';
+  }
+
+  // find the key to send API
+  getIncidentTypeKey(displayName: string): number | null {
+    const findIncidentType = this.incidentTypeList.find(
+      (type) => type.displayName === displayName
+    );
+    return findIncidentType ? findIncidentType.incidentTypeKey : null;
   }
 }

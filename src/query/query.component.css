@@ -1,14 +1,14 @@
-.grid-container{
+.grid-container {
   grid-template-columns: repeat(4, 1fr);
 }
 
-.grid-item{
+.grid-item {
   justify-content: center;
   height: 100%;
 }
 
 .results {
-  width:auto;
+  width: auto;
   padding: 0.5em;
   border-radius: 0.3em;
   text-align: center;
@@ -34,21 +34,31 @@
   flex: 1;
 }
 
-
-.inline-checkbox{
+.inline-checkbox {
   display: flex;
   align-items: center;
   gap: 0.5em;
   white-space: nowrap;
 }
 
-.date-field{
+.date-field {
   width: 100%;
 }
 
-
-.date-label{
+.date-label {
   font-size: 1em;
   font-weight: normal;
 }
 
+/*[C]reator, [T]ype, Status, [R]outed [T]o*/
+.CTSR {
+  height: 200px;
+}
+
+.group-option {
+  font-weight: bold;
+}
+
+.All {
+  font-weight: bold;
+}

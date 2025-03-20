@@ -2,30 +2,32 @@
   <!--Header-->
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
-      <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
+      <h1>
+        CORTS - CACC Operational <br />
+        Reports Tracking System
+      </h1>
       <h3>454 - MIS CACC</h3>
     </div>
     <div name="nav">
-      <button class = "navBtn" routerLink="/mainpage">Start Page</button>
-      <button class = "navBtn" routerLink="/logout">Logout</button>
+      <button class="navBtn" routerLink="/mainpage">Start Page</button>
+      <button class="navBtn" routerLink="/logout">Logout</button>
     </div>
   </header>
 </div>
 
-
 <!-- Query Form -->
 <div class="container">
   <h2>CACC Operational Report Query</h2>
-  <hr>
+  <hr />
   <form
-  id="Query"
-  method="post"
-  action="Search.ASP?WCI=tplSearchQuery&WCE=Submit&WCU="
-  target="_top"
+    id="Query"
+    method="post"
+    action="Search.ASP?WCI=tplSearchQuery&WCE=Submit&WCU="
+    target="_top"
   >
     <div class="grid-container">
       <!-- Date Created -->
@@ -77,24 +79,29 @@
       <!-- Creator -->
       <div class="grid-item">
         <label>Creator</label>
-        <select name="drpCreator" multiple>
-          <option value="0">(All)</option>
-          <option value="00001">GLEN MILLER - SUP</option>
-          <option value="00101">MATT DRENTERS - SUP</option>
+        <select name="drpCreator" class="CTSR" multiple>
+          <option value="">(All)</option>
+          <option
+            *ngFor="let employee of employees"
+            [value]="employee.empId"
+            name="empId"
+          >
+            {{ employee.empName }} - {{ employee.code }}
+          </option>
         </select>
       </div>
 
       <!-- COR Type -->
       <div class="grid-item">
         <label>Type</label>
-        <select name="drpType" multiple>
-          <option value="0">(All)</option>
-          <option value="1">Incident</option>
-          <option value="2">ALS/VSA</option>
-          <option value="3">Complaint/Inquiry</option>
-          <option value="4">CACC Equipment Failure</option>
-          <option value="5">
-            Fleet Equipment Failure & Vehicle Breakdown
+        <select name="drpType" class="CTSR" multiple>
+          <option value="">(All)</option>
+          <option
+            *ngFor="let type of cortTypes"
+            [value]="type.cORTypeKey"
+            name="cORTypeKey"
+          >
+            {{ type.displayName }}
           </option>
         </select>
       </div>
@@ -102,27 +109,40 @@
       <!-- Status -->
       <div class="grid-item">
         <label>Status</label>
-        <select name="drpStatus" multiple>
-          <option value="0">(All)</option>
-          <option value="1">Create</option>
-          <option value="2">Closed</option>
-          <option value="3">In Progress</option>
+        <select name="drpStatus" class="CTSR" multiple>
+          <option value="">(All)</option>
+          <option
+            *ngFor="let status of statuses"
+            [value]="status.cORStatusKey"
+            name="cORStatusKey"
+          >
+            {{ status.displayName }}
+          </option>
         </select>
       </div>
 
       <!-- Routed To -->
       <div class="grid-item">
         <label>Routed To</label>
-        <select name="drpAssign" multiple>
-          <option value="0">(All)</option>
-          <option value="00860">LARRY TITUS - COM</option>
-          <option value="00861">SCOTT MACMILLAN - COM</option>
+        <select name="drpAssign" class="CTSR" multiple>
+          <option value="" class="All">(All)</option>
+          <ng-container *ngFor="let route of routes">
+            <option [value]="'group-' + route.code" class="group-option">
+              {{ route.displayName }}
+            </option>
+            <option
+              *ngFor="let emp of groupedRoutes[route.displayName]"
+              [value]="emp.empId"
+            >
+              {{ emp.empName }} - {{ emp.functionalityGroup }}
+            </option>
+          </ng-container>
         </select>
       </div>
     </div>
   </form>
 
-  <hr>
+  <hr />
 
   <!-- Full Text Search -->
   <div class="grid-container-2c">
@@ -155,7 +175,6 @@
   </div>
 </div>
 
-
 <div class="container">
   <!-- Search Results -->
   <div class="results">
@@ -175,24 +194,21 @@
       </thead>
       <tbody>
         <tr>
-          <td colspan="8">No results found. Try again using different search parameters.</td>
+          <td colspan="8">
+            No results found. Try again using different search parameters.
+          </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Pagination -->
     <div class="pagination">
-      <button
-        [disabled]="true"
-        (click)="SetDirection('Prev')"
-      >
+      <button [disabled]="true" (click)="SetDirection('Prev')">
         Prev Page
       </button>
-      <button
-        [disabled]="true"
-        (click)="SetDirection('Next')"
-      >
+      <button [disabled]="true" (click)="SetDirection('Next')">
         Next Page
       </button>
     </div>
+  </div>
 </div>

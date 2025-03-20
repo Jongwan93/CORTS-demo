@@ -4,7 +4,7 @@
 <div class="container">
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
@@ -34,94 +34,14 @@
   onsubmit="beforeSubmit()"
 >
   <!-- Basic Information (White Card) -->
-  <div class="container">
-    <h2>Complaint/Inquiry Report</h2>
-    <hr />
-    <h4>Basic Information:</h4>
-
-    <!-- Basic Information Content -->
-    <div class="grid-container">
-      <!-- Created -->
-      <div class="grid-item">
-        <label for="created">Created</label>
-        <input type="text" id="created" value="02/03/2025 13:07:32" readonly />
-      </div>
-
-      <!-- COR # -->
-      <div class="grid-item">
-        <label for="cor-number">COR #</label>
-        <input type="text" id="cor-number" value="New" readonly />
-      </div>
-
-      <!-- Due Date -->
-      <div class="grid-item">
-        <label for="due-date">Due Date</label>
-        <input type="text" id="due-date" value="02/05/2025" readonly />
-      </div>
-
-      <!-- Status -->
-      <div class="grid-item">
-        <label for="status">Status</label>
-        <input type="text" id="status" value="New" readonly />
-      </div>
-
-      <!-- COR Type -->
-      <div class="grid-item">
-        <label for="cor-type">COR Type</label>
-        <input type="text" id="cor-type" value="Complaint/Inquiry" readonly />
-      </div>
-
-      <!-- Creator -->
-      <div class="grid-item">
-        <label for="creator">Creator</label>
-        <input
-          type="text"
-          id="creator"
-          value="29030, CASSONDRA FOERTER - COM"
-          readonly
-        />
-      </div>
-
-      <!-- Route To -->
-      <div class="grid-item">
-        <label for="route-to">Route To</label>
-        <select id="route-to">
-          <option value="29030" selected>29030, CASSONDRA FOERTER - COM</option>
-          <option value="Supervisor">Supervisor Group</option>
-        </select>
-      </div>
-
-      <!-- Incident (Call) # -->
-      <div class="grid-item">
-        <label for="incident-number">Incident (Call) #</label>
-        <input type="text" id="incident-number" />
-        <button class="view-button">View in VisiCAD</button>
-      </div>
-
-      <!-- Related CORs -->
-      <div class="grid-item">
-        <label>Related CORs</label>
-        <input type="text" id="related-cors-input" />
-        <textarea rows="5"></textarea>
-        <!-- Related CORs Buttons -->
-        <div class="form-actions">
-          <button class="btn primary">Add Related COR</button>
-          <button class="btn warn">Remove Related COR</button>
-        </div> <!-- End of Related CORs Buttons-->
-      </div> <!-- End of Related CORs -->
-    </div> <!-- End of Basic Information Content -->
-
-    <!-- Duplicate and Close COR buttons -->
-    <!-- Only shows on existing/open CORs -->
-    <hr>
-    <div class="grid-item">
-      <div class="form-actions">
-        <button>Duplicate COR</button>
-        <button>Close COR</button>
-      </div>
-    </div>
-
-  </div> <!-- End of Basic Information (White Card)-->
+  <app-basic-information
+    [corNumber]="corNumber"
+    [routedToSelection]="routedToSelection"
+    (routedToSelectionChangeDetect)="updateRoutedToSelection($event)"
+    (statusIDChange)="updateStatusID($event)"
+  >
+  </app-basic-information>
+  <!-- End of Basic Information (White Card)-->
 
   <!----------------------------------------------------------------->
 
@@ -132,20 +52,24 @@
     <!-- Complaint Details Content -->
     <div class="grid-container-2c">
       <div class="grid-column">
-
         <!-- Complaint/Inquiry -->
         <div class="grid-item">
           <label class="req-input" for="complaint-type"
             >Complaint/Inquiry*</label
           >
-          <select name="complaintType" id="complaint-type" required>
-            <option value="6">Conduct</option>
-            <option value="2">Damage to Property</option>
-            <option value="1">Delay</option>
-            <option value="3">General Inquiry</option>
-            <option value="4">Lost Property</option>
-            <option value="5">Media Inquiry</option>
-            <option value="7">Other</option>
+          <select
+            [(ngModel)]="complaintTypeKey"
+            name="complaintType"
+            (change)="complaintTypeChange(complaintTypeKey)"
+            required
+          >
+            <option value="">-- Select Complaint Type --</option>
+            <option
+              *ngFor="let type of complaintTypeList"
+              [value]="type.compalintTypeKey"
+            >
+              {{ type.displayName }}
+            </option>
           </select>
         </div>
 
@@ -157,7 +81,8 @@
           <input
             type="datetime-local"
             id="complaint-date"
-            name="complaint-date"
+            [(ngModel)]="complaintDateTime"
+            name="complaintDateTime"
             required
           />
         </div>
@@ -166,34 +91,57 @@
       <!-- Complaint Details or Other Info -->
       <div class="grid-item">
         <label class="req-input">Complaint Details or Other Info*</label>
-        <textarea rows="5" required></textarea>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="complaintCommentText"
+          name="complaintCommentText"
+          required
+        ></textarea>
       </div>
-    </div> <!-- End of Complaint Details Content -->
+    </div>
+    <!-- End of Complaint Details Content -->
 
     <h4 class="section-title">Contact Information:</h4>
 
     <!-- Contact Information -->
     <div class="grid-container">
-
       <!-- Last Name -->
       <div class="grid-item">
         <label for="last-name">Last Name</label>
-        <input type="text" id="last-name" />
+        <input
+          type="text"
+          id="last-name"
+          [(ngModel)]="lastName"
+          name="lastName"
+        />
       </div>
 
       <!-- First Name -->
       <div class="grid-item">
         <label for="first-name">First Name</label>
-        <input type="text" id="first-name" />
+        <input
+          type="text"
+          id="first-name"
+          [(ngModel)]="firstName"
+          name="firstName"
+        />
       </div>
 
       <!-- Phone # -->
       <div class="grid-item">
         <label for="phone">Phone #</label>
-        <input type="text" id="phone" />
+        <input
+          type="text"
+          id="phone"
+          [(ngModel)]="phoneNumber"
+          name="phoneNumber"
+        />
       </div>
-    </div> <!-- End of Contact Information-->
-  </div> <!-- End of Complaint Details (White Card)-->
+    </div>
+    <!-- End of Contact Information-->
+  </div>
+  <!-- End of Complaint Details (White Card)-->
 
   <!----------------------------------------------------------------->
 
@@ -206,29 +154,41 @@
     <table width="100%">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>User</th>
+          <th width="10%">Date</th>
+          <th width="13%">Time</th>
+          <th width="10%">User</th>
           <th>Comments</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>01/29/2025</td>
-          <td>09:45:41</td>
-          <td>29030</td>
-          <td>New COR Created</td>
+        <tr *ngFor="let entry of combinedEntries">
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.time }}</td>
+          <td>{{ entry.user }}</td>
+          <td
+            [ngClass]="{
+              'incident-comment': entry.type === 'incident',
+              'narrative-comment': entry.type === 'narrative'
+            }"
+            name="incidentComment"
+          >
+            {{ entry.comment }}
+          </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Narrative Container for content under the table -->
     <div class="narrative-container">
-
       <!-- Narrative Comments -->
       <div class="grid-item">
         <label>Comments</label>
-        <textarea rows="5"></textarea>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="narrativeCommentText"
+          name="narrativeCommentText"
+        ></textarea>
       </div>
 
       <!-- Form Action Buttons -->
@@ -236,12 +196,13 @@
         <button class="btn primary" (click)="saveChanges()">
           Save Changes
         </button>
-        <button class="btn primary" (click)="saveAndExit()">
+        <button class="btn primary" (click)="saveChangesExit()">
           Save Changes and Exit
         </button>
-        <button class="btn warn" (click)="reloadPage()">Reload Page</button>
+        <button class="btn warn" (click)="reload()">Reload Page</button>
       </div>
-
-    </div> <!-- End Narrative Container -->
-  </div> <!-- End of Narrative (White Card)-->
+    </div>
+    <!-- End Narrative Container -->
+  </div>
+  <!-- End of Narrative (White Card)-->
 </form>

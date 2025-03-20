@@ -27,6 +27,7 @@ export class AuthGuard implements CanActivate {
       console.warn('Unauthorized access - redirecting to login page');
       localStorage.clear();
       this.router.navigate(['/login']);
+      
       return false;
     }
   }

@@ -63,7 +63,8 @@
               "buildTarget": "CORTS3:build:production"
             },
             "development": {
-              "buildTarget": "CORTS3:build:development"
+              "buildTarget": "CORTS3:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

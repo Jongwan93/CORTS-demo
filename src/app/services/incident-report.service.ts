@@ -30,7 +30,7 @@ export class IncidentService {
   // update incident
   updateIncident(updateRequestBody: any): Observable<any> {
     console.log('Update Request Body:', updateRequestBody);
-    return this.http.put(`${this.apiBaseUrl}/update`, updateRequestBody, {
+    return this.http.post(`${this.apiBaseUrl}/update`, updateRequestBody, {
       headers: this.getHeaders(),
     });
   }

@@ -4,7 +4,7 @@
 <div class="container">
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
@@ -25,92 +25,15 @@
 </div>
 
 <form id="VSAReport" method="post" action="/vsa-report">
-  <!-- Basic Information -->
-  <div class="container">
-    <h2>ALS/VSA Report</h2>
-    <hr />
-
-    <h4>Basic Information:</h4>
-
-    <!-- Basic Information Content -->
-    <div class="grid-container">
-      <!-- Created -->
-      <div class="grid-item">
-        <label>Created</label>
-        <input type="text" value="01/29/2025 09:45:41" disabled />
-      </div>
-
-      <!-- COR # -->
-      <div class="grid-item">
-        <label>COR #</label>
-        <input type="text" value="New" disabled />
-      </div>
-
-      <!-- Due Date -->
-      <div class="grid-item">
-        <label>Due Date</label>
-        <input type="text" value="01/31/2025" disabled />
-      </div>
-
-      <!-- Status -->
-      <div class="grid-item">
-        <label>Status</label>
-        <input type="text" value="New" disabled />
-      </div>
-
-      <!-- COR Type -->
-      <div class="grid-item">
-        <label>COR Type</label>
-        <input type="text" value="ALS/VSA" disabled />
-      </div>
-
-      <!-- Creator -->
-      <div class="grid-item">
-        <label>Creator</label>
-        <input type="text" value="29030, CASSONDRA FOERTER - COM" disabled />
-      </div>
-
-      <!-- Route To -->
-      <div class="grid-item">
-        <label>Route To</label>
-        <select>
-          <option selected>29030, CASSONDRA FOERTER - COM</option>
-          <option>Supervisor Group</option>
-        </select>
-      </div>
-
-      <!-- Incidet (Call) # -->
-      <div class="grid-item">
-        <label for="incident-number" class="req-input"
-          >Incident (Call) #*</label
-        >
-        <input type="text" name="incident-number" required />
-        <button>View in VisiCAD</button>
-      </div>
-
-      <!-- Related CORs -->
-      <div class="grid-item">
-        <label>Related CORs</label>
-        <input type="text" id="related-cors-input" />
-        <textarea rows="5"></textarea>
-        <div class="form-actions">
-          <button class="btn primary">Add Related COR</button>
-          <button class="btn warn">Remove Related COR</button>
-        </div>
-      </div>
-    </div> <!-- End of Basic Information Content -->
-
-    <!-- Duplicate and Close COR buttons -->
-    <!-- Only shows on existing/open CORs -->
-    <hr>
-    <div class="grid-item">
-      <div class="form-actions">
-        <button>Duplicate COR</button>
-        <button>Close COR</button>
-      </div>
-    </div>
-
-  </div> <!-- End of Basic Information (White Card) -->
+  <!-- Basic Information Content -->
+  <app-basic-information
+    [corNumber]="corNumber"
+    [routedToSelection]="routedToSelection"
+    (routedToSelectionChangeDetect)="updateRoutedToSelection($event)"
+    (statusIDChange)="updateStatusID($event)"
+  >
+  </app-basic-information>
+  <!-- End of Basic Information (White Card) -->
 
   <!----------------------------------------------------------------->
 
@@ -128,12 +51,20 @@
         <label class="req-input">Report Type:*</label>
         <!-- ALS Checkbox -->
         <label for="als-intervention">
-          <input type="checkbox" id="als" (change)="toggleReportType('als')" />
+          <input
+            type="checkbox"
+            id="als"
+            (change)="toggleReportType('als', $event)"
+          />
           ALS Intervention
         </label>
         <!-- VSA Checkbox -->
         <label for="vsa">
-          <input type="checkbox" id="vsa" (change)="toggleReportType('vsa')" />
+          <input
+            type="checkbox"
+            id="vsa"
+            (change)="toggleReportType('vsa', $event)"
+          />
           VSA
         </label>
       </div>
@@ -144,7 +75,13 @@
       <!-- Pronounced By -->
       <div class="grid-item">
         <label class="vsa-req-input" for="pronouncedBy">Pronounced By</label>
-        <input type="text" id="pronouncedBy" [disabled]="!isVSASelected" />
+        <input
+          type="text"
+          id="pronouncedBy"
+          [disabled]="!isVSASelected"
+          [(ngModel)]="pronouncedBy"
+          name="pronouncedBy"
+        />
       </div>
 
       <!-- Pronounced Date -->
@@ -158,18 +95,23 @@
       <!-- DNR -->
       <div class="grid-item">
         <label for="dnr">DNR</label>
-        <select id="dnr">
-          <option>No DNR</option>
-          <option>Valid DNR signed and available</option>
-          <option>DNR available but not signed</option>
-          <option>DNR signed but not available</option>
+        <select id="dnr" [(ngModel)]="dnrTypeKey" name="dnrTypeKey">
+          <option value="">-- Select DNR --</option>
+          <option *ngFor="let dnr of dnrTypeList" [value]="dnr.code">
+            {{ dnr.displayName }}
+          </option>
         </select>
       </div>
 
       <!-- ALS/VSA Details -->
       <div class="grid-item">
         <label>ALS/VSA Details</label>
-        <textarea rows="5"></textarea>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="alsCommentText"
+          name="alsCommentText"
+        ></textarea>
       </div>
 
       <!-- A/R Intruction & CPR Instruction -->
@@ -181,8 +123,10 @@
           <input type="checkbox" id="cpr-instructions" /> CPR Instructions Given
         </label>
       </div>
-    </div> <!-- End of ALS/VSA Report Content -->
-  </div> <!-- End of ALS/VSA Report (White Card) -->
+    </div>
+    <!-- End of ALS/VSA Report Content -->
+  </div>
+  <!-- End of ALS/VSA Report (White Card) -->
 
   <!----------------------------------------------------------------->
 
@@ -195,29 +139,41 @@
     <table width="100%">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>User</th>
+          <th width="10%">Date</th>
+          <th width="13%">Time</th>
+          <th width="10%">User</th>
           <th>Comments</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>01/29/2025</td>
-          <td>09:45:41</td>
-          <td>29030</td>
-          <td>New COR Created</td>
+        <tr *ngFor="let entry of combinedEntries">
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.time }}</td>
+          <td>{{ entry.user }}</td>
+          <td
+            [ngClass]="{
+              'als-comment': entry.type === 'als',
+              'narrative-comment': entry.type === 'narrative'
+            }"
+            name="alsComment"
+          >
+            {{ entry.comment }}
+          </td>
         </tr>
       </tbody>
     </table>
 
     <!-- Narrative Container for content under the table -->
     <div class="narrative-container">
-
       <!-- Narrative Comments -->
       <div class="grid-item">
         <label>Comments</label>
-        <textarea rows="5"></textarea>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="narrativeCommentText"
+          name="narrativeCommentText"
+        ></textarea>
       </div>
 
       <!-- Form Action Buttons -->
@@ -225,12 +181,13 @@
         <button class="btn primary" (click)="saveChanges()">
           Save Changes
         </button>
-        <button class="btn primary" (click)="saveAndExit()">
+        <button class="btn primary" (click)="saveChangesExit()">
           Save Changes and Exit
         </button>
-        <button class="btn warn" (click)="reloadPage()">Reload Page</button>
+        <button class="btn warn" (click)="reload()">Reload Page</button>
       </div>
-
-    </div> <!-- End Narrative Container -->
-  </div> <!-- End of Narrative (White Card)-->
+    </div>
+    <!-- End Narrative Container -->
+  </div>
+  <!-- End of Narrative (White Card)-->
 </form>

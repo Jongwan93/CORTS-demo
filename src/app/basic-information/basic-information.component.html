@@ -1,117 +1,126 @@
+<!-- Basic Information Content -->
 <form id="IncidentReport">
-    <!-- Basic Information -->
-    <div class="container">
-      <h2>Incident Report</h2>
-      <hr />
-  
-      <h4>Basic Information:</h4>
-  
-      <!-- Basic Information Content -->
-      <div class="grid-container">
-  
-        <!-- Created -->
-        <div class="grid-item">
-          <label>Created</label>
-          <input type="text" [value]="formatDisplayDateTime(fullDateTime)" disabled />
-        </div>
-  
-        <!-- COR # -->
-        <div class="grid-item">
-          <label>COR #</label>
-          <input type="text" [ngModel]="corNumber" name="corNumber" disabled />
-        </div>
-  
-        <!-- Due Date -->
-        <div class="grid-item">
-          <label>Due Date</label>
-          <input type="text" [value]="dueDate" disabled />
-        </div>
-  
-        <!-- Status -->
-        <div class="grid-item">
-          <label>Status</label>
-          <input type="text" [value]="status" disabled />
-        </div>
-  
-        <!-- COR Type -->
-        <div class="grid-item">
-          <label>COR Type</label>
-          <input type="text" [value]="corType" disabled />
-        </div>
-  
-        <!-- Creator -->
-        <div class="grid-item">
-          <!-- how do I fetch the current user information?-->
-          <label>Creator</label>
-          <input type="text" [value]="userName" disabled />
-        </div>
-  
-        <!-- Route To -->
-        <div class="grid-item">
-          <label>Route To</label>
-          <!-- how do I fetch the current user information?-->
-           <!--tow way binding. set routedToSelction default-->
-          <select (change)="routedToSelectionChangeHandler($event)">
-            <option selected>select routed to option</option>
-            <option [value]="userName">{{ userName }}</option>
-            <option [value]="routedToGroup">{{ routedToGroup }}</option>
-          </select>
-        </div>
-  
-        <!-- Incident (Call) # -->
-        <div class="grid-item">
-          <label>Incident (Call) #</label>
-          <input type="text" />
-          <button>View in VisiCAD</button>
-        </div>
-  
-        <!-- Related CORs -->
-        <div class="grid-item">
-          <label>Related CORs</label>
-          <input
-            type="text"
-            [(ngModel)]="relatedCORsInput"
-            name="relatedCORsInput"
-          />
-          <!-- Enter related COR number -->
-          <select
-            size="5"
-            [(ngModel)]="selectedRelatedCOR"
-            name="selectedRelatedCOR"
-          >
-            <option *ngFor="let cor of relatedCORs" [value]="cor">
-              {{ cor }}
-            </option>
-          </select>
-          <!-- Related COR Buttons -->
-          <div class="form-actions">
-            <button
-              class="btn primary"
-              (click)="addRelatedCOR($event)"
-              type="button"
-            >
-              Add Related COR
-            </button>
-            <button
-              class="btn warn"
-              (click)="removeSelectedCOR($event)"
-              type="button"
-            >
-              Remove Related COR
-            </button>
-          </div> <!-- End of Related COR Buttons-->
-        </div> <!-- End of Related CORs-->
-  
-      </div> <!-- End of Basic Information Content -->
-  
-      <!-- Duplicate and Close COR buttons -->
-      <!-- Only shows on existing/open CORs -->
-      <hr>
+  <!-- Basic Information -->
+  <div class="container">
+    <h2>{{ corType }} Report</h2>
+    <hr />
+
+    <h4>Basic Information:</h4>
+    <div class="grid-container">
+      <!-- Created -->
       <div class="grid-item">
-        <div class="form-actions" *ngIf="isDupCloseCorButtonsVisible">
-          <button>Duplicate COR</button>
-          <button (click)="closeCOR()">Close COR</button>
-        </div>
+        <label>Created</label>
+        <input
+          type="text"
+          [value]="formatDisplayDateTime(fullDateTime)"
+          disabled
+        />
       </div>
-    </div> <!-- End of Basic Information (White Card) -->
+
+      <!-- COR # -->
+      <div class="grid-item">
+        <label>COR #</label>
+        <input type="text" [ngModel]="corNumber" name="corNumber" disabled />
+      </div>
+
+      <!-- Due Date -->
+      <div class="grid-item">
+        <label>Due Date</label>
+        <input type="text" [value]="dueDate" disabled />
+      </div>
+
+      <!-- Status -->
+      <div class="grid-item">
+        <label>Status</label>
+        <input type="text" [value]="status" disabled />
+      </div>
+
+      <!-- COR Type -->
+      <div class="grid-item">
+        <label>COR Type</label>
+        <input type="text" [value]="corType" disabled />
+      </div>
+
+      <!-- Creator -->
+      <div class="grid-item">
+        <!-- how do I fetch the current user information?-->
+        <label>Creator</label>
+        <input type="text" [value]="userName" disabled />
+      </div>
+
+      <!-- Route To -->
+      <div class="grid-item">
+        <label>Route To</label>
+        <!-- how do I fetch the current user information?-->
+        <!--tow way binding. set routedToSelction default-->
+        <select (change)="routedToSelectionChangeHandler($event)">
+          <option selected>select routed to option</option>
+          <option [value]="userName">{{ userName }}</option>
+          <option [value]="routedToGroup">{{ routedToGroup }}</option>
+        </select>
+      </div>
+
+      <!-- Incident (Call) # -->
+      <div class="grid-item">
+        <label>Incident (Call) #</label>
+        <input
+          type="text"
+          [(ngModel)]="incidentCallNumber"
+          name="incidentCallNumber"
+        />
+        <button>View in VisiCAD</button>
+      </div>
+
+      <!-- Related CORs -->
+      <div class="grid-item">
+        <label>Related CORs</label>
+        <input
+          type="text"
+          [(ngModel)]="relatedCORsInput"
+          name="relatedCORsInput"
+        />
+        <!-- Enter related COR number -->
+        <select
+          size="5"
+          [(ngModel)]="selectedRelatedCOR"
+          name="selectedRelatedCOR"
+        >
+          <option *ngFor="let cor of relatedCORs" [value]="cor">
+            {{ cor }}
+          </option>
+        </select>
+        <!-- Related COR Buttons -->
+        <div class="form-actions">
+          <button
+            class="btn primary"
+            (click)="addRelatedCOR($event)"
+            type="button"
+          >
+            Add Related COR
+          </button>
+          <button
+            class="btn warn"
+            (click)="removeSelectedCOR($event)"
+            type="button"
+          >
+            Remove Related COR
+          </button>
+        </div>
+        <!-- End of Related COR Buttons-->
+      </div>
+      <!-- End of Related CORs-->
+    </div>
+    <!-- End of Basic Information Content -->
+
+    <!-- Duplicate and Close COR buttons -->
+    <!-- Only shows on existing/open CORs -->
+    <hr />
+    <div class="grid-item">
+      <div class="form-actions" *ngIf="isDupCloseCorButtonsVisible">
+        <button>Duplicate COR</button>
+        <button (click)="closeCOR()">Close COR</button>
+      </div>
+    </div>
+  </div>
 </form>
+<!-- End of Basic Information (White Card) -->

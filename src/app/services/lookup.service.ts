@@ -50,4 +50,14 @@ export class LookupService {
     const data = localStorage.getItem(`lookup-${endpoint}`);
     return data ? JSON.parse(data) : null;
   }
+
+  getSystemMessageByCode(messageCode: string): string | null {
+    const data = this.getLookupData('system-messages');
+    if (data && data.data) {
+      const messageObj = data.data.find((msg: any) => msg.messageCode === messageCode);
+      return messageObj ? messageObj.message : null;
+    }
+    return null;
+  }
+
 }

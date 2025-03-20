@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { LookupService } from '../services/lookup.service';
 
 @Component({
   selector: 'app-basic-information',
@@ -24,6 +25,7 @@ import { ActivatedRoute } from '@angular/router';
 export class BasicInformationComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private lookupService = inject(LookupService);
 
   @Input() corNumber: string = 'New'; // cor#
   @Output() corNumberChange = new EventEmitter<string>();
@@ -45,8 +47,9 @@ export class BasicInformationComponent implements OnInit {
   groupCodeID: number = 0; // group code ID for create incident report API request body
   routedToGroup: string = ''; // Routed To group full name
   isAssignedtoGroup: boolean = true; // Routed To. group or person?
-
   previousRoutedTo: string = ''; // if user chose new Routed To
+
+  incidentCallNumber: string = ''; // Incident (Call) #
 
   isDupCloseCorButtonsVisible: boolean = false; // default not showing buttons
 
@@ -215,9 +218,23 @@ export class BasicInformationComponent implements OnInit {
   //---------------------------UTILITY------------------------------  
   // refeshes the page (for now)
   closeCOR() {
-    alert("this COR report is closed");
+    const msgTemplateClose =
+      this.lookupService.getSystemMessageByCode('CLOSED');
+    if (msgTemplateClose) {
+      alert(msgTemplateClose);
+    }
+    // To Do: need logic of deleting this report in db
     window.location.reload();
   } // +++++++++ end of closeCOR function +++++++++++
+
+  dupCOR() {
+    const msgTemplateDup =
+      this.lookupService.getSystemMessageByCode('DUPLICATED');
+      if (msgTemplateDup){
+        alert(msgTemplateDup);
+        // To Do : need logic of duplicating current report
+      }
+  }
 
   fullDateTime: string = 'New'; // Current date + time
   dueDate: string = 'New'; // Due date (two days after)
