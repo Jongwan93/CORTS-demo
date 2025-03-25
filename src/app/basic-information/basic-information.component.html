@@ -50,11 +50,11 @@
 
       <!-- Route To -->
       <div class="grid-item">
-        <label>Route To</label>
+        <label class="req-input">Route To*</label>
         <!-- how do I fetch the current user information?-->
         <!--tow way binding. set routedToSelction default-->
-        <select (change)="routedToSelectionChangeHandler($event)">
-          <option selected>select routed to option</option>
+        <select (change)="routedToSelectionChangeHandler($event)" required>
+          <option value = '' disabled selected>select routed to option</option>
           <option [value]="userName">{{ userName }}</option>
           <option [value]="routedToGroup">{{ routedToGroup }}</option>
         </select>

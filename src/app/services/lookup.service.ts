@@ -17,6 +17,7 @@ export class LookupService {
     'incident-type',
     'system-messages',
     'user-group',
+    'breakdown-type',
   ];
 
   constructor(private http: HttpClient) {}

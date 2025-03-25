@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { IncidentService } from '../app/services/incident-report.service';
+import { validateRequiredFields } from '../app/utils/validateFields';
 import { LookupService } from '../app/services/lookup.service';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
@@ -92,22 +93,9 @@ export class IncidentReportComponent implements OnInit {
 
   // save changes button
   saveChanges() {
-    console.log("combinedEntries: ", this.combinedEntries);
+    const isValid = validateRequiredFields();
 
-    // incident detail, type, date cannot be empty
-    if (
-      !this.incidentCommentText.trim() ||
-      !this.incidentTypeKey ||
-      this.incidentTypeKey === '' ||
-      !this.incidentDateTime ||
-      this.incidentDateTime.trim() === ''
-    ) {
-      alert('Please complete all the required fields.');
-      return;
-    }
-
-    if (this.routedToSelection === '') {
-      alert('Please select Route To option');
+    if (!isValid) {
       return;
     }
 
@@ -143,7 +131,7 @@ export class IncidentReportComponent implements OnInit {
       const msgTemplateReassign =
         this.lookupService.getSystemMessageByCode('REASSIGN');
 
-      // "new incident report created" added
+      // "new report created" added
       if (msgTemplateCreate) {
         addNarrativeEntry(msgTemplateCreate, true);
       }

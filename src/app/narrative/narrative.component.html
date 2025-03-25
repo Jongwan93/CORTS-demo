@@ -1,0 +1,56 @@
+<div class="container">
+    <h4>Narrative:</h4>
+    <hr />
+
+    <!-- Narative Table -->
+    <table width="100%">
+      <thead>
+        <tr>
+          <th width="10%">Date</th>
+          <th width="13%">Time</th>
+          <th width="10%">User</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of combinedEntries">
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.time }}</td>
+          <td>{{ entry.user }}</td>
+          <td
+            [ngClass]="{
+              'incident-comment': entry.type === 'incident',
+              'narrative-comment': entry.type === 'narrative'
+            }"
+            name="incidentComment"
+          >
+            {{ entry.comment }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Narrative Container for content under the table -->
+    <div class="narrative-container">
+      <!-- Narrative Comments -->
+      <div class="grid-item">
+        <label>Comments</label>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="narrativeCommentText"
+          name="narrativeCommentText"
+        ></textarea>
+      </div>
+
+      <!-- Form Action Buttons -->
+      <div class="form-actions">
+        <button class="btn primary" (click)="saveChanges()">
+          Save Changes
+        </button>
+        <button class="btn primary" (click)="saveChangesExit()">Save Changes and Exit</button>
+        <button class="btn warn" (click)="reload()">Reload Page</button>
+      </div>
+    </div>
+    <!-- End Narrative Container -->
+  </div>

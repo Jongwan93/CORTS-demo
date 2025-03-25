@@ -4,7 +4,9 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+// import { validateRequiredFields } from '../app/utils/validateFields';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
+import { validateRequiredFields } from '../app/utils/validateFields';
 
 @Component({
   selector: 'app-cacc-equipment-failure-report',
@@ -101,12 +103,9 @@ export class caccEquipmentFailureComponent implements OnInit {
   combinedEntries: any[] = [];
 
   saveChanges() {
-    if (!this.validateReqFields()) {
-      return;
-    }
+    const isValid = validateRequiredFields()
 
-    if (this.routedToSelection === '') {
-      alert('Please select Route To option');
+    if(!isValid) {
       return;
     }
 
@@ -118,7 +117,7 @@ export class caccEquipmentFailureComponent implements OnInit {
 
     const narrativesArray: any[] = [];
 
-    const addNarrativeEntry = (comment: string) => {
+    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
         time: this.basicInfoComponent.formatTime(now),
@@ -146,14 +145,14 @@ export class caccEquipmentFailureComponent implements OnInit {
         this.lookupService.getSystemMessageByCode('REASSIGN');
 
       if (msgTemplateCreate) {
-        addNarrativeEntry(msgTemplateCreate);
+        addNarrativeEntry(msgTemplateCreate, true);
       }
 
       // "Routed To..." message added
       if (msgTemplateReassign) {
         addNarrativeEntry(
-          msgTemplateReassign.replace('%1', this.routedToSelection)
-        );
+          msgTemplateReassign.replace('%1', this.routedToSelection),
+        true);
       }
       this.previousRoutedTo = this.routedToSelection;
 
@@ -173,8 +172,8 @@ export class caccEquipmentFailureComponent implements OnInit {
           msgTemplateChange
             .replace('%1', 'Routed To')
             .replace('%2', this.routedToSelection)
-            .replace('%3', this.previousRoutedTo)
-        );
+            .replace('%3', this.previousRoutedTo), 
+        true);
       }
       this.previousRoutedTo = this.routedToSelection;
     }
@@ -186,8 +185,7 @@ export class caccEquipmentFailureComponent implements OnInit {
           msgTemplateChange
             .replace('%1', 'Equipment Type')
             .replace('%2', this.getEquipmentTypeText(this.equipmentTypeKey))
-            .replace('%3', this.getEquipmentTypeText(this.prevEquipmentTypeKey))
-        );
+            .replace('%3', this.getEquipmentTypeText(this.prevEquipmentTypeKey)), true);
       }
       this.prevEquipmentTypeKey = this.equipmentTypeKey;
     }
@@ -199,11 +197,32 @@ export class caccEquipmentFailureComponent implements OnInit {
           msgTemplateChange
           .replace('%1', 'Equipment Location')
           .replace('%2', this.getEquipmentLocationText(this.equipmentLocationKey))
-          .replace('%3', this.getEquipmentLocationText(this.prevEquipmentLocationKey))
+          .replace('%3', this.getEquipmentLocationText(this.prevEquipmentLocationKey)), true
         );
       }
       this.prevEquipmentLocationKey = this.equipmentLocationKey;
     }
+
+    // user's equipment comment added
+    if (this.equipmentCommentText.trim()) {
+      this.combinedEntries.unshift({
+        date: this.basicInfoComponent.formatDate(now),
+        time: this.basicInfoComponent.formatTime(now),
+        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+        comment: this.equipmentCommentText.trim(),
+        type: 'equipment',
+      });
+    }
+
+    // user's narrative comment added
+    let narrativeCommentValue = '';
+    if (this.narrativeCommentText.trim()) {
+      addNarrativeEntry(this.narrativeCommentText.trim(), false);
+      narrativeCommentValue = this.narrativeCommentText.trim();
+    }
+
+    this.equipmentCommentText = '';
+    this.narrativeCommentText = '';
 
     this.basicInfoComponent.setStatusToCreate();
   } // +++++++++++end of saveChanges() +++++++++++
@@ -220,8 +239,10 @@ export class caccEquipmentFailureComponent implements OnInit {
 
   // button Reload Page
   reload() {
-    window.alert('do you want to refresh the page?');
-    location.reload();
+    const userChoice = window.confirm('Do you want to refresh the page?');
+    if (userChoice) {
+      location.reload();
+    }
   }
 
   //==============================UTILITY==================================
@@ -263,20 +284,6 @@ export class caccEquipmentFailureComponent implements OnInit {
 
   completedDateTimeChange(newCompletedDateTime: string) {
     this.completedDateTime = newCompletedDateTime;
-  }
-
-  // Method verifies if all Required Fields are filled in
-  validateReqFields(): boolean {
-    const reqFields = document.querySelectorAll('[required]');
-    for (let field of reqFields) {
-      const inputField = field as HTMLInputElement;
-      if (!inputField.value) {
-        console.error('Required field not filled:', field);
-        window.alert('Error: Not all required fields are filled in.');
-        return false;
-      }
-    }
-    return true;
   }
 
   // finding Equipment type name according to the Equipment type key

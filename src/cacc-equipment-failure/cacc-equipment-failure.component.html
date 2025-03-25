@@ -144,7 +144,12 @@
       <!-- Failure Details or Other Info -->
       <div class="grid-item">
         <label class="req-input">Failure Details or Other Info*</label>
-        <textarea rows="5" required></textarea>
+        <textarea
+          rows="5"
+          [(ngModel)]="equipmentCommentText"
+          name="equipmentCommentText"
+          required
+        ></textarea>
       </div>
 
       <!-- Response Delay -->
@@ -203,7 +208,7 @@
           <td>{{ entry.user }}</td>
           <td
             [ngClass]="{
-              'incident-comment': entry.type === 'incident',
+              'equipment-comment': entry.type === 'equipment',
               'narrative-comment': entry.type === 'narrative'
             }"
             name="incidentComment"
@@ -219,7 +224,12 @@
       <!-- Narrative Comments -->
       <div class="grid-item">
         <label>Comments</label>
-        <textarea rows="5"></textarea>
+        <textarea
+          rows="5"
+          maxlength="255"
+          [(ngModel)]="narrativeCommentText"
+          name="narrativeCommentText"
+        ></textarea>
       </div>
 
       <!-- Form Action Buttons -->

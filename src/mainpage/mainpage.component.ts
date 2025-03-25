@@ -1,14 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../app/services/auth.service';
+import { LookupService } from '../app/services/lookup.service';
 
 @Component({
   selector: 'app-mainpage',
-  templateUrl: './mainpage.component.html',
-  styleUrl: './mainpage.component.css',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule, NgFor],
+  templateUrl: './mainpage.component.html',
+  styleUrls: ['./mainpage.component.css'],
 })
 export class MainpageComponent {
   constructor(private router: Router, private titleService: Title) {
@@ -16,12 +18,19 @@ export class MainpageComponent {
   }
 
   private authService = inject(AuthService);
+  private lookupService = inject(LookupService);
 
   userName: string = ''; // user name for the mainpage
+  cortsTypeList: any[] = [];
 
   ngOnInit() {
     // set user name for mainpage
     this.userName = this.authService.getUserName();
+
+    const cortsTypeData = this.lookupService.getLookupData('cort-type');
+    if (cortsTypeData && cortsTypeData.data) {
+      this.cortsTypeList = cortsTypeData.data;
+    }
   }
 
   onProceed(): void {

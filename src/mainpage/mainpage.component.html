@@ -5,16 +5,18 @@
   <!-- Header -->
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <!-- Title -->
     <div name="title">
-      <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
+      <h1>
+        CORTS - CACC Operational <br />
+        Reports Tracking System
+      </h1>
       <h3>454 - MIS CACC</h3>
     </div>
-    <div name="nav">
-    </div>
-    <hr>
+    <div name="nav"></div>
+    <hr />
     <h2>Start Page</h2>
   </header>
 
@@ -23,22 +25,20 @@
     <div class="grid-container">
       <!-- Create a new COR: -->
       <div class="grid-item">
-        <input type="radio" value="NewCOR" checked name="R1">
+        <input type="radio" value="NewCOR" checked name="R1" />
       </div>
       <div class="grid-item">
         <label for="create-new">Create a New COR:</label>
         <select id="create-new">
-          <option value="2">ALS/VSA</option>
-          <option value="4">CACC Equipment Failure</option>
-          <option value="3">Complaint/Inquiry</option>
-          <option value="5">Fleet Equipment Failure & Vehicle Breakdown</option>
-          <option value="1">Incident</option>
+          <option *ngFor="let type of cortsTypeList" [value]="type.cORTypeKey">
+            {{ type.displayName }}
+          </option>
         </select>
       </div>
 
       <!--Find an existing COR-->
       <div class="grid-item">
-        <input type="radio" id="find-cor" value="FindCOR" name="R1">
+        <input type="radio" id="find-cor" value="FindCOR" name="R1" />
       </div>
       <div class="grid-item">
         <label for="find-cor" value="existing">Find an Existing COR</label>
@@ -46,7 +46,7 @@
 
       <!--Logout-->
       <div class="grid-item">
-        <input type="radio" value="Logout" name="R1">
+        <input type="radio" value="Logout" name="R1" />
       </div>
       <div class="grid-item">
         <label value="logout">Logout of CORTS</label>
@@ -55,18 +55,23 @@
 
     <!--Proceed Button-->
     <div class="grid-container">
-      <input type="submit" value="Proceed" class="subbtn" (click)="onProceed()">
+      <input
+        type="submit"
+        value="Proceed"
+        class="subbtn"
+        (click)="onProceed()"
+      />
     </div>
   </div>
 
   <!-- Footer -->
   <footer>
     <hr />
-      <p>
-        Hello {{ userName }}, you currently have
-        <b><a [routerLink]="'/query'">1 COR routed to you.</a></b>
-      </p>
+    <p>
+      Hello {{ userName }}, you currently have
+      <b><a [routerLink]="'/query'">1 COR routed to you.</a></b>
+    </p>
 
-      <hr />
+    <hr />
   </footer>
 </div>

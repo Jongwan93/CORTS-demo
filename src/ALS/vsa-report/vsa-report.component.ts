@@ -4,6 +4,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../../app/services/lookup.service';
+import { validateVsaReport } from '../../app/utils/validateFields';
 import { BasicInformationComponent } from '../../app/basic-information/basic-information.component';
 
 @Component({
@@ -102,20 +103,7 @@ export class vsaReportComponent implements OnInit {
         ? element.setAttribute('required', '')
         : element.removeAttribute('required');
     });
-  }
-
-  // Method verifies of the Report Type is selected
-  vsaTypeCheck(): boolean {
-    if (this.isALSSelected || this.isVSASelected) {
-      return true;
-    } else {
-      console.error('You must select either ALS, VSA, or both.');
-      window.alert('Error: You must select either ALS, VSA or both.');
-      return false;
-    }
-  }
-
-  
+  }  
 
   // -------------------------Narrative--------------------------------
   /**
@@ -134,22 +122,14 @@ export class vsaReportComponent implements OnInit {
     // if (this.isSaved) return;
     // this.isSaved = true;
 
-    console.log("combinedEntires: ", this.combinedEntries);
+    const isValid = validateVsaReport({
+      isALSSelected: this.isALSSelected,
+      isVSASelected: this.isVSASelected,
+      incidentCallNumber: this.basicInfoComponent.incidentCallNumber,
+      requiredFieldsSelector: '[required]'
+    });
 
-    if (!this.routedToSelection) {
-      alert('please select Routed To option');
-      this.isSaved = false;
-      return;
-    }
-
-    if (!this.basicInfoComponent.incidentCallNumber){
-      alert('please fill in all the required fields');
-      this.isSaved = false;
-      return;
-    }
-
-    if (!this.isVSASelected && !this.isALSSelected) {
-      alert('Please select one/both of the checkboxes.');
+    if (!isValid) {
       this.isSaved = false;
       return;
     }
@@ -246,7 +226,7 @@ export class vsaReportComponent implements OnInit {
         time: this.basicInfoComponent.formatTime(now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
         comment: this.alsCommentText.trim(),
-        type: 'incident',
+        type: 'als',
       });
     }
 
@@ -339,5 +319,16 @@ export class vsaReportComponent implements OnInit {
   getDnrTypeText(value: string): string {
     const findDnrType = this.dnrTypeList.find((type) => type.code === value);
     return findDnrType ? findDnrType.displayName : 'Unknown';
+  }
+
+  
+  // Method verifies of the Report Type is selected
+  vsaTypeCheck(): boolean {
+    if (this.isALSSelected || this.isVSASelected) {
+      return true;
+    } else {
+      window.alert('You must select either ALS, VSA or both.');
+      return false;
+    }
   }
 }

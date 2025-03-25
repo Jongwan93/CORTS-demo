@@ -5,6 +5,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
+import { validateRequiredFields } from '../app/utils/validateFields';
 
 @Component({
   selector: 'app-complaint-report',
@@ -91,34 +92,14 @@ export class ComplaintReportComponent implements OnInit {
   combinedEntries: any[] = [];
 
   saveChanges() {
-    if(!this.validateReqFields()) {
-      alert('Please complete all the required fields.');
-      return;
-    }
+    const isValid = validateRequiredFields();
 
-    /*
-    if (
-      !this.complaintCommentText.trim() ||
-      !this.complaintTypeKey ||
-      !this.complaintDateTime
-    ) {
-      alert('Please complete all the required fields.');
+    if (!isValid) {
       return;
     }
-
-    if (this.routedToSelection === '') {
-      alert('Please select Route To option');
-      return;
-    }
-
-    if (this.phoneNumber.length !== 10) {
-      alert('invalid length of phone number');
-      return;
-    }
-    */
 
     // format the phone number (xxx)xxx-xxxx
-    this.formatPhoneNumber(this.phoneNumber) 
+    this.formatPhoneNumber(this.phoneNumber);
 
     const now = new Date();
     const currentTimestamp = now.toISOString();
@@ -188,7 +169,7 @@ export class ComplaintReportComponent implements OnInit {
 
     const msgTemplateChange =
       this.lookupService.getSystemMessageByCode('CHANGE');
-      
+
     // Update - when Routed To is changed
     if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
       if (msgTemplateChange) {
@@ -201,7 +182,6 @@ export class ComplaintReportComponent implements OnInit {
       }
       this.previousRoutedTo = this.routedToSelection;
     }
-
 
     // Update - when complaint Type is changed
     if (
@@ -292,20 +272,6 @@ export class ComplaintReportComponent implements OnInit {
     }
 
     return `(${cleaned.slice(0, 3)})${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-  }
-
-  // Method verifies if all Required Fields are filled in
-  validateReqFields(): boolean {
-    const reqFields = document.querySelectorAll('[required]');
-    for (let field of reqFields) {
-      const inputField = field as HTMLInputElement;
-      if (!inputField.value) {
-        console.error('Required field not filled:', field);
-        window.alert('Error: Not all required fields are filled in.');
-        return false;
-      }
-    }
-    return true;
   }
 
   getComplaintTypeText(value: string): string {
