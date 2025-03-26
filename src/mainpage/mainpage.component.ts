@@ -31,6 +31,8 @@ export class MainpageComponent {
     if (cortsTypeData && cortsTypeData.data) {
       this.cortsTypeList = cortsTypeData.data;
     }
+
+    console.log("cort-type: ", cortsTypeData);
   }
 
   onProceed(): void {

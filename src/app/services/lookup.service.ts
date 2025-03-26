@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { forkJoin, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LookupService {
-  private baseURL = '/api/reports/lookup'; // common url
+  private baseURL = '/api/reports/lookup';
   private lookupEndpoints = [
     'complaint-type',
     'cort-type',
@@ -21,7 +23,8 @@ export class LookupService {
   ];
 
   constructor(private http: HttpClient) {}
-  fetchAndStoreLookups() {
+
+  async fetchAndStoreLookups(): Promise<void> {
     const token = localStorage.getItem('login-token');
     if (!token) {
       console.error('Login Token missing');
@@ -32,19 +35,24 @@ export class LookupService {
       Accept: '*/*',
       Authorization: `Bearer ${token}`,
     });
-
-    this.lookupEndpoints.forEach((endpoint) => {
-      const url = `${this.baseURL}/${endpoint}`; // entire API URL created
-      this.http.get(url, { headers }).subscribe({
-        next: (data) => {
+    
+    const requests = this.lookupEndpoints.map((endpoint) => {
+      const url = `${this.baseURL}/${endpoint}`;
+      return this.http.get(url, { headers }).pipe(
+        map((data) => {
           localStorage.setItem(`lookup-${endpoint}`, JSON.stringify(data));
           console.log(`${endpoint} SAVED!`);
-        },
-        error: (err) => {
-          console.error(`${endpoint} FAILED...:`, err);
-        },
-      });
+          return true;
+        })
+      );
     });
+
+    try {
+      await firstValueFrom(forkJoin(requests));
+    } catch (err) {
+      console.error('One or more lookup requests failed:', err);
+      throw err;
+    }
   }
 
   getLookupData(endpoint: string) {
@@ -60,5 +68,4 @@ export class LookupService {
     }
     return null;
   }
-
 }

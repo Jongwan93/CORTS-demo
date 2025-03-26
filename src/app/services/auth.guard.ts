@@ -10,18 +10,17 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
   constructor() {
-    if (!sessionStorage.getItem('sessionActive')) {
-      localStorage.clear();
-    }
-
     sessionStorage.setItem('sessionActive', 'true');
   }
 
-  canActivate(): boolean {
-    const isLoggedIn = this.authService.isLoggedIn();
-    const hasUserData = !!localStorage.getItem('user-data');
+  async canActivate(): Promise<boolean> {
+    await new Promise(resolve => setTimeout(resolve,50));
 
-    if (isLoggedIn && hasUserData) {
+    const token = localStorage.getItem('login-token');
+
+    console.log("token: ", token);
+
+    if (token) {
       return true;
     } else {
       console.warn('Unauthorized access - redirecting to login page');
