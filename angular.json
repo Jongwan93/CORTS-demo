@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "CORTS3": {
+    "CORTS": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/corts3",
+            "outputPath": "dist/corts",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -27,7 +27,6 @@
               }
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -60,11 +59,12 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "CORTS3:build:production"
+              "buildTarget": "CORTS:build:production"
             },
             "development": {
-              "buildTarget": "CORTS3:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "buildTarget": "CORTS:build:development",
+              "proxyConfig": "proxy.conf.json",
+              "port": 3000
             }
           },
           "defaultConfiguration": "development"
@@ -87,7 +87,6 @@
               }
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"
             ],
             "scripts": []
