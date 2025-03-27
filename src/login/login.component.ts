@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   caccId: number = 401; // hard coded for now
 
   private hasConfirmedNavigation = false;
-  
+
   private titleService = inject(Title);
   private router = inject(Router);
   private http = inject(HttpClient);
@@ -49,8 +49,7 @@ export class LoginComponent implements OnInit {
         if (!confirmLeave) {
           history.forward();
         } else {
-          localStorage.clear();
-          sessionStorage.clear();
+          this.router.navigate(['/logout']);
         }
       }
     });

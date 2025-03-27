@@ -28,6 +28,7 @@ export class ComplaintReportComponent implements OnInit {
     this.statusID = this.basicInfoComponent.statusID;
     this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
+    this.isNewReport = this.basicInfoComponent.corNumber === 'New';
   }
 
   constructor() {
@@ -50,8 +51,9 @@ export class ComplaintReportComponent implements OnInit {
   //(DO NOT TOUCH)--------------------------------------------------------
 
   complaintTypeList: any[] = []; // to send it to html
-  isSystemGenerated: boolean = true; // "Routed To.." "New Report Created"
+  narrativesArray: any[] = []; // temp
   corMainKey: string = ''; // Primary key to find the exisitng report
+  isNewReport: boolean = true;
 
   ngOnInit() {
     this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
@@ -103,13 +105,10 @@ export class ComplaintReportComponent implements OnInit {
 
     const now = new Date();
     const currentTimestamp = now.toISOString();
-    const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
     this.combinedEntries = [...this.combinedEntries];
 
-    const narrativesArray: any[] = [];
-
-    const addNarrativeEntry = (comment: string) => {
+    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
         time: this.basicInfoComponent.formatTime(now),
@@ -117,11 +116,11 @@ export class ComplaintReportComponent implements OnInit {
         comment: comment,
         type: 'narrative',
       });
-      narrativesArray.push({
+      this.narrativesArray.push({
         narrativeKey: 0,
         corFk: 0,
         timeStamp: currentTimestamp,
-        systemGenerated: this.isSystemGenerated,
+        systemGenerated: systemGenerated,
         createdBy: this.basicInfoComponent.userName,
         createdByInitials: this.loginUserName,
         narrativeText: comment,
@@ -129,7 +128,7 @@ export class ComplaintReportComponent implements OnInit {
     };
 
     // New - Routed To, Complaint Type
-    if (isNewReport) {
+    if (this.isNewReport) {
       const msgTemplateCreate =
         this.lookupService.getSystemMessageByCode('CREATE');
       const msgTemplateReassign =
@@ -137,47 +136,65 @@ export class ComplaintReportComponent implements OnInit {
 
       // "new Complaint report created" added
       if (msgTemplateCreate) {
-        addNarrativeEntry(msgTemplateCreate);
+        addNarrativeEntry(msgTemplateCreate, true);
       }
 
       // "Routed To..." message added
       if (msgTemplateReassign) {
         addNarrativeEntry(
-          msgTemplateReassign.replace('%1', this.routedToSelection)
+          msgTemplateReassign.replace('%1', this.routedToSelection),
+          true
         );
       }
       this.previousRoutedTo = this.routedToSelection;
 
-      if (this.lastName) {
-        addNarrativeEntry(`last name is updated to: [${this.lastName}]`);
-        this.prevLastName = this.lastName;
-      }
-
-      if (this.firstName) {
-        addNarrativeEntry(`first name is updated to: [${this.firstName}]`);
-        this.prevFirstName = this.firstName;
-      }
-
-      if (this.phoneNumber) {
-        addNarrativeEntry(`phone number is updated to: [${this.phoneNumber}]`);
-        this.prevPhoneNumber = this.phoneNumber;
-      }
-
       // show the duplicate and close COR button
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
+      this.isNewReport = false;
     }
 
     const msgTemplateChange =
       this.lookupService.getSystemMessageByCode('CHANGE');
 
+    if (
+      (!this.prevLastName && this.lastName) ||
+      this.prevLastName !== this.lastName ||
+      (!this.prevFirstName && this.firstName) ||
+      this.prevFirstName !== this.firstName
+    ) {
+      if (msgTemplateChange) {
+        const formattedMessage = msgTemplateChange
+          .replace('%1', 'Name')
+          .replace('%2', `${this.firstName} ${this.lastName}`)
+          .replace('%3', `${this.prevFirstName} ${this.prevLastName}`);
+
+        addNarrativeEntry(formattedMessage, true);
+      }
+
+      this.prevLastName = this.lastName;
+      this.prevFirstName = this.firstName;
+    }
+
+    if (
+      (!this.prevPhoneNumber && this.phoneNumber) ||
+      this.prevPhoneNumber != this.phoneNumber
+    ) {
+      addNarrativeEntry(
+        `phone number is updated to: [${this.phoneNumber}]`,
+        true
+      );
+      this.prevPhoneNumber = this.phoneNumber;
+    }
+
     // Update - when Routed To is changed
-    if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
+    if (!this.isNewReport && this.previousRoutedTo !== this.routedToSelection) {
       if (msgTemplateChange) {
         addNarrativeEntry(
           msgTemplateChange
             .replace('%1', 'Routed To')
             .replace('%2', this.routedToSelection)
-            .replace('%3', this.previousRoutedTo)
+            .replace('%3', this.previousRoutedTo),
+          true
         );
       }
       this.previousRoutedTo = this.routedToSelection;
@@ -185,7 +202,7 @@ export class ComplaintReportComponent implements OnInit {
 
     // Update - when complaint Type is changed
     if (
-      !isNewReport &&
+      !this.isNewReport &&
       this.previousComplaintTypeKey !== this.complaintTypeKey
     ) {
       if (msgTemplateChange) {
@@ -193,7 +210,8 @@ export class ComplaintReportComponent implements OnInit {
           msgTemplateChange
             .replace('%1', 'Complant Type')
             .replace('%2', this.complaintTypeKey)
-            .replace('%3', this.previousComplaintTypeKey)
+            .replace('%3', this.previousComplaintTypeKey),
+          true
         );
       }
       this.previousComplaintTypeKey = this.complaintTypeKey;
@@ -206,7 +224,8 @@ export class ComplaintReportComponent implements OnInit {
       this.prevPhoneNumber !== this.phoneNumber
     ) {
       addNarrativeEntry(
-        `Personal information is updated to [${this.firstName} ${this.lastName} #${this.phoneNumber}]`
+        `Personal information is updated to [${this.firstName} ${this.lastName} #${this.phoneNumber}]`,
+        true
       );
       this.prevFirstName = this.firstName;
       this.prevFirstName = this.firstName;
@@ -227,7 +246,7 @@ export class ComplaintReportComponent implements OnInit {
     // user's narrative comment added
     let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      addNarrativeEntry(this.narrativeCommentText.trim());
+      addNarrativeEntry(this.narrativeCommentText.trim(), false);
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
@@ -235,6 +254,9 @@ export class ComplaintReportComponent implements OnInit {
     //
     //
     //
+
+    this.complaintCommentText = '';
+    this.narrativeCommentText = '';
 
     this.basicInfoComponent.setStatusToCreate();
   } // ++++++++end of saveChanges()

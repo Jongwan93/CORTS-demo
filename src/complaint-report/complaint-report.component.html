@@ -31,7 +31,6 @@
   method="post"
   action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU="
   target="_top"
-  onsubmit="beforeSubmit()"
 >
   <!-- Basic Information (White Card) -->
   <app-basic-information
@@ -171,8 +170,8 @@
               'narrative-comment': entry.type === 'narrative'
             }"
             name="incidentComment"
+            [innerHTML]="entry.comment"
           >
-            {{ entry.comment }}
           </td>
         </tr>
       </tbody>

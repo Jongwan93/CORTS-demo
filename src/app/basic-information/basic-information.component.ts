@@ -285,4 +285,8 @@ export class BasicInformationComponent implements OnInit {
 
     return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
   }
+
+  getLabelText(): string {
+    return this.corType === 'ALS/VSA' ? 'Incident (Call) #*' : 'Incident (Call) #';
+  }
 }

@@ -1,5 +1,3 @@
-// validateFields.ts
-
 export interface VsaValidationContext {
   isALSSelected: boolean;
   isVSASelected: boolean;

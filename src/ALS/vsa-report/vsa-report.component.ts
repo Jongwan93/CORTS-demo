@@ -24,10 +24,13 @@ export class vsaReportComponent implements OnInit {
   @ViewChild(BasicInformationComponent)
   basicInfoComponent!: BasicInformationComponent;
 
+  isNewReport: boolean = true; 
+
   ngAfterViewInit(): void {
     this.statusID = this.basicInfoComponent.statusID;
     this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
+    this.isNewReport = this.basicInfoComponent.corNumber === 'New'; 
   }
 
   constructor() {
@@ -130,7 +133,6 @@ export class vsaReportComponent implements OnInit {
     });
 
     if (!isValid) {
-      this.isSaved = false;
       return;
     }
 
@@ -141,7 +143,8 @@ export class vsaReportComponent implements OnInit {
      *  therefore, isNewReport is always true.
      *  causing malfunctioning on ALS/VSA comments and Narrative comments
      */
-    const isNewReport = this.basicInfoComponent.corNumber === 'New';
+
+    // make it const when API implemented
 
     this.combinedEntries = [...this.combinedEntries];
 
@@ -165,7 +168,7 @@ export class vsaReportComponent implements OnInit {
     };
 
     // New - Routed To, dnr Type
-    if (isNewReport) {
+    if (this.isNewReport) {
       const msgTemplateCreate =
         this.lookupService.getSystemMessageByCode('CREATE');
       const msgTemplateReassign =
@@ -187,12 +190,13 @@ export class vsaReportComponent implements OnInit {
 
       // show the duplicate and close COR button
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
+      this.isNewReport = false; // delete after API implemented
     }
 
     const msgTemplateChange =
       this.lookupService.getSystemMessageByCode('CHANGE');
     // Update - when Routed To is changed
-    if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
+    if (!this.isNewReport && this.previousRoutedTo !== this.routedToSelection) {
       if (msgTemplateChange) {
         addNarrativeEntry(
           msgTemplateChange
@@ -206,7 +210,7 @@ export class vsaReportComponent implements OnInit {
     }
 
     // Update - when DNR Type is changed
-    if (!isNewReport && this.previousDnrTypeKey !== this.dnrTypeKey) {
+    if (!this.isNewReport && this.previousDnrTypeKey !== this.dnrTypeKey) {
       if (msgTemplateChange) {
         addNarrativeEntry(
           msgTemplateChange

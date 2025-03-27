@@ -123,8 +123,8 @@
               'narrative-comment': entry.type === 'narrative'
             }"
             name="incidentComment"
+            [innerHTML]="entry.comment"
           >
-            {{ entry.comment }}
           </td>
         </tr>
       </tbody>

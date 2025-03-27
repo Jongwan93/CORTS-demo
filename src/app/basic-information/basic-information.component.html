@@ -54,7 +54,7 @@
         <!-- how do I fetch the current user information?-->
         <!--tow way binding. set routedToSelction default-->
         <select (change)="routedToSelectionChangeHandler($event)" required>
-          <option value = '' disabled selected>select routed to option</option>
+          <option value="" disabled selected>select routed to option</option>
           <option [value]="userName">{{ userName }}</option>
           <option [value]="routedToGroup">{{ routedToGroup }}</option>
         </select>
@@ -62,7 +62,9 @@
 
       <!-- Incident (Call) # -->
       <div class="grid-item">
-        <label>Incident (Call) #</label>
+        <label [ngClass]="{ 'req-input': corType === 'ALS/VSA' }">{{
+          getLabelText()
+        }}</label>
         <input
           type="text"
           [(ngModel)]="incidentCallNumber"

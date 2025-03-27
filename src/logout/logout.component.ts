@@ -21,6 +21,7 @@ export class LogoutComponent {
 
   logout() {
     this.authService.clearUser();
+    localStorage.clear();
     this.router.navigate(['/logout']);
   }
 
