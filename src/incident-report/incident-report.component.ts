@@ -6,6 +6,7 @@ import { Title } from '@angular/platform-browser';
 import { IncidentService } from '../app/services/incident-report.service';
 import { validateRequiredFields } from '../app/utils/validateFields';
 import { LookupService } from '../app/services/lookup.service';
+import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
 @Component({
@@ -16,6 +17,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     RouterModule,
     NgFor,
     CommonModule,
+    NarrativeComponent,
     BasicInformationComponent,
   ],
   templateUrl: './incident-report.component.html',

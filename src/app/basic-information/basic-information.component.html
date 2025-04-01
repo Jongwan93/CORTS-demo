@@ -38,14 +38,19 @@
       <!-- COR Type -->
       <div class="grid-item">
         <label>COR Type</label>
-        <input type="text" [value]="corType" disabled />
+        <input type="text" [value]="corType" [title]="corType" disabled />
       </div>
 
       <!-- Creator -->
       <div class="grid-item">
         <!-- how do I fetch the current user information?-->
         <label>Creator</label>
-        <input type="text" [value]="userName" disabled />
+        <textarea
+          readonly
+          rows="3"
+          class="basic-info-creator"
+          [value]="userName + '\n' + groupName"
+        ></textarea>
       </div>
 
       <!-- Route To -->

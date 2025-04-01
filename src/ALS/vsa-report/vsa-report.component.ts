@@ -5,6 +5,7 @@ import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../../app/services/lookup.service';
 import { validateVsaReport } from '../../app/utils/validateFields';
+import { NarrativeComponent } from '../../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../../app/basic-information/basic-information.component';
 
 @Component({
@@ -15,6 +16,7 @@ import { BasicInformationComponent } from '../../app/basic-information/basic-inf
     RouterModule,
     NgFor,
     CommonModule,
+    NarrativeComponent,
     BasicInformationComponent,
   ],
   templateUrl: './vsa-report.component.html',
@@ -311,6 +313,7 @@ export class vsaReportComponent implements OnInit {
       location.reload();
     }
   }
+  
   //========================UTILITY===========================
   updateRoutedToSelection(newSelection: string) {
     this.routedToSelection = newSelection;

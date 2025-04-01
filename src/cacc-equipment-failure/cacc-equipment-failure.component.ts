@@ -4,8 +4,9 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
-import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
+import { NarrativeComponent } from '../app/narrative/narrative.component';
+import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
 @Component({
   selector: 'app-cacc-equipment-failure-report',
@@ -15,6 +16,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
     RouterModule,
     NgFor,
     CommonModule,
+    NarrativeComponent,
     BasicInformationComponent,
   ],
   templateUrl: './cacc-equipment-failure.component.html',

@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
 
@@ -14,6 +15,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
     RouterModule,
     NgFor,
     CommonModule,
+    NarrativeComponent,
     BasicInformationComponent,
   ],
   templateUrl: './fleet-equipment-report.component.html',

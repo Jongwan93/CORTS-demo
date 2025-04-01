@@ -33,6 +33,11 @@ export class AuthService {
     return user?.personnel?.functionalityGroupCode || 'Unknown';
   }
 
+  getGroupName(): string {
+    const user = this.getUser();
+    return user?.personnel?.functionalityGroupDesc || 'Unknown';
+  }
+
   logout() {
     this.clearUser();
     this.router.navigate(['/login']); 

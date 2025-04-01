@@ -42,6 +42,7 @@ export class BasicInformationComponent implements OnInit {
   corTypeKey: number = 0;
   corType: string = '';
   userName: string = '';
+  groupName: string = '';
 
   groupCode: string = ''; // user's functionality group code
   groupCodeID: number = 0; // group code ID for create incident report API request body
@@ -59,6 +60,7 @@ export class BasicInformationComponent implements OnInit {
   ngOnInit() {
     this.userName = this.authService.getUserName(); // 29030, CASSONDRA FOERTER
     this.groupCode = this.authService.getGroupCode(); // fetch group code (COM)
+    this.groupName = this.authService.getGroupName(); // COM Officer
 
     // getting user name from authService
     const user = this.authService.getUser();

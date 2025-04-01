@@ -200,3 +200,23 @@ tbody tr {
   padding: 0.5em;
   align-items: start;
 }
+
+/* if it is not narrative comments, row will be colored */
+.incident-comment {
+  background-color: #eaf7ff;
+}
+
+/* basic information creator box */
+.basic-info-creator {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0.5em;
+  width: 100%;
+  margin-bottom: 0.5em;
+  resize: none;
+  font-size: 1em;
+  font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+  background-color: #faf9f9;
+  height: 55px;
+  line-height: 1.6;
+}
