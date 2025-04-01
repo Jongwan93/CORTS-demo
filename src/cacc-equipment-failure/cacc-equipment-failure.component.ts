@@ -4,7 +4,6 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
-// import { validateRequiredFields } from '../app/utils/validateFields';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
 
