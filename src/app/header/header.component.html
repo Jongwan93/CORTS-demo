@@ -1,0 +1,23 @@
+<!-- Header -->
+<div class="container">
+    <header align="center">
+      <!-- Ontario Logo -->
+      <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
+  
+      <!-- Title -->
+      <div name="title">
+        <h1>
+          CORTS - CACC Operational <br />
+          Reports Tracking System
+        </h1>
+        <h3>454 - MIS CACC</h3>
+      </div>
+  
+      <!-- Navigation Buttons -->
+      <div name="nav" *ngIf="!isLogoutPage()">
+        <button class="navBtn" routerLink="/mainpage">Start Page</button>
+        <button class="navBtn" routerLink="/query" *ngIf="!isQueryPage()">Search</button>
+        <button class="navBtn" routerLink="/logout">Logout</button>
+      </div>
+    </header>
+  </div>
