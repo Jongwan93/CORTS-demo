@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router'
 import { AuthService } from '../app/services/auth.service';
+import { HeaderComponent } from '../app/header/header.component';
 
 @Component({
   selector: 'app-logout',
-  imports: [],
+  imports: [HeaderComponent],
   templateUrl: './logout.component.html',
   styleUrls: ['./logout.component.css']
 })

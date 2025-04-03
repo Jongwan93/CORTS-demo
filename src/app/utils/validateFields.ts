@@ -5,8 +5,6 @@ export interface VsaValidationContext {
   requiredFieldsSelector?: string;
 }
 
-
-
 // unified required check
 export function validateRequiredFields(
   selector: string = '[required]'
@@ -49,11 +47,27 @@ export function validateIncidentCallNumber(
   return true;
 }
 
+// when VSA is selected, check if "pronounced by" is filled
+export function validateVsaPronouncedBy(context: VsaValidationContext): boolean {
+  if (context.isVSASelected) {
+    const pronouncedInput = document.getElementById('pronouncedBy') as HTMLInputElement;
+    if (!pronouncedInput || !pronouncedInput.value.trim()) {
+      alert('For a VSA, you must enter the name of the pronouncing doctor if you enter a VSA date. Otherwise, leave both of these fields blank.');
+      return false;
+    }
+  }
+  return true;
+}
+
 // VSA report validation
 export function validateVsaReport(context: VsaValidationContext): boolean {
   const requiredValid = validateRequiredFields(context.requiredFieldsSelector);
   const callNumberValid = validateIncidentCallNumber(context);
   const typeSelectionValid = validateVsaTypeSelection(context);
+  const pronouncedByValid = validateVsaPronouncedBy(context);
 
-  return requiredValid && callNumberValid && typeSelectionValid;
+  return requiredValid && callNumberValid && typeSelectionValid && pronouncedByValid;
 }
+
+
+

@@ -3,9 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
-import { IncidentService } from '../app/services/incident-report.service';
+import { ReportService } from '../app/services/report.service';
 import { validateRequiredFields } from '../app/utils/validateFields';
 import { LookupService } from '../app/services/lookup.service';
+import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
@@ -17,6 +18,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     RouterModule,
     NgFor,
     CommonModule,
+    HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
   ],
@@ -40,7 +42,7 @@ export class IncidentReportComponent implements OnInit {
 
   // services
   private titleService = inject(Title);
-  private incidentService = inject(IncidentService);
+  private reportService = inject(ReportService);
   private lookupService = inject(LookupService);
   private router = inject(Router);
 
@@ -98,94 +100,50 @@ export class IncidentReportComponent implements OnInit {
     const isValid = validateRequiredFields();
 
     if (!isValid) {
+      this.isSaved = false;
       return;
     }
 
-    const now = new Date();
-    const currentTimestamp = now.toISOString();
     const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
     this.combinedEntries = [...this.combinedEntries];
 
-    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
-      this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
-        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
-        comment: comment,
-        type: 'narrative',
-      });
-      this.narrativesArray.push({
-        narrativeKey: 0,
-        corFk: 0,
-        timeStamp: currentTimestamp,
-        systemGenerated: systemGenerated,
-        createdBy: this.basicInfoComponent.userName,
-        createdByInitials: this.loginUserName,
-        narrativeText: comment,
-      });
-    };
-
     // New - Routed To, Incident Type
     if (isNewReport) {
-      const msgTemplateCreate =
-        this.lookupService.getSystemMessageByCode('CREATE');
-      const msgTemplateReassign =
-        this.lookupService.getSystemMessageByCode('REASSIGN');
-
-      // "new report created" added
-      if (msgTemplateCreate) {
-        addNarrativeEntry(msgTemplateCreate, true);
-      }
-
-      // "COR Routed To..." message added
-      if (msgTemplateReassign) {
-        addNarrativeEntry(
-          msgTemplateReassign.replace('%1', this.routedToSelection),
-          true
-        );
-      }
+      this.updateFields('CREATE', []);
+      this.updateFields('REASSIGN', [this.routedToSelection]);
+    
       this.previousRoutedTo = this.routedToSelection;
 
-      // show the duplicate and close COR button
+      // show duplicated and close COR buttons
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
-
-    const msgTemplateChange =
-      this.lookupService.getSystemMessageByCode('CHANGE');
+    
     // Update - when Routed To is changed
     if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Routed To')
-            .replace('%2', this.routedToSelection)
-            .replace('%3', this.previousRoutedTo),
-          true
-        );
-      }
+      this.updateFields('CHANGE', [
+        'Routed To',
+        this.routedToSelection,
+        this.previousRoutedTo,
+      ]);
       this.previousRoutedTo = this.routedToSelection;
     }
 
-    // Update - when incident Type is changed
+    // Update - when Incident Type is changed
     if (!isNewReport && this.previousIncidentTypeKey !== this.incidentTypeKey) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Incident Type')
-            .replace('%2', this.incidentTypeKey)
-            .replace('%3', this.previousIncidentTypeKey),
-          true
-        );
-      }
+      this.updateFields('CHANGE', [
+        'Incident Type',
+        this.getIncidentTypeText(this.incidentTypeKey),
+        this.getIncidentTypeText(this.previousIncidentTypeKey),
+      ]);
       this.previousIncidentTypeKey = this.incidentTypeKey;
     }
 
     // user's incident comment added
     if (this.incidentCommentText.trim()) {
       this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
+        date: this.basicInfoComponent.formatDate(this.now),
+        time: this.basicInfoComponent.formatTime(this.now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
         comment: this.incidentCommentText.trim(),
         type: 'incident',
@@ -195,7 +153,7 @@ export class IncidentReportComponent implements OnInit {
     // user's narrative comment added
     let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      addNarrativeEntry(this.narrativeCommentText.trim(), false);
+      this.addNarrativeEntry(this.narrativeCommentText.trim(), false);
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
@@ -248,11 +206,11 @@ export class IncidentReportComponent implements OnInit {
 
     // API call
     if (this.corNumber === 'New') {
-      this.incidentService.createIncident(createRequestBody).subscribe(
+      this.reportService.createIncident(createRequestBody).subscribe(
         (response) => {
-          this.incidentService.setIncidentResponse(response);
-          this.corNumber = this.incidentService.getCorNumber();
-          this.corMainKey = this.incidentService.getcorMainKey();
+          this.reportService.setIncidentResponse(response);
+          this.corNumber = this.reportService.getCorNumber();
+          this.corMainKey = this.reportService.getcorMainKey();
 
           this.incidentCommentText = '';
           this.narrativeCommentText = '';
@@ -265,9 +223,9 @@ export class IncidentReportComponent implements OnInit {
         }
       );
     } else {
-      this.incidentService.updateIncident(updateRequestBody).subscribe(
+      this.reportService.updateIncident(updateRequestBody).subscribe(
         (response) => {
-          this.incidentService.setIncidentResponse(response);
+          this.reportService.setIncidentResponse(response);
           console.log('request body: ', updateRequestBody);
 
           this.incidentCommentText = '';
@@ -283,20 +241,26 @@ export class IncidentReportComponent implements OnInit {
     }
 
     this.basicInfoComponent.setStatusToCreate();
+
+    this.isSaved = true;
   } // --------- end of save changes function
 
   // button Save Changes and Exit
   saveChangesExit() {
     if (!this.isSaved) {
       this.saveChanges();
-    }
 
-    // wait for API to save the data
-    setTimeout(() => {
-      this.isSaved = false;
-      window.alert('Changes Saved');
+      const interval = setInterval(() => {
+        if (this.isSaved) {
+          clearInterval(interval);
+          window.alert('Changes Saved');
+          this.isSaved = false;
+          this.router.navigate(['/mainpage']);
+        }
+      }, 100);
+    } else {
       this.router.navigate(['/mainpage']);
-    }, 500);
+    }
   }
 
   // button Reload Page
@@ -330,5 +294,46 @@ export class IncidentReportComponent implements OnInit {
       (type) => type.displayName === displayName
     );
     return findIncidentType ? findIncidentType.incidentTypeKey : null;
+  }
+
+  now = new Date();
+  currentTimestamp = this.now.toISOString();
+
+  private addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+    this.combinedEntries.unshift({
+      date: this.basicInfoComponent.formatDate(this.now),
+      time: this.basicInfoComponent.formatTime(this.now),
+      user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+      comment: comment,
+      type: 'narrative',
+    });
+    this.narrativesArray.push({
+      narrativeKey: 0,
+      corFk: 0,
+      timeStamp: this.currentTimestamp,
+      systemGenerated: systemGenerated,
+      createdBy: this.basicInfoComponent.userName,
+      createdByInitials: this.loginUserName,
+      narrativeText: comment,
+    });
+  };
+
+  // reflect field changes and send messages to narrative
+  private updateFields(
+    messageCode: string,
+    values: string[],
+    systemGenerated: boolean = true
+  ) {
+    const msgTemplate = this.lookupService.getSystemMessageByCode(messageCode);
+
+    if (!msgTemplate) return;
+
+    let formattedMessage = msgTemplate;
+
+    values.forEach((val, index) => {
+      formattedMessage = formattedMessage.replace(`%${index + 1}`, val);
+    });
+
+    this.addNarrativeEntry(formattedMessage, systemGenerated);
   }
 }

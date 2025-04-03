@@ -1,29 +1,7 @@
 <!-- Code for ALS/VSA Report -->
 
 <!-- Header -->
-<div class="container">
-  <header align="center">
-    <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
-
-    <!-- Title -->
-    <div name="title">
-      <h1>
-        CORTS - CACC Operational <br />
-        Reports Tracking System
-      </h1>
-      <h3>454 - MIS CACC</h3>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <div name="nav">
-      <button class="navBtn" routerLink="/mainpage">Start Page</button>
-      <button class="navBtn" routerLink="/query">Search</button>
-      <button class="navBtn" routerLink="/logout">Logout</button>
-    </div>
-  </header>
-</div>
-
+<app-header></app-header>
 <form id="VSAReport" method="post" action="/vsa-report">
   <!-- Basic Information Content -->
   <app-basic-information
@@ -89,13 +67,23 @@
         <label class="vsa-req-input" for="pronouncedDateTime"
           >Pronounced Date/Time</label
         >
-        <input type="datetime-local" id="pronouncedDateTime" />
+        <input
+          type="datetime-local"
+          id="pronouncedDateTime"
+          [disabled]="!pronouncedBy.trim()"
+        />
       </div>
 
       <!-- DNR -->
       <div class="grid-item">
-        <label for="dnr">DNR</label>
-        <select id="dnr" [(ngModel)]="dnrTypeKey" name="dnrTypeKey">
+        <label for="dnr" class="req-input">DNR*</label>
+        <select
+          id="dnr"
+          [(ngModel)]="dnrTypeKey"
+          name="dnrTypeKey"
+          (change)="dnrTypeChange(dnrTypeKey)"
+          required
+        >
           <option value="">-- Select DNR --</option>
           <option *ngFor="let dnr of dnrTypeList" [value]="dnr.code">
             {{ dnr.displayName }}
@@ -105,12 +93,14 @@
 
       <!-- ALS/VSA Details -->
       <div class="grid-item">
-        <label>ALS/VSA Details</label>
+        <label class="req-input">ALS/VSA Details*</label>
         <textarea
           rows="5"
           maxlength="255"
           [(ngModel)]="alsCommentText"
           name="alsCommentText"
+          (input)="isSaved = false"
+          required
         ></textarea>
       </div>
 

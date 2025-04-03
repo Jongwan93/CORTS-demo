@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
@@ -15,6 +16,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
     RouterModule,
     NgFor,
     CommonModule,
+    HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
   ],
@@ -77,18 +79,18 @@ export class FleetEquipmentReportComponent implements OnInit {
 
   // ------------------------Fleet Report-----------------------------
 
-  fleetTypeKey: string = ''; // dropdown menu
-  prevFleetTypeKey: string = ''; // to detect change
-  fleetDateTime = '';
-  fleetCommentText: string = ''; // incident details input
+  breakDownTypeKey: string = ''; // dropdown menu
+  prevBreakDownTypeKey: string = ''; // to detect change
+  failureDateTime = '';
+  prevFailureDateTime = '';
+  
+  // detect breakdown type change
+  fleetTypeChange(newBreakDownTypeKey: string) {
+    this.breakDownTypeKey = newBreakDownTypeKey;
 
-  // detect incident type change
-  fleetTypeChange(newFleetTypeKey: string) {
-    this.fleetTypeKey = newFleetTypeKey;
-
-    // only update previousInicdnetTypeKey one time at the beginning
+    // only update previousBreakDownTypeKey one time at the beginning
     if (this.corNumber === 'New') {
-      this.prevFleetTypeKey = this.fleetTypeKey;
+      this.prevBreakDownTypeKey = this.breakDownTypeKey;
     }
   }
 
@@ -103,6 +105,7 @@ export class FleetEquipmentReportComponent implements OnInit {
     const isValid = validateRequiredFields();
 
     if (!isValid) {
+      this.isSaved = false;
       return;
     }
 
@@ -131,7 +134,7 @@ export class FleetEquipmentReportComponent implements OnInit {
       });
     };
 
-    // New - Routed To, Incident Type
+    // New - Routed To, breakdown Type
     if (isNewReport) {
       const msgTemplateCreate =
         this.lookupService.getSystemMessageByCode('CREATE');
@@ -174,17 +177,17 @@ export class FleetEquipmentReportComponent implements OnInit {
       }
 
       // Update - when Breakdown Type is changed
-      if (this.prevFleetTypeKey !== this.fleetTypeKey) {
+      if (this.prevBreakDownTypeKey !== this.breakDownTypeKey) {
         if (msgTemplateChange) {
           addNarrativeEntry(
             msgTemplateChange
               .replace('%1', 'Breakdown Type')
-              .replace('%2', this.fleetTypeKey)
-              .replace('%3', this.prevFleetTypeKey),
+              .replace('%2', this.breakDownTypeKey)
+              .replace('%3', this.prevBreakDownTypeKey),
             true
           );
         }
-        this.prevFleetTypeKey = this.fleetTypeKey;
+        this.prevBreakDownTypeKey = this.breakDownTypeKey;
       }
 
       // adding break down type comment
@@ -193,14 +196,14 @@ export class FleetEquipmentReportComponent implements OnInit {
       }
     }
 
-    // user's ALS/VSA comment added
+    // user's failure comment added
     if (this.failureCommentText.trim()) {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
         time: this.basicInfoComponent.formatTime(now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
         comment: this.failureCommentText.trim(),
-        type: 'als',
+        type: 'failure',
       });
     }
 
@@ -218,20 +221,26 @@ export class FleetEquipmentReportComponent implements OnInit {
     
 
     this.basicInfoComponent.setStatusToCreate();
+
+    this.isSaved = true;
   } // +++++++++++++++ end of save changes function
 
   // button Save Changes and Exit
   saveChangesExit() {
     if (!this.isSaved) {
       this.saveChanges();
-    }
-
-    // wait for API to save the data
-    setTimeout(() => {
-      this.isSaved = false;
-      window.alert('Changes Saved');
+      
+      const interval = setInterval(() => {
+        if (this.isSaved) {
+          clearInterval(interval);
+          window.alert('Changes Saved');
+          this.isSaved = false;
+          this.router.navigate(['/mainpage']);
+        }
+      }, 100);
+    } else {
       this.router.navigate(['/mainpage']);
-    }, 500);
+    }
   }
 
   // button Reload Page

@@ -1,28 +1,7 @@
 <!-- Code for the CACC Equipment Falure Report Page -->
 
 <!-- Header -->
-<div class="container">
-  <header align="center">
-    <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
-
-    <!-- Title -->
-    <div name="title">
-      <h1>
-        CORTS - CACC Operational <br />
-        Reports Tracking System
-      </h1>
-      <h3>454 - MIS CACC</h3>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <div name="nav">
-      <button class="navBtn" routerLink="/mainpage">Start Page</button>
-      <button class="navBtn" routerLink="/query">Search</button>
-      <button class="navBtn" routerLink="/logout">Logout</button>
-    </div>
-  </header>
-</div>
+<app-header></app-header>
 
 <!----------------------------------------------------------------->
 
@@ -101,7 +80,7 @@
       <!-- Service Request To -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Request To</label>
-        <input type="text" [(ngModel)]="requestComment" name="requestComment" />
+        <input type="text" [(ngModel)]="requestTo" name="requestTo" />
         <input
           type="datetime-local"
           id="pronouncedDateTime"
@@ -114,7 +93,7 @@
       <!-- Service Responded By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Responded By</label>
-        <input type="text" [(ngModel)]="respondComment" name="respondComment" />
+        <input type="text" [(ngModel)]="respondBy" name="respondBy" />
         <input
           type="datetime-local"
           id="pronouncedDateTime"
@@ -127,11 +106,7 @@
       <!-- Service Completed By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Completed By</label>
-        <input
-          type="text"
-          [(ngModel)]="completedComment"
-          name="completedComment"
-        />
+        <input type="text" [(ngModel)]="completedBy" name="completedBy" />
         <input
           type="datetime-local"
           id="pronouncedDateTime"
@@ -146,8 +121,9 @@
         <label class="req-input">Failure Details or Other Info*</label>
         <textarea
           rows="5"
-          [(ngModel)]="equipmentCommentText"
-          name="equipmentCommentText"
+          [(ngModel)]="failureCommentText"
+          name="failureCommentText"
+          (input)="isSaved = false"
           required
         ></textarea>
       </div>
@@ -157,7 +133,13 @@
         <label for="responseDelay">Response Delay</label>
         <!-- Response Delay Checkbox -->
         <div class="time-duration-container">
-          <input type="checkbox" id="delay" (change)="toggleDelayTime()" />
+          <input
+            type="checkbox"
+            id="delay"
+            name="delayTime"
+            [(ngModel)]="isDelaySelected"
+            (change)="toggleDelayTime()"
+          />
           <input
             type="number"
             id="delay-hours"
@@ -165,7 +147,10 @@
             max="99"
             step="1"
             value="00"
+            name="delayHours"
+            [(ngModel)]="delayHours"
             [disabled]="!isDelaySelected"
+            (change)="updateResponseDelay()"
           />
           <p>:</p>
           <input
@@ -175,7 +160,10 @@
             max="59"
             step="1"
             value="00"
+            name="delayMinutes"
+            [(ngModel)]="delayMinutes"
             [disabled]="!isDelaySelected"
+            (change)="updateResponseDelay()"
           />
         </div>
       </div>

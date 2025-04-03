@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class IncidentService {
+export class ReportService {
   private incidentResponse: any = null;
   private apiBaseUrl = '/api/reports/incident-report'; // basic API Url
 

@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common/http';
+import { HeaderComponent } from '../app/header/header.component';
 
 @Component({
   selector: 'app-query',
   standalone: true,
-  imports: [RouterModule, FormsModule, NgFor, CommonModule],
+  imports: [RouterModule, FormsModule, NgFor, CommonModule, HeaderComponent],
   templateUrl: './query.component.html',
   styleUrls: ['./query.component.css'],
 })
@@ -19,9 +20,11 @@ export class QueryComponent implements OnInit {
   routes: any[] = [];
   groupedRoutes: any = {};
 
-  constructor(private titleService: Title, private http: HttpClient) {
+  constructor() {
     this.titleService.setTitle('CORTS - Query');
   }
+
+  private titleService = inject(Title);
 
   ngOnInit() {
     this.displayCortsType();
@@ -54,14 +57,16 @@ export class QueryComponent implements OnInit {
       if (Array.isArray(parsedData.data)) {
         this.employees = parsedData.data
           .map(
-            (item: { // specify the types for sorting
+            (item: {
+              // specify the types for sorting
               code: string;
               empId: string;
               empName: string;
               empRecId: number;
               fgRecId: number;
               functionalityGroup: string;
-            }) => ({ // assign the values
+            }) => ({
+              // assign the values
               code: item.code,
               empId: item.empId,
               empName: item.empName,

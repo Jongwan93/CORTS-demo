@@ -17,6 +17,15 @@ export class NarrativeComponent {
   @Output() saveChangesExit = new EventEmitter<void>();
   @Output() reload = new EventEmitter<void>();
 
+  typeClassMap: { [key: string]: string } = {
+    incident: 'report-comment',
+    narrative: 'narrative-comment',
+    als: 'als-comment',
+    vsa: 'vsa-comment',
+    general: 'general-comment',
+    system: 'system-comment',
+  };
+
   onTextChange(newText: string) {
     this.narrativeCommentText = newText;
     this.narrativeCommentTextChange.emit(newText);

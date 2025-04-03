@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
@@ -16,6 +17,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
     RouterModule,
     NgFor,
     CommonModule,
+    HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
   ],
@@ -55,7 +57,6 @@ export class ComplaintReportComponent implements OnInit {
   complaintTypeList: any[] = []; // to send it to html
   narrativesArray: any[] = []; // temp
   corMainKey: string = ''; // Primary key to find the exisitng report
-  isNewReport: boolean = true;
 
   ngOnInit() {
     this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
@@ -75,6 +76,7 @@ export class ComplaintReportComponent implements OnInit {
   complaintTypeKey: string = '';
   previousComplaintTypeKey: string = '';
   complaintDateTime = '';
+  prevComplaintDateTime = '';
   complaintCommentText: string = '';
   firstName = '';
   prevFirstName = '';
@@ -94,11 +96,14 @@ export class ComplaintReportComponent implements OnInit {
   // ------------------------------Narrative---------------------------------
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
+  isNewReport: boolean = true;
+  isSaved: boolean = false;
 
   saveChanges() {
     const isValid = validateRequiredFields();
 
     if (!isValid) {
+      this.isSaved = false;
       return;
     }
 
@@ -152,39 +157,47 @@ export class ComplaintReportComponent implements OnInit {
 
       // show the duplicate and close COR button
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
-      this.isNewReport = false;
     }
 
     const msgTemplateChange =
       this.lookupService.getSystemMessageByCode('CHANGE');
 
+    // Update - when name is Changed
     if (
-      (!this.prevLastName && this.lastName) ||
-      this.prevLastName !== this.lastName ||
-      (!this.prevFirstName && this.firstName) ||
-      this.prevFirstName !== this.firstName
+      !this.isNewReport &&
+      ((!this.prevLastName && this.lastName) ||
+        this.prevLastName !== this.lastName ||
+        (!this.prevFirstName && this.firstName) ||
+        this.prevFirstName !== this.firstName)
     ) {
       if (msgTemplateChange) {
-        const formattedMessage = msgTemplateChange
-          .replace('%1', 'Name')
-          .replace('%2', `${this.firstName} ${this.lastName}`)
-          .replace('%3', `${this.prevFirstName} ${this.prevLastName}`);
-
-        addNarrativeEntry(formattedMessage, true);
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Name')
+            .replace('%2', `${this.firstName} ${this.lastName}`)
+            .replace('%3', `${this.prevFirstName} ${this.prevLastName}`),
+          true
+        );
       }
-
       this.prevLastName = this.lastName;
       this.prevFirstName = this.firstName;
     }
 
+    // Update - when Phone number is changed
     if (
-      (!this.prevPhoneNumber && this.phoneNumber) ||
-      this.prevPhoneNumber != this.phoneNumber
+      !this.isNewReport &&
+      ((!this.prevPhoneNumber && this.phoneNumber) ||
+        this.prevPhoneNumber != this.phoneNumber)
     ) {
-      addNarrativeEntry(
-        `phone number is updated to: [${this.phoneNumber}]`,
-        true
-      );
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Phone Number')
+            .replace('%2', this.phoneNumber)
+            .replace('%3', this.prevPhoneNumber),
+          true
+        );
+      }
       this.prevPhoneNumber = this.phoneNumber;
     }
 
@@ -211,12 +224,32 @@ export class ComplaintReportComponent implements OnInit {
         addNarrativeEntry(
           msgTemplateChange
             .replace('%1', 'Complant Type')
-            .replace('%2', this.complaintTypeKey)
-            .replace('%3', this.previousComplaintTypeKey),
+            .replace('%2', this.getComplaintTypeText(this.complaintTypeKey))
+            .replace(
+              '%3',
+              this.getComplaintTypeText(this.previousComplaintTypeKey)
+            ),
           true
         );
       }
       this.previousComplaintTypeKey = this.complaintTypeKey;
+    }
+
+    // Update - complaint date time
+    if (
+      !this.isNewReport &&
+      this.prevComplaintDateTime !== this.complaintDateTime
+    ) {
+      if (msgTemplateChange) {
+        addNarrativeEntry(
+          msgTemplateChange
+            .replace('%1', 'Complaint date')
+            .replace('%2', this.complaintDateTime)
+            .replace('%3', this.prevComplaintDateTime),
+          true
+        );
+      }
+      this.prevComplaintDateTime = this.complaintDateTime;
     }
 
     // Update - first name or last name or phone number
@@ -256,27 +289,43 @@ export class ComplaintReportComponent implements OnInit {
     //
     //
     //
+    //-------------------------Temp------------------------
+    this.isNewReport = false;
+    this.corNumber = '123';
+    //---------REMOVE WHEN API REQUEST IMPLEMENTED---------
 
     this.complaintCommentText = '';
     this.narrativeCommentText = '';
 
     this.basicInfoComponent.setStatusToCreate();
+
+    this.isSaved = true;
   } // ++++++++end of saveChanges()
 
   // button Save Changes and Exit
   saveChangesExit() {
-    this.saveChanges();
-    // wait for API to save the data
-    setTimeout(() => {
-      window.alert('Changes Saved');
+    if (!this.isSaved) {
+      this.saveChanges();
+      
+      const interval = setInterval(() => {
+        if (this.isSaved) {
+          clearInterval(interval);
+          window.alert('Changes Saved');
+          this.isSaved = false;
+          this.router.navigate(['/mainpage']);
+        }
+      }, 100);
+    } else {
       this.router.navigate(['/mainpage']);
-    }, 500);
+    }
   }
 
   // button Reload Page
   reload() {
-    window.alert('do you want to refresh the page?');
-    location.reload();
+    const userChoice = window.confirm('Do you want to refresh the page?');
+    if (userChoice) {
+      location.reload();
+    }
   }
 
   //==============================UTILITY==================================
@@ -298,6 +347,7 @@ export class ComplaintReportComponent implements OnInit {
     return `(${cleaned.slice(0, 3)})${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   }
 
+  // finding complaint type name according to the complaint type key
   getComplaintTypeText(value: string): string {
     const findComplaintType = this.complaintTypeList.find(
       (type) => type.complaintTypeKey === Number(value)

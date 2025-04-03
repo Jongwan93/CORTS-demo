@@ -202,7 +202,7 @@ tbody tr {
 }
 
 /* if it is not narrative comments, row will be colored */
-.incident-comment {
+.report-comment {
   background-color: #eaf7ff;
 }
 
@@ -215,8 +215,9 @@ tbody tr {
   margin-bottom: 0.5em;
   resize: none;
   font-size: 1em;
-  font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
-  background-color: #faf9f9;
+  color: #414141;
+  font-family: "Raleway", "Arial", "Calibri";
+  background-color: #fafafa;
   height: 55px;
   line-height: 1.6;
 }

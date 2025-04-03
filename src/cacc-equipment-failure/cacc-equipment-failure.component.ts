@@ -5,6 +5,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
 import { validateRequiredFields } from '../app/utils/validateFields';
+import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
@@ -16,6 +17,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     RouterModule,
     NgFor,
     CommonModule,
+    HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
   ],
@@ -52,8 +54,6 @@ export class caccEquipmentFailureComponent implements OnInit {
   //(DO NOT TOUCH)--------------------------------------------------------
 
   //Variables
-  isDelaySelected = false;
-
   equipmentTypeList: any[] = []; // to send it to html
   equipmentLocationList: any[] = []; // to send it to html
   isSystemGenerated: boolean = true; // "Routed To.." "New Report Created"
@@ -82,31 +82,62 @@ export class caccEquipmentFailureComponent implements OnInit {
   equipmentLocationKey: string = '';
   prevEquipmentLocationKey: string = '';
   failureDateTime = '';
+  prevFailureDateTime = '';
 
   // no need to print it on the table
   requestDateTime = '';
-  requestComment: string = '';
+  requestTo: string = '';
   respondDateTime = '';
-  respondComment: string = '';
+  respondBy: string = '';
   completedDateTime = '';
-  completedComment: string = '';
+  completedBy: string = '';
 
-  equipmentCommentText: string = ''; // Equipment details input
+  failureCommentText: string = ''; // Equipment details input
+
   responseDelay = '';
+  isDelaySelected = false;
+  delayHours: number = 0;
+  delayMinutes: number = 0;
 
   //Method toggles delayed field (To be able to input the time)
   toggleDelayTime() {
-    this.isDelaySelected = !this.isDelaySelected;
+    if (!this.isDelaySelected) {
+      this.responseDelay = '';
+      this.delayHours = 0;
+      this.delayMinutes = 0;
+    } else {
+      this.updateResponseDelay();
+    }
+  }
+
+  // detect equipment and location type change
+  equipmentTypeChange(newEquipmentTypeKey: string) {
+    this.equipmentTypeKey = newEquipmentTypeKey;
+
+    if (this.corNumber === 'New') {
+      this.prevEquipmentTypeKey = this.equipmentTypeKey;
+    }
+  }
+
+  equipmentLocationChange(newEquipmentLocationKey: string) {
+    this.equipmentLocationKey = newEquipmentLocationKey;
+
+    if (this.corNumber === 'New') {
+      this.prevEquipmentLocationKey = this.equipmentLocationKey;
+    }
   }
 
   //--------------------------Narrative------------------------
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
+  isSaved: boolean = false;
+  isNewReport: boolean = true;
 
   saveChanges() {
     const isValid = validateRequiredFields()
 
     if(!isValid) {
+      this.isSaved = false;
       return;
     }
 
@@ -157,9 +188,6 @@ export class caccEquipmentFailureComponent implements OnInit {
       }
       this.previousRoutedTo = this.routedToSelection;
 
-      this.prevEquipmentTypeKey = this.equipmentTypeKey;
-      this.prevEquipmentLocationKey = this.equipmentLocationKey;
-
       // show the duplicate and close COR button
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
@@ -204,13 +232,26 @@ export class caccEquipmentFailureComponent implements OnInit {
       this.prevEquipmentLocationKey = this.equipmentLocationKey;
     }
 
+    // Update - when Failure date/time is changed
+    if (!isNewReport && this.prevFailureDateTime !== this.failureDateTime) {
+      if(msgTemplateChange){
+        addNarrativeEntry(
+          msgTemplateChange
+          .replace('%1', 'Failure Date/Time')
+          .replace('%2', this.failureDateTime)
+          .replace('%3', this.prevFailureDateTime), true
+        );
+      }
+      this.prevEquipmentLocationKey = this.equipmentLocationKey;
+    }
+
     // user's equipment comment added
-    if (this.equipmentCommentText.trim()) {
+    if (this.failureCommentText.trim()) {
       this.combinedEntries.unshift({
         date: this.basicInfoComponent.formatDate(now),
         time: this.basicInfoComponent.formatTime(now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
-        comment: this.equipmentCommentText.trim(),
+        comment: this.failureCommentText.trim(),
         type: 'equipment',
       });
     }
@@ -222,20 +263,35 @@ export class caccEquipmentFailureComponent implements OnInit {
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-    this.equipmentCommentText = '';
+    this.failureCommentText = '';
     this.narrativeCommentText = '';
 
+    //------------TEMP---------------------------
+    this.isNewReport = true;
+    this.corNumber = '1234';
+    //-----DELETE IT AFTER api IMPLEMENTATION-----
+
     this.basicInfoComponent.setStatusToCreate();
+
+    this.isSaved = true;
   } // +++++++++++end of saveChanges() +++++++++++
 
   // button Save Changes and Exit
   saveChangesExit() {
-    this.saveChanges();
-    // wait for API to save the data
-    setTimeout(() => {
-      window.alert('Changes Saved');
+    if (!this.isSaved) {
+      this.saveChanges();
+      
+      const interval = setInterval(() => {
+        if (this.isSaved) {
+          clearInterval(interval);
+          window.alert('Changes Saved');
+          this.isSaved = false;
+          this.router.navigate(['/mainpage']);
+        }
+      }, 100);
+    } else {
       this.router.navigate(['/mainpage']);
-    }, 500);
+    }
   }
 
   // button Reload Page
@@ -255,22 +311,6 @@ export class caccEquipmentFailureComponent implements OnInit {
     this.statusID = newStatusID;
   }
 
-  equipmentTypeChange(newEquipmentTypeKey: string) {
-    this.equipmentTypeKey = newEquipmentTypeKey;
-
-    if (this.corNumber === 'New') {
-      this.prevEquipmentTypeKey = this.equipmentTypeKey;
-    }
-  }
-
-  equipmentLocationChange(newEquipmentLocationKey: string) {
-    this.equipmentLocationKey = newEquipmentLocationKey;
-
-    if (this.corNumber === 'New') {
-      this.prevEquipmentLocationKey = this.equipmentLocationKey;
-    }
-  }
-
   failureDateTimeChange(newFailureDateTime: string) {
     this.failureDateTime = newFailureDateTime;
   }
@@ -285,6 +325,16 @@ export class caccEquipmentFailureComponent implements OnInit {
 
   completedDateTimeChange(newCompletedDateTime: string) {
     this.completedDateTime = newCompletedDateTime;
+  }
+
+  updateResponseDelay() {
+    const hours = this.padNumber(this.delayHours);
+    const minutes = this.padNumber(this.delayMinutes);
+    this.responseDelay = `${hours}:${minutes}`;
+  }
+  
+  padNumber(num: number): string {
+    return num < 10 ? '0' + num : num.toString();
   }
 
   // finding Equipment type name according to the Equipment type key
