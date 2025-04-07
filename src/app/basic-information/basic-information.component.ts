@@ -14,11 +14,13 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { LookupService } from '../services/lookup.service';
+import { CorStateService } from '../services/corStatus.service';
+import { DisableIfClosed } from '../services/disable.service';
 
 @Component({
   selector: 'app-basic-information',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DisableIfClosed],
   templateUrl: './basic-information.component.html',
   styleUrls: ['./basic-information.component.css'],
 })
@@ -26,6 +28,7 @@ export class BasicInformationComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private lookupService = inject(LookupService);
+  private corStatusService = inject(CorStateService);
 
   @Input() corNumber: string = 'New'; // cor#
   @Output() corNumberChange = new EventEmitter<string>();
@@ -53,6 +56,8 @@ export class BasicInformationComponent implements OnInit {
   incidentCallNumber: string = ''; // Incident (Call) #
 
   isDupCloseCorButtonsVisible: boolean = false; // default not showing buttons
+
+  isCorClosed: boolean = false;
 
   createdDate: string = 'New';
   createdTime: string = '';
@@ -94,7 +99,7 @@ export class BasicInformationComponent implements OnInit {
     }
 
     // set Status to "Initial Assignment"
-    this.setInitialCorStatus();
+    this.setStatusTo('Initial Assignment');
 
     // update initial time
     if (this.status == 'Initial Assignment') {
@@ -105,22 +110,21 @@ export class BasicInformationComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {}
 
   // change status to CREATE when save change button is clicked
-  setStatusToCreate() {
+  setStatusTo(newStatus: string) {
     const CORstatus = localStorage.getItem('lookup-corts-status');
 
     if (CORstatus) {
       const parsedStatus = JSON.parse(CORstatus);
-      const openStatus = parsedStatus.data.find(
-        (status: any) => status.displayName === 'Create'
+      const foundStatus = parsedStatus.data.find(
+        (status: any) => status.displayName === newStatus
       );
 
-      this.statusID = openStatus.cORStatusKey;
-
-      if (openStatus) {
-        this.status = openStatus.displayName;
+      if (foundStatus) {
+        this.status = foundStatus.displayName;
+        this.statusID = foundStatus.cORStatusKey;
+        console.log('StatusID: ', this.statusID);
+        this.statusIDChange.emit(this.statusID);
       }
-
-      this.statusIDChange.emit(this.statusID);
     }
   }
 
@@ -135,22 +139,6 @@ export class BasicInformationComponent implements OnInit {
 
       if (matchedCORType) {
         this.corType = matchedCORType.displayName;
-      }
-    }
-  }
-
-  setInitialCorStatus() {
-    // removed in incident-report
-    const CORstatus = localStorage.getItem('lookup-corts-status');
-    if (CORstatus) {
-      const parsedStatus = JSON.parse(CORstatus);
-
-      if (this.corNumber === 'New') {
-        this.statusID = 4;
-        const initialAssignment = parsedStatus.data.find(
-          (status: any) => status.cORStatusKey === 4
-        );
-        this.status = initialAssignment.displayName;
       }
     }
   }
@@ -217,27 +205,31 @@ export class BasicInformationComponent implements OnInit {
     }
   }
 
-  //---------------------------UTILITY------------------------------  
-  // refeshes the page (for now)
+  // close the COR report
+  @Output() closeCorMessage = new EventEmitter<string>();
   closeCOR() {
     const msgTemplateClose =
       this.lookupService.getSystemMessageByCode('CLOSED');
+
+    this.setStatusTo('Closed');
+    this.statusIDChange.emit(this.statusID);
     if (msgTemplateClose) {
-      alert(msgTemplateClose);
+      this.closeCorMessage.emit(msgTemplateClose);
     }
-    // To Do: need logic of deleting this report in db
-    window.location.reload();
+
+    this.corStatusService.setDisabledState(true);
   } // +++++++++ end of closeCOR function +++++++++++
 
+  @Output() dupCorMessage = new EventEmitter<string>();
   dupCOR() {
     const msgTemplateDup =
       this.lookupService.getSystemMessageByCode('DUPLICATED');
-      if (msgTemplateDup){
-        alert(msgTemplateDup);
-        // To Do : need logic of duplicating current report
-      }
+    if (msgTemplateDup) {
+      this.dupCorMessage.emit(msgTemplateDup);
+    }
   }
 
+  //---------------------------UTILITY------------------------------
   fullDateTime: string = 'New'; // Current date + time
   dueDate: string = 'New'; // Due date (two days after)
 
@@ -289,6 +281,8 @@ export class BasicInformationComponent implements OnInit {
   }
 
   getLabelText(): string {
-    return this.corType === 'ALS/VSA' ? 'Incident (Call) #*' : 'Incident (Call) #';
+    return this.corType === 'ALS/VSA'
+      ? 'Incident (Call) #*'
+      : 'Incident (Call) #';
   }
 }

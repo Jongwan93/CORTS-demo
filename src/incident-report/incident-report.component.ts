@@ -9,6 +9,8 @@ import { LookupService } from '../app/services/lookup.service';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
+import { CorStateService } from '../app/services/corStatus.service';
+import { DisableIfClosed } from '../app/services/disable.service';
 
 @Component({
   selector: 'app-incident-report',
@@ -21,6 +23,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
+    DisableIfClosed,
   ],
   templateUrl: './incident-report.component.html',
   styleUrls: ['./incident-report.component.css'],
@@ -95,6 +98,54 @@ export class IncidentReportComponent implements OnInit {
   combinedEntries: any[] = [];
   isSaved: boolean = false;
 
+  // create request body
+  private buildCreateRequestBody(): any {
+    return {
+      assignedTo: this.routedToSelection,
+      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+      cadIncidentNum: '454-Z023046766', // hard coded for now
+      corStatus: this.basicInfoComponent.statusID,
+      corType: this.corTypeKey,
+      createDate: this.basicInfoComponent.fullDateTime,
+      createdby: this.loginUserName,
+      incidenType: this.incidentTypeKey,
+      incidentDateTime: new Date(this.incidentDateTime).toISOString(),
+      incidentDetails: this.incidentCommentText.trim(),
+      userGroup: this.basicInfoComponent.groupCodeID,
+      narratives: this.narrativesArray,
+      relatedCors: [],
+    };
+  }
+
+  // Update Request Body
+  private buildUpdateRequestBody(): any {
+    return {
+      corMainKey: this.corMainKey,
+      corNumber: this.corNumber,
+      createDate: this.basicInfoComponent.fullDateTime,
+      corType: this.corTypeKey,
+      createdby: this.loginUserName,
+      userGroup: this.basicInfoComponent.groupCodeID,
+      assignedTo: this.routedToSelection,
+      assignedDate: this.basicInfoComponent.fullDateTime,
+      cadIncidentNum: '454-Z023046766',
+      corStatus: this.basicInfoComponent.statusID,
+      dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
+      lastAssignedTo: this.routedToSelection,
+      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+      lastModifiedBy: this.loginUserName,
+      lastModifiedDate: new Date().toISOString(),
+      closedby: '',
+      closeDate: '',
+      lastAssignedDate: this.basicInfoComponent.fullDateTime,
+      relatedCors: [],
+      incidenType: this.incidentTypeKey,
+      incidentDate: new Date(this.incidentDateTime).toISOString(),
+      incidentDetails: this.incidentCommentText,
+      narratives: this.narrativesArray,
+    };
+  }
+
   // save changes button
   saveChanges() {
     const isValid = validateRequiredFields();
@@ -112,13 +163,13 @@ export class IncidentReportComponent implements OnInit {
     if (isNewReport) {
       this.updateFields('CREATE', []);
       this.updateFields('REASSIGN', [this.routedToSelection]);
-    
+
       this.previousRoutedTo = this.routedToSelection;
 
       // show duplicated and close COR buttons
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
-    
+
     // Update - when Routed To is changed
     if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
       this.updateFields('CHANGE', [
@@ -158,89 +209,7 @@ export class IncidentReportComponent implements OnInit {
     }
 
     //-----------------------create incident API call-------------------------
-    // Create body
-    const createRequestBody = {
-      assignedTo: this.routedToSelection,
-      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
-      cadIncidentNum: '454-Z023046766', // hard coded for now
-      corStatus: this.statusID,
-      corType: this.corTypeKey,
-      createDate: this.basicInfoComponent.fullDateTime,
-      createdby: this.loginUserName,
-      incidenType: this.incidentTypeKey,
-      incidentDateTime: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: this.incidentCommentText.trim(),
-      userGroup: this.basicInfoComponent.groupCodeID,
-      narratives: this.narrativesArray,
-      relatedCors: [],
-    };
-
-    console.log('create request body: ', createRequestBody);
-
-    // Update body
-    const updateRequestBody = {
-      corMainKey: this.corMainKey,
-      corNumber: this.corNumber,
-      createDate: this.basicInfoComponent.fullDateTime,
-      cortsType: this.corTypeKey,
-      createdby: this.loginUserName,
-      userGroup: this.basicInfoComponent.groupCodeID,
-      assignedTo: this.routedToSelection,
-      assignedDate: this.basicInfoComponent.fullDateTime,
-      cadIncidentNum: '454-Z023046766', // hard coded for now
-      cortStatus: this.statusID,
-      dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
-      lastAssignedTo: this.routedToSelection,
-      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
-      lastModifiedBy: this.loginUserName,
-      lastModifiedDate: new Date().toISOString(),
-      closedby: '',
-      closeDate: '',
-      lastAssignedDate: this.basicInfoComponent.fullDateTime,
-      relatedCors: [],
-      incidenType: this.incidentTypeKey,
-      incidentDate: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: this.incidentCommentText,
-      narratives: this.narrativesArray,
-    };
-
-    // API call
-    if (this.corNumber === 'New') {
-      this.reportService.createIncident(createRequestBody).subscribe(
-        (response) => {
-          this.reportService.setIncidentResponse(response);
-          this.corNumber = this.reportService.getCorNumber();
-          this.corMainKey = this.reportService.getcorMainKey();
-
-          this.incidentCommentText = '';
-          this.narrativeCommentText = '';
-
-          alert('Incident Report Successfully Created');
-        },
-        (error) => {
-          console.error('Error:', error);
-          alert('Failed to Create Incident Report');
-        }
-      );
-    } else {
-      this.reportService.updateIncident(updateRequestBody).subscribe(
-        (response) => {
-          this.reportService.setIncidentResponse(response);
-          console.log('request body: ', updateRequestBody);
-
-          this.incidentCommentText = '';
-          this.narrativeCommentText = '';
-
-          alert('Incident Report Successfully Updated');
-        },
-        (error) => {
-          console.error('Error:', error);
-          alert('Failed to Update Incident Report');
-        }
-      );
-    }
-
-    this.basicInfoComponent.setStatusToCreate();
+    this.submitIncident();
 
     this.isSaved = true;
   } // --------- end of save changes function
@@ -276,8 +245,49 @@ export class IncidentReportComponent implements OnInit {
     this.routedToSelection = newSelection;
   }
 
-  updateStatusID(newStatusID: number) {
-    this.statusID = newStatusID;
+  //handler for close COR button
+  handleCloseCor(message: string) {
+    // add message to narrative
+    this.addNarrativeEntry(message, true);
+
+    // update request body and close overwrite to close
+    const updateRequestBody = this.buildUpdateRequestBody();
+    updateRequestBody.closedby = this.loginUserName;
+    updateRequestBody.closeDate = new Date().toISOString();
+
+    // call API
+    console.log('Closing: Sending updateIncident: ', updateRequestBody);
+
+    this.reportService.updateIncident(updateRequestBody).subscribe(
+      (response) => {
+        console.log('Closing: updateIncident SUCCESS');
+        this.handleIncidentResponse(response, 'close');
+      },
+      (error) => {
+        console.log('Closing: updateIncident FAILED', error);
+        this.handleIncidentError('close', error);
+      }
+    );
+  }
+
+  // handler for duplicate COR button
+  handleDupCor(message: string){
+    this.addNarrativeEntry(message, true);
+
+    const createRequestBody = this.buildCreateRequestBody();
+
+    console.log('Duplicating: Sending createIncident: ', createRequestBody);
+
+    this.reportService.createIncident(createRequestBody).subscribe(
+      (response) => {
+        console.log('Duplicating: createIncident SUCCESS');
+        this.handleIncidentResponse(response, 'create');
+      },
+      (error) => {
+        console.log('Duplicating: createIncident FAILED', error);
+        this.handleIncidentError('create', error);
+      }
+    )
   }
 
   // finding incident type name according to the incident type key
@@ -299,7 +309,7 @@ export class IncidentReportComponent implements OnInit {
   now = new Date();
   currentTimestamp = this.now.toISOString();
 
-  private addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+  addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
     this.combinedEntries.unshift({
       date: this.basicInfoComponent.formatDate(this.now),
       time: this.basicInfoComponent.formatTime(this.now),
@@ -335,5 +345,64 @@ export class IncidentReportComponent implements OnInit {
     });
 
     this.addNarrativeEntry(formattedMessage, systemGenerated);
+  }
+
+  // API request succeeded
+  private handleIncidentResponse(
+    response: any,
+    mode: 'create' | 'update' | 'close'
+  ) {
+    this.reportService.setIncidentResponse(response);
+
+    if (mode === 'create') {
+      this.corNumber = this.reportService.getCorNumber();
+      this.corMainKey = this.reportService.getcorMainKey();
+      this.basicInfoComponent.setStatusTo('Create');
+    }
+
+    this.incidentCommentText = '';
+    this.narrativeCommentText = '';
+
+    const messages = {
+      create: 'Incident Report Successfully Created',
+      update: 'Incident Report Successfully Updated',
+      close: 'Incident Report Successfully Closed',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // when API request failed (test purpose)
+  private handleIncidentError(mode: 'create' | 'update' | 'close', error: any) {
+    console.error('Error:', error);
+
+    const messages = {
+      create: 'Failed to Create Incident Report',
+      update: 'Failed to Update Incident Report',
+      close: 'Failed to Close Incident Report',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // API call
+  private submitIncident() {
+    if (this.corNumber === 'New') {
+      const createRequestBody = this.buildCreateRequestBody();
+      console.log('create request body: ', createRequestBody);
+
+      this.reportService.createIncident(createRequestBody).subscribe(
+        (response) => this.handleIncidentResponse(response, 'create'),
+        (error) => this.handleIncidentError('create', error)
+      );
+    } else {
+      const updateRequestBody = this.buildUpdateRequestBody();
+      console.log('update request body: ', updateRequestBody);
+
+      this.reportService.updateIncident(updateRequestBody).subscribe(
+        (response) => this.handleIncidentResponse(response, 'update'),
+        (error) => this.handleIncidentError('update', error)
+      );
+    }
   }
 }

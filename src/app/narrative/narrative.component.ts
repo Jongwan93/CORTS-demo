@@ -1,14 +1,19 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, inject, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CorStateService } from '../services/corStatus.service';
+import { DisableIfClosed } from '../services/disable.service';
 
 @Component({
   standalone: true,
   selector: 'app-narrative',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DisableIfClosed],
   templateUrl: './narrative.component.html',
 })
 export class NarrativeComponent {
+
+  private corStatusService = inject(CorStateService);
+
   @Input() combinedEntries: any[] = [];
   @Input() narrativeCommentText: string = '';
 

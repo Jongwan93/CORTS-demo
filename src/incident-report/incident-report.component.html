@@ -8,7 +8,8 @@
   [corNumber]="corNumber"
   [routedToSelection]="routedToSelection"
   (routedToSelectionChangeDetect)="updateRoutedToSelection($event)"
-  (statusIDChange)="updateStatusID($event)"
+  (closeCorMessage)="handleCloseCor($event)"
+  (dupCorMessage)="handleDupCor($event)"
 >
 </app-basic-information>
 
@@ -33,6 +34,7 @@
           [(ngModel)]="incidentTypeKey"
           name="incidentType"
           (change)="incidentTypeChange(incidentTypeKey)"
+          appDisableIf
           required
         >
           <option value="">-- Select Incident Type --</option>
@@ -55,6 +57,7 @@
           id="DateTimeofIncident"
           [(ngModel)]="incidentDateTime"
           name="incidentDateTime"
+          appDisableIf
           required
         />
       </div>
@@ -68,6 +71,7 @@
           [(ngModel)]="incidentCommentText"
           name="incidentCommentText"
           (input)="isSaved = false"
+          appDisableIf
           required
         ></textarea>
       </div>

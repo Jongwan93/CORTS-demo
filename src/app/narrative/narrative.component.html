@@ -31,14 +31,15 @@
       [ngModel]="narrativeCommentText"
       (ngModelChange)="onTextChange($event)"
       name="narrativeCommentText"
+      appDisableIf
     ></textarea>
   </div>
 
   <div class="form-actions">
-    <button class="btn primary" (click)="saveChanges.emit()">
+    <button class="btn primary" (click)="saveChanges.emit()" appDisableIf>
       Save Changes
     </button>
-    <button class="btn primary" (click)="saveChangesExit.emit()">
+    <button class="btn primary" (click)="saveChangesExit.emit()" appDisableIf>
       Save Changes and Exit
     </button>
     <button class="btn warn" (click)="reload.emit()">Reload Page</button>

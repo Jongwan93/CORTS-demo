@@ -271,7 +271,7 @@ export class caccEquipmentFailureComponent implements OnInit {
     this.corNumber = '1234';
     //-----DELETE IT AFTER api IMPLEMENTATION-----
 
-    this.basicInfoComponent.setStatusToCreate();
+    this.basicInfoComponent.setStatusTo('Create');
 
     this.isSaved = true;
   } // +++++++++++end of saveChanges() +++++++++++

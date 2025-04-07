@@ -172,7 +172,7 @@ export class vsaReportComponent implements OnInit {
       this.previousRoutedTo = this.routedToSelection;
 
       if(this.pronouncedBy){
-        //this.updateFields('Pronounced By: ', [this.pronouncedBy]); <-- NEED API
+        //this.updateFields('Pronounced By: ', [this.pronouncedBy]);
         this.prevPronouncedBy = this.pronouncedBy;
       }
 
@@ -269,7 +269,7 @@ export class vsaReportComponent implements OnInit {
     this.corNumber = '1234';
     //---------DELETE AFTER api IMPLEMENTED-----------
 
-    this.basicInfoComponent.setStatusToCreate();
+    this.basicInfoComponent.setStatusTo('Create');
 
     this.isSaved = true;
   } // <=== end of saveChanges()

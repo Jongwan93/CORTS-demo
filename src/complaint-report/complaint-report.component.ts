@@ -297,7 +297,7 @@ export class ComplaintReportComponent implements OnInit {
     this.complaintCommentText = '';
     this.narrativeCommentText = '';
 
-    this.basicInfoComponent.setStatusToCreate();
+    this.basicInfoComponent.setStatusTo('Create');
 
     this.isSaved = true;
   } // ++++++++end of saveChanges()

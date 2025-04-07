@@ -220,7 +220,7 @@ export class FleetEquipmentReportComponent implements OnInit {
     // To Do: need API call
     
 
-    this.basicInfoComponent.setStatusToCreate();
+    this.basicInfoComponent.setStatusTo('Create');
 
     this.isSaved = true;
   } // +++++++++++++++ end of save changes function
