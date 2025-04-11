@@ -20,6 +20,10 @@ export class QueryComponent implements OnInit {
   routes: any[] = [];
   groupedRoutes: any = {};
 
+  data: any[] = [];
+  sortedColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
+
   constructor() {
     this.titleService.setTitle('CORTS - Query');
   }
@@ -142,4 +146,29 @@ export class QueryComponent implements OnInit {
   SetDirection(direction: string) {
     console.log(`Direction: ${direction}`);
   }
+
+  // sorting algorithm
+  sortTable(column: string) {
+    if (this.sortedColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortedColumn = column;
+      this.sortDirection = 'asc';
+    }
+  
+    this.data.sort((a, b) => {
+      let valA = a[column];
+      let valB = b[column];
+      
+      if (column.toLowerCase().includes('date')) {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+  
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+  
 }

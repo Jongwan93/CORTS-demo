@@ -34,6 +34,13 @@ export class ReportService {
     });
   }
 
+  // search incident
+  searchIncident(updateRequestBody: any): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}/search`, updateRequestBody, {
+      headers: this.getHeaders(),
+    });
+  }
+
   // store the response
   setIncidentResponse(response: any) {
     this.incidentResponse = response;
@@ -56,5 +63,9 @@ export class ReportService {
 
   getcorMainKey(): string {
     return this.getIncidentResponse()?.data.corMain?.corMainKey || '';
+  }
+
+  getIncidentByCorNumber(corNumber: string) {
+    return this.http.get(`/api/incidents/${corNumber}`);
   }
 }
