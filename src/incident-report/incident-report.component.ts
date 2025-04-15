@@ -63,6 +63,7 @@ export class IncidentReportComponent implements OnInit {
 
   incidentTypeList: any[] = []; // to send it to html
   corMainKey: string = ''; // Primary key to find the exisitng report
+  incidentKey: string = ''; // incident Key for API update request
 
   narrativesArray: any[] = []; // temp
 
@@ -80,7 +81,7 @@ export class IncidentReportComponent implements OnInit {
     const isDuplicated = this.getParam(urlParams, 'isDuplicated') === 'true';
 
     if (isDuplicated && corNumber) {
-      const searchRequestBody = this.searchRequestBody(corNumber);
+      const searchRequestBody = this.buildRequestBody('update');
       console.log('ngOnInit searchRequestBody: ', searchRequestBody);
       this.reportService.searchIncident(searchRequestBody).subscribe(
         (response) => {
@@ -128,67 +129,49 @@ export class IncidentReportComponent implements OnInit {
   combinedEntries: any[] = [];
   isSaved: boolean = false;
 
-  // create request body
-  private createRequestBody(): any {
-    return {
-      assignedTo: this.routedToSelection,
-      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
-      cadIncidentNum: '454-Z023046766', // hard coded for now
-      corStatus: this.basicInfoComponent.statusID,
-      corType: this.corTypeKey,
-      createDate: this.basicInfoComponent.fullDateTime,
-      createdby: this.loginUserName,
-      incidenType: this.incidentTypeKey,
-      incidentDateTime: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: this.incidentCommentText.trim(),
-      userGroup: this.basicInfoComponent.groupCodeID,
-      narratives: this.narrativesArray,
-      relatedCors: this.basicInfoComponent.relatedCORs,
-    };
-  }
+  private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
+    const currentTimestamp = new Date().toISOString();
 
-  // Update Request Body
-  private updateRequestBody(): any {
-    return {
-      corMainKey: this.corMainKey,
-      corNumber: this.corNumber,
-      createDate: this.basicInfoComponent.fullDateTime,
-      corType: this.corTypeKey,
-      createdby: this.loginUserName,
-      userGroup: this.basicInfoComponent.groupCodeID,
-      assignedTo: this.routedToSelection,
-      assignedDate: this.basicInfoComponent.fullDateTime,
-      cadIncidentNum: '454-Z023046766',
-      corStatus: this.basicInfoComponent.statusID,
-      dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
-      lastAssignedTo: this.routedToSelection,
-      assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
-      lastModifiedBy: this.loginUserName,
-      lastModifiedDate: new Date().toISOString(),
-      closedby: '',
-      closeDate: '',
-      lastAssignedDate: this.basicInfoComponent.fullDateTime,
-      relatedCors: this.basicInfoComponent.relatedCORs,
-      incidenType: this.incidentTypeKey,
-      incidentDate: new Date(this.incidentDateTime).toISOString(),
-      incidentDetails: this.incidentCommentText,
-      narratives: this.narrativesArray,
-    };
-  }
+    const isUpdate = mode !== 'create';
 
-  // search request body
-  private searchRequestBody(corNumber: string): any {
     return {
-      corNumber: corNumber,
-      cadIncidentNum: '',
-      createdBy: '',
-      routedTo: '',
-      corStatus: 0,
-      corType: 0,
-      dueDate: '',
-      createDateFrom: '',
-      createDateTo: '',
-      text: '',
+      corMain: {
+        corMainKey: isUpdate ? this.corMainKey : 0,
+        corNumber: isUpdate ? this.corNumber : '',
+        cadIncidentNum: '454-Z023046766',
+        corTypeFk: this.corTypeKey,
+        corStatusFk: this.basicInfoComponent.statusID,
+        userGroupFk: this.basicInfoComponent.groupCodeID,
+        createdBy: this.loginUserName.split(',')[0],
+        createDate: this.basicInfoComponent.fullDateTime,
+        closedBy: mode === 'close' ? this.loginUserName : '',
+        closeDate: mode === 'close' ? currentTimestamp : '',
+        lastAssignedTo: this.routedToSelection,
+        lastAssignedDate: this.basicInfoComponent.fullDateTime,
+        assignedTo: this.routedToSelection,
+        assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+        assignedDate: this.basicInfoComponent.fullDateTime,
+        dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
+        lastModifiedBy: this.loginUserName,
+        lastModifiedDate: currentTimestamp,
+      },
+      relatedCors: this.basicInfoComponent.relatedCORs,
+      incident: {
+        incidentKey: isUpdate ? this.incidentKey : 0,
+        corKey: isUpdate ? this.corMainKey : 0,
+        incidentType: this.incidentTypeKey,
+        incidentDate: new Date(this.incidentDateTime).toISOString(),
+        incidentDescription: this.incidentCommentText.trim(),
+      },
+      narratives: this.narrativesArray.map((entry: any) => ({
+        narrativeKey: 0,
+        corFk: this.corMainKey || 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: entry.systemGenerated ?? true,
+        createdBy: this.loginUserName,
+        createdByInitials: this.loginUserName.split(',')[0],
+        narrativeText: entry.narrativeText || '',
+      })),
     };
   }
 
@@ -297,7 +280,7 @@ export class IncidentReportComponent implements OnInit {
     this.addNarrativeEntry(message, true);
 
     // update request body and close overwrite to close
-    const updateRequestBody = this.updateRequestBody();
+    const updateRequestBody = this.buildRequestBody('close');
     updateRequestBody.closedby = this.loginUserName;
     updateRequestBody.closeDate = new Date().toISOString();
 
@@ -320,7 +303,7 @@ export class IncidentReportComponent implements OnInit {
   handleDupCor(message: string) {
     const originalCorNumber = this.corNumber;
 
-    const createRequestBody = this.createRequestBody();
+    const createRequestBody = this.buildRequestBody('create');
 
     console.log('Duplicating: Sending createIncident: ', createRequestBody);
 
@@ -446,19 +429,27 @@ export class IncidentReportComponent implements OnInit {
   // API call
   private submitIncident() {
     if (this.corNumber === 'New') {
-      const createRequestBody = this.createRequestBody();
+      const createRequestBody = this.buildRequestBody('create');
       console.log('create request body: ', createRequestBody);
 
       this.reportService.createIncident(createRequestBody).subscribe(
-        (response) => this.handleIncidentResponse(response, 'create'),
+        (response) => {
+          console.log('create response body: ', response); // print response
+          this.corMainKey = response?.corMain?.corMainKey ?? 0;
+          this.incidentKey = response?.incident?.incidentKey ?? 0;
+          this.handleIncidentResponse(response, 'create');
+        },
         (error) => this.handleIncidentError('create', error)
       );
     } else {
-      const updateRequestBody = this.updateRequestBody();
+      const updateRequestBody = this.buildRequestBody('update');
       console.log('update request body: ', updateRequestBody);
 
       this.reportService.updateIncident(updateRequestBody).subscribe(
-        (response) => this.handleIncidentResponse(response, 'update'),
+        (response) => {
+          console.log('update response body: ', response); // print response
+          this.handleIncidentResponse(response, 'update');
+        },
         (error) => this.handleIncidentError('update', error)
       );
     }

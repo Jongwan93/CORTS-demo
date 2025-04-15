@@ -41,6 +41,15 @@ export class ReportService {
     });
   }
 
+  // search report /get
+  getIncidentDetailsByCorMainKey(corMainKey: number): Observable<any> {
+    const url = `${this.apiBaseUrl}/details/${corMainKey}`;
+    return this.http.get(url, {
+      headers: this.getHeaders(),
+    });
+  }
+  
+
   // store the response
   setIncidentResponse(response: any) {
     this.incidentResponse = response;
