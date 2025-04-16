@@ -64,7 +64,6 @@ export class IncidentReportComponent implements OnInit {
 
   incidentTypeList: any[] = []; // to send it to html
   corMainKey: string = ''; // Primary key to find the exisitng report
-  
 
   narrativesArray: any[] = []; // temp
 
@@ -100,7 +99,7 @@ export class IncidentReportComponent implements OnInit {
         duplicatedRequest.narratives = [];
 
         this.reportService
-          .createIncident(duplicatedRequest)
+          .createReport(duplicatedRequest, 'incident')
           .subscribe((res) => {
             this.corMainKey = res?.corMain?.corMainKey ?? 0;
             this.corNumber = res?.corMain?.corNumber ?? 'New';
@@ -113,7 +112,7 @@ export class IncidentReportComponent implements OnInit {
 
             this.populateUIFromRequestBody(duplicatedRequest);
 
-            this.handleIncidentResponse(res, 'create');
+            this.handleReportResponse(res, 'create');
           });
       }
     }
@@ -183,7 +182,7 @@ export class IncidentReportComponent implements OnInit {
         corFk: this.corMainKey || 0,
         timeStamp: currentTimestamp,
         systemGenerated: entry.systemGenerated ?? true,
-        createdBy: this.loginUserName,
+        createdBy: this.routedToSelection,
         createdByInitials: this.loginUserName.split(',')[0],
         narrativeText: entry.narrativeText || '',
       })),
@@ -233,6 +232,8 @@ export class IncidentReportComponent implements OnInit {
       ]);
       this.previousIncidentTypeKey = this.incidentTypeKey;
     }
+
+    console.log(this.combinedEntries);
 
     // user's incident comment added
     if (this.incidentCommentText.trim()) {
@@ -302,16 +303,18 @@ export class IncidentReportComponent implements OnInit {
     // call API
     console.log('Closing: Sending updateIncident: ', updateRequestBody);
 
-    this.reportService.updateIncident(updateRequestBody).subscribe(
-      (response) => {
-        console.log('Closing: updateIncident SUCCESS');
-        this.handleIncidentResponse(response, 'close');
-      },
-      (error) => {
-        console.log('Closing: updateIncident FAILED', error);
-        this.handleIncidentError('close', error);
-      }
-    );
+    this.reportService
+      .updateIncident(updateRequestBody, 'incident-report')
+      .subscribe(
+        (response) => {
+          console.log('Closing: Incident report SUCCESS');
+          this.handleReportResponse(response, 'close');
+        },
+        (error) => {
+          console.log('Closing: Incident report FAILED', error);
+          this.handleReportError('close', error);
+        }
+      );
   }
 
   // handler for duplicate COR button
@@ -389,7 +392,7 @@ export class IncidentReportComponent implements OnInit {
   }
 
   // API request succeeded
-  private handleIncidentResponse(
+  private handleReportResponse(
     response: any,
     mode: 'create' | 'update' | 'close'
   ) {
@@ -414,7 +417,7 @@ export class IncidentReportComponent implements OnInit {
   }
 
   // when API request failed (test purpose)
-  private handleIncidentError(mode: 'create' | 'update' | 'close', error: any) {
+  private handleReportError(mode: 'create' | 'update' | 'close', error: any) {
     console.error('Error:', error);
 
     const messages = {
@@ -430,36 +433,41 @@ export class IncidentReportComponent implements OnInit {
   private submitIncident() {
     if (this.corNumber === 'New') {
       const createRequestBody = this.buildRequestBody('create');
-      this.reportService.createIncident(createRequestBody).subscribe(
-        (response) => {
-          console.log('create response body: ', response); // print response
-          this.corMainKey = response?.corMain?.corMainKey ?? 0;
-          this.incidentKey = response?.incident?.incidentKey ?? 0;
+      console.log('Creatd Request Body: ', createRequestBody);
+      this.reportService
+        .createReport(createRequestBody, 'incident-report')
+        .subscribe(
+          (response) => {
+            console.log('create response body: ', response); // print response
+            this.corMainKey = response?.corMain?.corMainKey ?? 0;
+            this.incidentKey = response?.incident?.incidentKey ?? 0;
 
-          this.router.navigate(['/incident-report'], {
-            queryParams: {
-              corTypeKey: this.corTypeKey,
-              corMainKey: this.corMainKey,
-              corNumber: this.corNumber,
-            },
-            replaceUrl: true,
-          });
+            this.router.navigate(['/incident-report'], {
+              queryParams: {
+                corTypeKey: this.corTypeKey,
+                corMainKey: this.corMainKey,
+                corNumber: this.corNumber,
+              },
+              replaceUrl: true,
+            });
 
-          this.handleIncidentResponse(response, 'create');
-        },
-        (error) => this.handleIncidentError('create', error)
-      );
+            this.handleReportResponse(response, 'create');
+          },
+          (error) => this.handleReportError('create', error)
+        );
     } else {
       const updateRequestBody = this.buildRequestBody('update');
       console.log('update request body: ', updateRequestBody);
 
-      this.reportService.updateIncident(updateRequestBody).subscribe(
-        (response) => {
-          console.log('update response body: ', response); // print response
-          this.handleIncidentResponse(response, 'update');
-        },
-        (error) => this.handleIncidentError('update', error)
-      );
+      this.reportService
+        .updateIncident(updateRequestBody, 'incident-report')
+        .subscribe(
+          (response) => {
+            console.log('update response body: ', response); // print response
+            this.handleReportResponse(response, 'update');
+          },
+          (error) => this.handleReportError('update', error)
+        );
     }
   }
 

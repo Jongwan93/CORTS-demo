@@ -4,6 +4,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { ReportService } from '../app/services/report.service';
 import { validateVsaReport } from '../app/utils/validateFields';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
@@ -28,13 +29,10 @@ export class vsaReportComponent implements OnInit {
   @ViewChild(BasicInformationComponent)
   basicInfoComponent!: BasicInformationComponent;
 
-  isNewReport: boolean = true;
-
   ngAfterViewInit(): void {
     this.statusID = this.basicInfoComponent.statusID;
     this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
-    this.isNewReport = this.basicInfoComponent.corNumber === 'New';
   }
 
   constructor() {
@@ -45,6 +43,7 @@ export class vsaReportComponent implements OnInit {
   private titleService = inject(Title);
   private lookupService = inject(LookupService); // might use it?
   private router = inject(Router);
+  private reportService = inject(ReportService);
 
   //(DO NOT TOUCH)--------------------------------------------------------
   loginUserName: string = ''; // login ID                                |
@@ -99,7 +98,7 @@ export class vsaReportComponent implements OnInit {
   toggleReportType(reportType: string, event: any): void {
     if (reportType === 'vsa') {
       this.isVSASelected = event.target.checked;
-      this.vsaReqInput(); // VSA 선택 시 실행되는 함수
+      this.vsaReqInput();
     } else if (reportType === 'als') {
       this.isALSSelected = event.target.checked;
     }
@@ -128,14 +127,6 @@ export class vsaReportComponent implements OnInit {
   }
 
   // -------------------------Narrative--------------------------------
-  /**
-   * March 19th problem
-   * isNewReport is boolean depending on corNumber
-   * if corNumber stays 'New' isNewReport stays 'false'
-   * which cause duplicate of system generated messages.
-   * corNumber is generated and sent by API.
-   * Require API to fix this matter.
-   */
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
   isSaved: boolean = false;
@@ -144,10 +135,7 @@ export class vsaReportComponent implements OnInit {
   private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
     const currentTimestamp = new Date().toISOString();
     const isUpdate = mode !== 'create';
-  
-    const userFullName = this.loginUserName; // e.g., "29030, CASSONDRA FOERTER"
-    const userInitials = userFullName.split(',')[0]; // e.g., "29030"
-  
+
     return {
       corMain: {
         corMainKey: isUpdate ? this.corMainKey : 0,
@@ -170,32 +158,33 @@ export class vsaReportComponent implements OnInit {
         lastModifiedDate: currentTimestamp,
       },
       relatedCors: this.basicInfoComponent.relatedCORs ?? [],
-  
+
       report: {
         vsaKey: isUpdate ? this.vsaKey : 0,
         corFk: isUpdate ? this.corMainKey : 0,
         als: this.isALSSelected,
         vsa: this.isVSASelected,
-        vsaDate: new Date(this.pronouncedDateTime).toISOString(),
+        vsaDate: this.pronouncedDateTime
+          ? new Date(this.pronouncedDateTime).toISOString()
+          : null,
         pronounceDeadBy: this.pronouncedBy ?? '',
         arInstGiven: this.isARSelected,
         cprInstGiven: this.isCPRSelected,
         validDnrFk: this.dnrTypeKey,
         otherInfo: this.alsCommentText.trim() ?? '',
       },
-  
+
       narratives: this.narrativesArray.map((entry: any) => ({
         narrativeKey: 0,
         corFk: this.corMainKey || 0,
         timeStamp: currentTimestamp,
         systemGenerated: entry.systemGenerated ?? true,
-        createdBy: this.loginUserName,
+        createdBy: this.routedToSelection,
         createdByInitials: this.loginUserName.split(',')[0],
         narrativeText: entry.narrativeText || '',
       })),
     };
   }
-  
 
   // save Changes button
   saveChanges() {
@@ -222,7 +211,7 @@ export class vsaReportComponent implements OnInit {
 
       this.previousRoutedTo = this.routedToSelection;
 
-      if(this.pronouncedBy){
+      if (this.pronouncedBy) {
         this.updateFields('Pronounced By: ', [this.pronouncedBy]);
         this.prevPronouncedBy = this.pronouncedBy;
       }
@@ -242,7 +231,7 @@ export class vsaReportComponent implements OnInit {
     }
 
     // Update - when DNR Type is changed
-    if (!this.isNewReport && this.previousDnrTypeKey !== this.dnrTypeKey) {
+    if (!isNewReport && this.previousDnrTypeKey !== this.dnrTypeKey) {
       this.updateFields('CHANGE', [
         'DNR Type',
         this.getDnrTypeText(this.dnrTypeKey),
@@ -269,19 +258,7 @@ export class vsaReportComponent implements OnInit {
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-
-    this.alsCommentText = '';
-    this.narrativeCommentText = '';
-
-    // TODO: API implementation
-
-
-    //--------------TEMP------------------------------
-    this.isNewReport = false;
-    this.corNumber = '1234';
-    //---------DELETE AFTER api IMPLEMENTED-----------
-
-    this.basicInfoComponent.setStatusTo('Create');
+    this.submitReport();
 
     this.isSaved = true;
   } // <=== end of saveChanges()
@@ -321,6 +298,31 @@ export class vsaReportComponent implements OnInit {
     this.statusID = newStatusID;
   }
 
+  //handler for close COR button
+  handleCloseCor(message: string) {
+    // add message to narrative
+    this.addNarrativeEntry(message, true);
+
+    // update request body and close overwrite to close
+    const updateRequestBody = this.buildRequestBody('close');
+    updateRequestBody.closedby = this.loginUserName;
+    updateRequestBody.closeDate = new Date().toISOString();
+
+    // call API
+    this.reportService
+      .updateIncident(updateRequestBody, 'als-vsa-report')
+      .subscribe(
+        (response) => {
+          console.log('Closing: ALS-VSA report SUCCESS');
+          this.handleReportResponse(response, 'close');
+        },
+        (error) => {
+          console.log('Closing: ALS-VSA report FAILED', error);
+          this.handleReportError('close', error);
+        }
+      );
+  }
+
   getDnrTypeText(value: string): string {
     const findDnrType = this.dnrTypeList.find((type) => type.code === value);
     return findDnrType ? findDnrType.displayName : 'Unknown';
@@ -339,7 +341,7 @@ export class vsaReportComponent implements OnInit {
   now = new Date();
   currentTimestamp = this.now.toISOString();
 
-  private addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+  addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
     this.combinedEntries.unshift({
       date: this.basicInfoComponent.formatDate(this.now),
       time: this.basicInfoComponent.formatTime(this.now),
@@ -375,5 +377,85 @@ export class vsaReportComponent implements OnInit {
     });
 
     this.addNarrativeEntry(formattedMessage, systemGenerated);
+  }
+
+  // API request succeeded
+  private handleReportResponse(
+    response: any,
+    mode: 'create' | 'update' | 'close'
+  ) {
+    this.reportService.setIncidentResponse(response);
+
+    if (mode === 'create') {
+      this.corNumber = this.reportService.getCorNumber();
+      this.corMainKey = this.reportService.getcorMainKey();
+      this.basicInfoComponent.setStatusTo('Create');
+    }
+
+    this.alsCommentText = '';
+    this.narrativeCommentText = '';
+
+    const messages = {
+      create: 'ALS-VSA Report Successfully Created',
+      update: 'ALS-VSA Report Successfully Updated',
+      close: 'ALS-VSA Report Successfully Closed',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // when API request failed
+  private handleReportError(mode: 'create' | 'update' | 'close', error: any) {
+    console.error('Error:', error);
+
+    const messages = {
+      create: 'Failed to Create ALS-VSA Report',
+      update: 'Failed to Update ALS-VSA Report',
+      close: 'Failed to Close ALS-VSA Report',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // API call
+  private submitReport() {
+    if (this.corNumber === 'New') {
+      const createRequestBody = this.buildRequestBody('create');
+      console.log('create response body: ', createRequestBody);
+      this.reportService
+        .createReport(createRequestBody, 'als-vsa-report')
+        .subscribe(
+          (response) => {
+            console.log('create response body: ', response); // print response
+            this.corMainKey = response?.corMain?.corMainKey ?? 0;
+            this.vsaKey = response?.incident?.incidentKey ?? 0;
+
+            this.router.navigate(['/vsa-report'], {
+              queryParams: {
+                corTypeKey: this.corTypeKey,
+                corMainKey: this.corMainKey,
+                corNumber: this.corNumber,
+              },
+              replaceUrl: true,
+            });
+
+            this.handleReportResponse(response, 'create');
+          },
+          (error) => this.handleReportError('create', error)
+        );
+    } else {
+      const updateRequestBody = this.buildRequestBody('update');
+      console.log('update request body: ', updateRequestBody);
+
+      this.reportService
+        .updateIncident(updateRequestBody, 'als-vsa-report')
+        .subscribe(
+          (response) => {
+            console.log('update response body: ', response); // print response
+            this.handleReportResponse(response, 'update');
+          },
+          (error) => this.handleReportError('update', error)
+        );
+    }
   }
 }

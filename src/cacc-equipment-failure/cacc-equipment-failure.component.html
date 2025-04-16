@@ -42,15 +42,21 @@
             {{ type.displayName }}
           </option>
         </select>
+        <textarea
+          type="text"
+          rows="6"
+          [(ngModel)]="equipmentDesc"
+          name="equipmentDesc"
+        ></textarea>
       </div>
 
       <!-- Location -->
       <div class="grid-item">
         <label class="req-input">Location*</label>
         <select
-          [(ngModel)]="equipmentLocationKey"
-          name="equipmentLocation"
-          (change)="equipmentLocationChange(equipmentLocationKey)"
+          [(ngModel)]="locationKey"
+          name="locationKey"
+          (change)="equipmentLocationChange(locationKey)"
           required
         >
           <option value="">-- Select Equipment Location</option>
@@ -61,6 +67,12 @@
             {{ type.displayName }}
           </option>
         </select>
+        <textarea
+          type="text"
+          rows="6"
+          [(ngModel)]="locationDesc"
+          name="locationDesc"
+        ></textarea>
       </div>
 
       <!-- Failure Date/Time -->

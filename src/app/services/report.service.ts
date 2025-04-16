@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ReportService {
   private incidentResponse: any = null;
-  private apiBaseUrl = '/api/reports/incident-report'; // basic API Url
+  private apiBaseUrl = '/api/reports'; // basic API Url
 
   constructor(private http: HttpClient) {}
 
@@ -21,15 +21,16 @@ export class ReportService {
   }
 
   // post
-  createIncident(createRequestBody: any): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/create`, createRequestBody, {
+  createReport(createRequestBody: any, reportType: string): Observable<any> {
+    const url = `${this.apiBaseUrl}/${reportType}/create`;
+    return this.http.post(url, createRequestBody, {
       headers: this.getHeaders(),
     });
   }
 
   // update incident
-  updateIncident(updateRequestBody: any): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/update`, updateRequestBody, {
+  updateIncident(updateRequestBody: any, reportType: string): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}/${reportType}/update`, updateRequestBody, {
       headers: this.getHeaders(),
     });
   }

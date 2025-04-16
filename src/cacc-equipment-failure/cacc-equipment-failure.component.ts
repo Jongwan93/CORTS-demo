@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { ReportService } from '../app/services/report.service';
 import { validateRequiredFields } from '../app/utils/validateFields';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
@@ -42,6 +43,7 @@ export class caccEquipmentFailureComponent implements OnInit {
   private titleService = inject(Title);
   private lookupService = inject(LookupService);
   private router = inject(Router);
+  private reportService = inject(ReportService);
 
   //(DO NOT TOUCH)--------------------------------------------------------
   loginUserName: string = ''; // login ID                                |
@@ -58,6 +60,8 @@ export class caccEquipmentFailureComponent implements OnInit {
   equipmentLocationList: any[] = []; // to send it to html
   isSystemGenerated: boolean = true; // "Routed To.." "New Report Created"
   corMainKey: string = ''; // Primary key to find the exisitng report
+
+  narrativesArray: any[] = [];
 
   ngOnInit() {
     this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
@@ -79,16 +83,22 @@ export class caccEquipmentFailureComponent implements OnInit {
   // ------------------------Equipment Report -----------------------------
   equipmentTypeKey: string = ''; // dropdown menu
   prevEquipmentTypeKey: string = ''; // to detect change
-  equipmentLocationKey: string = '';
-  prevEquipmentLocationKey: string = '';
+  equipmentDesc: string = '';
+
+  locationKey: string = '';
+  prevLocationKey: string = '';
+  locationDesc: string = '';
+
   failureDateTime = '';
   prevFailureDateTime = '';
 
   // no need to print it on the table
   requestDateTime = '';
   requestTo: string = '';
+
   respondDateTime = '';
   respondBy: string = '';
+
   completedDateTime = '';
   completedBy: string = '';
 
@@ -98,6 +108,9 @@ export class caccEquipmentFailureComponent implements OnInit {
   isDelaySelected = false;
   delayHours: number = 0;
   delayMinutes: number = 0;
+  elapsedDelay = '';
+
+  equipmentFailureKey: string = ''; // API call purpose
 
   //Method toggles delayed field (To be able to input the time)
   toggleDelayTime() {
@@ -120,10 +133,10 @@ export class caccEquipmentFailureComponent implements OnInit {
   }
 
   equipmentLocationChange(newEquipmentLocationKey: string) {
-    this.equipmentLocationKey = newEquipmentLocationKey;
+    this.locationKey = newEquipmentLocationKey;
 
     if (this.corNumber === 'New') {
-      this.prevEquipmentLocationKey = this.equipmentLocationKey;
+      this.prevLocationKey = this.locationKey;
     }
   }
 
@@ -133,6 +146,66 @@ export class caccEquipmentFailureComponent implements OnInit {
   isSaved: boolean = false;
   isNewReport: boolean = true;
 
+  private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
+    const currentTimestamp = new Date().toISOString();
+    const isUpdate = mode !== 'create';
+  
+    return {
+      corMain: {
+        corMainKey: isUpdate ? this.corMainKey : 0,
+        corNumber: isUpdate ? this.corNumber : '',
+        cadIncidentNum: '454-Z023046766',
+        corTypeFk: this.corTypeKey,
+        corStatusFk: this.basicInfoComponent.statusID,
+        userGroupFk: this.basicInfoComponent.groupCodeID,
+        createdBy: this.loginUserName.split(',')[0],
+        createDate: this.basicInfoComponent.fullDateTime,
+        closedBy: mode === 'close' ? this.loginUserName : '',
+        closeDate: mode === 'close' ? currentTimestamp : '',
+        lastAssignedTo: this.routedToSelection,
+        lastAssignedDate: this.basicInfoComponent.fullDateTime,
+        assignedTo: this.routedToSelection,
+        assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+        assignedDate: this.basicInfoComponent.fullDateTime,
+        dueDate: this.basicInfoComponent.dueDate
+          ? new Date(this.basicInfoComponent.dueDate).toISOString()
+          : null,
+        lastModifiedBy: this.loginUserName,
+        lastModifiedDate: currentTimestamp,
+      },
+  
+      relatedCors: this.basicInfoComponent.relatedCORs ?? [],
+  
+      report: {
+        equipmentFailureKey: isUpdate ? this.equipmentFailureKey : 0,
+        corFk: isUpdate ? this.corMainKey : 0,
+        equipmentTypeFk: this.equipmentTypeKey, // Equipment Type
+        equipmentLocationFk: this.locationKey, // Location Type
+        typeDescription: this.equipmentDesc.trim(),
+        locationDescription: this.locationDesc.trim(),
+        serviceRequestTo: this.requestTo.trim(),
+        failureDate: this.failureDateTime,
+        requestDate: this.requestDateTime,
+        serviceRespondedBy: this.respondBy,
+        respondedDate: this.respondDateTime,
+        serviceCompletedBy: this.completedBy,
+        completedDate: this.completedDateTime,
+        responseDelay: 12,
+        elapsedDelay: 12,
+        description: this.failureCommentText.trim(),
+      },
+      narratives: this.narrativesArray.map((entry: any) => ({
+        narrativeKey: 0,
+        corFk: this.corMainKey || 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: entry.systemGenerated ?? true,
+        createdBy: this.routedToSelection,
+        createdByInitials: this.loginUserName.split(',')[0],
+        narrativeText: entry.narrativeText || '',
+      })),
+    };
+  }
+
   saveChanges() {
     const isValid = validateRequiredFields()
 
@@ -141,115 +214,56 @@ export class caccEquipmentFailureComponent implements OnInit {
       return;
     }
 
-    const now = new Date();
-    const currentTimestamp = now.toISOString();
     const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
     this.combinedEntries = [...this.combinedEntries];
 
-    const narrativesArray: any[] = [];
-
-    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
-      this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
-        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
-        comment: comment,
-        type: 'narrative',
-      });
-      narrativesArray.push({
-        narrativeKey: 0,
-        corFk: 0,
-        timeStamp: currentTimestamp,
-        systemGenerated: this.isSystemGenerated,
-        createdBy: this.basicInfoComponent.userName,
-        createdByInitials: this.loginUserName,
-        narrativeText: comment,
-      });
-    };
-
-    // New - Routed To, Equipment Type
+    // New - Routed To, Incident Type
     if (isNewReport) {
-      // "new Equipment report created" added
-      const msgTemplateCreate =
-        this.lookupService.getSystemMessageByCode('CREATE');
-      const msgTemplateReassign =
-        this.lookupService.getSystemMessageByCode('REASSIGN');
+      this.updateFields('CREATE', []);
+      this.updateFields('REASSIGN', [this.routedToSelection]);
 
-      if (msgTemplateCreate) {
-        addNarrativeEntry(msgTemplateCreate, true);
-      }
-
-      // "Routed To..." message added
-      if (msgTemplateReassign) {
-        addNarrativeEntry(
-          msgTemplateReassign.replace('%1', this.routedToSelection),
-        true);
-      }
       this.previousRoutedTo = this.routedToSelection;
 
-      // show the duplicate and close COR button
+      // show duplicated and close COR buttons
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
 
-    const msgTemplateChange =
-      this.lookupService.getSystemMessageByCode('CHANGE');
-    // Update - when Routed To is changed
-    if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Routed To')
-            .replace('%2', this.routedToSelection)
-            .replace('%3', this.previousRoutedTo), 
-        true);
-      }
+     // Update - when Routed To is changed
+     if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
+      this.updateFields('CHANGE', [
+        'Routed To',
+        this.routedToSelection,
+        this.previousRoutedTo,
+      ]);
       this.previousRoutedTo = this.routedToSelection;
     }
 
     // Update - when Equipment Type is changed
     if (!isNewReport && this.prevEquipmentTypeKey !== this.equipmentTypeKey) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Equipment Type')
-            .replace('%2', this.getEquipmentTypeText(this.equipmentTypeKey))
-            .replace('%3', this.getEquipmentTypeText(this.prevEquipmentTypeKey)), true);
-      }
+      this.updateFields('CHANGE', [
+        'Equipment Type',
+        this.getEquipmentTypeText(this.equipmentTypeKey),
+        this.getEquipmentTypeText(this.prevEquipmentTypeKey),
+      ]);
       this.prevEquipmentTypeKey = this.equipmentTypeKey;
     }
 
-    // Update - when Equipment Location is changed
-    if (!isNewReport && this.prevEquipmentLocationKey !== this.equipmentLocationKey) {
-      if(msgTemplateChange){
-        addNarrativeEntry(
-          msgTemplateChange
-          .replace('%1', 'Equipment Location')
-          .replace('%2', this.getEquipmentLocationText(this.equipmentLocationKey))
-          .replace('%3', this.getEquipmentLocationText(this.prevEquipmentLocationKey)), true
-        );
-      }
-      this.prevEquipmentLocationKey = this.equipmentLocationKey;
+    // Update - when Location Type is changed
+    if (!isNewReport && this.prevLocationKey !== this.locationKey) {
+      this.updateFields('CHANGE', [
+        'Location Type',
+        this.getEquipmentLocationText(this.locationKey),
+        this.getEquipmentLocationText(this.prevLocationKey),
+      ]);
+      this.prevLocationKey = this.locationKey;
     }
 
-    // Update - when Failure date/time is changed
-    if (!isNewReport && this.prevFailureDateTime !== this.failureDateTime) {
-      if(msgTemplateChange){
-        addNarrativeEntry(
-          msgTemplateChange
-          .replace('%1', 'Failure Date/Time')
-          .replace('%2', this.failureDateTime)
-          .replace('%3', this.prevFailureDateTime), true
-        );
-      }
-      this.prevEquipmentLocationKey = this.equipmentLocationKey;
-    }
-
-    // user's equipment comment added
+    // user's incident comment added
     if (this.failureCommentText.trim()) {
       this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
+        date: this.basicInfoComponent.formatDate(this.now),
+        time: this.basicInfoComponent.formatTime(this.now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
         comment: this.failureCommentText.trim(),
         type: 'equipment',
@@ -259,19 +273,12 @@ export class caccEquipmentFailureComponent implements OnInit {
     // user's narrative comment added
     let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      addNarrativeEntry(this.narrativeCommentText.trim(), false);
+      this.addNarrativeEntry(this.narrativeCommentText.trim(), false);
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-    this.failureCommentText = '';
-    this.narrativeCommentText = '';
 
-    //------------TEMP---------------------------
-    this.isNewReport = true;
-    this.corNumber = '1234';
-    //-----DELETE IT AFTER api IMPLEMENTATION-----
-
-    this.basicInfoComponent.setStatusTo('Create');
+    this.submitIncident();
 
     this.isSaved = true;
   } // +++++++++++end of saveChanges() +++++++++++
@@ -335,7 +342,7 @@ export class caccEquipmentFailureComponent implements OnInit {
   
   padNumber(num: number): string {
     return num < 10 ? '0' + num : num.toString();
-  }
+  }  
 
   // finding Equipment type name according to the Equipment type key
   getEquipmentTypeText(value: string): string {
@@ -353,5 +360,126 @@ export class caccEquipmentFailureComponent implements OnInit {
     return findEquipmentLocation
       ? findEquipmentLocation.displayName
       : 'Unknwon';
+  }
+
+  now = new Date();
+  currentTimestamp = this.now.toISOString();
+
+  addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+    this.combinedEntries.unshift({
+      date: this.basicInfoComponent.formatDate(this.now),
+      time: this.basicInfoComponent.formatTime(this.now),
+      user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+      comment: comment,
+      type: 'narrative',
+    });
+    this.narrativesArray.push({
+      narrativeKey: 0,
+      corFk: 0,
+      timeStamp: this.currentTimestamp,
+      systemGenerated: systemGenerated,
+      createdBy: this.basicInfoComponent.userName,
+      createdByInitials: this.loginUserName,
+      narrativeText: comment,
+    });
+  };
+
+  // reflect field changes and send messages to narrative
+  private updateFields(
+    messageCode: string,
+    values: string[],
+    systemGenerated: boolean = true
+  ) {
+    const msgTemplate = this.lookupService.getSystemMessageByCode(messageCode);
+
+    if (!msgTemplate) return;
+
+    let formattedMessage = msgTemplate;
+
+    values.forEach((val, index) => {
+      formattedMessage = formattedMessage.replace(`%${index + 1}`, val);
+    });
+
+    this.addNarrativeEntry(formattedMessage, systemGenerated);
+  }
+
+  // API request succeeded
+  private handleReportResponse(
+    response: any,
+    mode: 'create' | 'update' | 'close'
+  ) {
+    this.reportService.setIncidentResponse(response);
+
+    if (mode === 'create') {
+      this.corNumber = this.reportService.getCorNumber();
+      this.corMainKey = this.reportService.getcorMainKey();
+      this.basicInfoComponent.setStatusTo('Create');
+    }
+
+    this.failureCommentText = '';
+    this.narrativeCommentText = '';
+
+    const messages = {
+      create: 'Equipment Failure Report Successfully Created',
+      update: 'Equipment Failure Report Successfully Updated',
+      close: 'Equipment Failure Report Successfully Closed',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // when API request failed (test purpose)
+  private handleReportError(mode: 'create' | 'update' | 'close', error: any) {
+    console.error('Error:', error);
+
+    const messages = {
+      create: 'Failed to Create Equipment Failure Report',
+      update: 'Failed to Update Equipment Failure Report',
+      close: 'Failed to Close Equipment Failure Report',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // API call
+  private submitIncident() {
+    if (this.corNumber === 'New') {
+      const createRequestBody = this.buildRequestBody('create');
+      console.log('Creatd Request Body: ', createRequestBody);
+      this.reportService
+        .createReport(createRequestBody, 'cacc-equipment-failure-report')
+        .subscribe(
+          (response) => {
+            console.log('create response body: ', response); // print response
+            this.corMainKey = response?.corMain?.corMainKey ?? 0;
+            this.equipmentFailureKey = response?.incident?.incidentKey ?? 0;
+
+            this.router.navigate(['/cacc-equipment-failure'], {
+              queryParams: {
+                corTypeKey: this.corTypeKey,
+                corMainKey: this.corMainKey,
+                corNumber: this.corNumber,
+              },
+              replaceUrl: true,
+            });
+
+            this.handleReportResponse(response, 'create');
+          },
+          (error) => this.handleReportError('create', error)
+        );
+    } else {
+      const updateRequestBody = this.buildRequestBody('update');
+      console.log('update request body: ', updateRequestBody);
+
+      this.reportService
+        .updateIncident(updateRequestBody, 'cacc-equipment-failure-report')
+        .subscribe(
+          (response) => {
+            console.log('update response body: ', response); // print response
+            this.handleReportResponse(response, 'update');
+          },
+          (error) => this.handleReportError('update', error)
+        );
+    }
   }
 }

@@ -70,6 +70,8 @@
         <input
           type="datetime-local"
           id="pronouncedDateTime"
+          [(ngModel)]="pronouncedDateTime"
+          name="pronouncedDateTime"
           [disabled]="!pronouncedBy.trim()"
         />
       </div>
@@ -85,7 +87,7 @@
           required
         >
           <option value="">-- Select DNR --</option>
-          <option *ngFor="let dnr of dnrTypeList" [value]="dnr.code">
+          <option *ngFor="let dnr of dnrTypeList" [value]="dnr.dnrstatusKey">
             {{ dnr.displayName }}
           </option>
         </select>
@@ -107,10 +109,22 @@
       <!-- A/R Intruction & CPR Instruction -->
       <div class="details-checkbox-container">
         <label for="ar-instructions">
-          <input type="checkbox" id="ar-instructions" /> A/R Instructions Given
+          <input
+            type="checkbox"
+            id="ar-instructions"
+            [(ngModel)]="isARSelected"
+            name="arInstructions"
+          />
+          A/R Instructions Given
         </label>
         <label for="cpr-instructions">
-          <input type="checkbox" id="cpr-instructions" /> CPR Instructions Given
+          <input
+            type="checkbox"
+            id="cpr-instructions"
+            [(ngModel)]="isCPRSelected"
+            name="cprInstructions"
+          />
+          CPR Instructions Given
         </label>
       </div>
     </div>
