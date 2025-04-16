@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
@@ -10,7 +10,7 @@ import { LookupService } from '../app/services/lookup.service';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
-import { CorStateService } from '../app/services/corStatus.service';
+// import { CorStateService } from '../app/services/corStatus.service';
 import { DisableIfClosed } from '../app/services/disable.service';
 
 @Component({
@@ -36,8 +36,8 @@ export class IncidentReportComponent implements OnInit {
 
   ngAfterViewInit(): void {
     this.statusID = this.basicInfoComponent.statusID;
-    this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
+    this.corType = this.basicInfoComponent.corType;
   }
 
   constructor() {
@@ -49,7 +49,8 @@ export class IncidentReportComponent implements OnInit {
   private reportService = inject(ReportService);
   private lookupService = inject(LookupService);
   private router = inject(Router);
-  private http = inject(HttpClient);
+  private route = inject(ActivatedRoute);
+  // private http = inject(HttpClient);
 
   //(DO NOT TOUCH)--------------------------------------------------------
   loginUserName: string = ''; // login ID                                |
@@ -63,7 +64,7 @@ export class IncidentReportComponent implements OnInit {
 
   incidentTypeList: any[] = []; // to send it to html
   corMainKey: string = ''; // Primary key to find the exisitng report
-  incidentKey: string = ''; // incident Key for API update request
+  
 
   narrativesArray: any[] = []; // temp
 
@@ -76,32 +77,45 @@ export class IncidentReportComponent implements OnInit {
       this.incidentTypeList = incidentData.data;
     }
 
-    const urlParams = this.router.url;
-    const corNumber = this.getParam(urlParams, 'corNumber');
-    const isDuplicated = this.getParam(urlParams, 'isDuplicated') === 'true';
+    const isDuplicated = this.route.snapshot.queryParams['isDuplicated'];
+    if (isDuplicated === 'true') {
+      const raw = sessionStorage.getItem('duplicated-cor-request');
+      if (raw) {
+        const duplicatedRequest = JSON.parse(raw);
 
-    if (isDuplicated && corNumber) {
-      const searchRequestBody = this.buildRequestBody('update');
-      console.log('ngOnInit searchRequestBody: ', searchRequestBody);
-      this.reportService.searchIncident(searchRequestBody).subscribe(
-        (response) => {
-          const result = response?.data?.[0];
-          if (result) {
-            this.searchReportData(result);
-          }
-        },
-        (error) => {
-          console.error('Failed to fetch duplicated COR data', error);
+        console.log('Duplicated create report: ', duplicatedRequest);
+
+        duplicatedRequest.corMain.corMainKey = 0;
+        duplicatedRequest.corMain.corNumber = '';
+        duplicatedRequest.corMain.createDate = new Date().toISOString();
+        duplicatedRequest.corMain.closedBy = '';
+        duplicatedRequest.corMain.closeDate = '';
+        duplicatedRequest.corMain.lastModifiedDate = new Date().toISOString();
+
+        const originalCor = this.route.snapshot.queryParams['related'];
+        if (originalCor) {
+          duplicatedRequest.relatedCors = [originalCor];
         }
-      );
-    }
 
-    const relatedFromUrl = this.getParam(urlParams, 'related');
-    if (relatedFromUrl) {
-      this.basicInfoComponent.relatedCORs = [
-        ...this.basicInfoComponent.relatedCORs,
-        relatedFromUrl,
-      ];
+        duplicatedRequest.narratives = [];
+
+        this.reportService
+          .createIncident(duplicatedRequest)
+          .subscribe((res) => {
+            this.corMainKey = res?.corMain?.corMainKey ?? 0;
+            this.corNumber = res?.corMain?.corNumber ?? 'New';
+            this.incidentKey = res?.incident?.incidentKey ?? 0;
+
+            this.incidentCommentText =
+              duplicatedRequest.incidentCommentText || '';
+            this.narrativeCommentText =
+              duplicatedRequest.narrativeCommentText || '';
+
+            this.populateUIFromRequestBody(duplicatedRequest);
+
+            this.handleIncidentResponse(res, 'create');
+          });
+      }
     }
   } // ++++++ end of ngOnInit() ++++++
 
@@ -128,6 +142,7 @@ export class IncidentReportComponent implements OnInit {
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
   isSaved: boolean = false;
+  incidentKey: string = ''; // incident Key for API update request
 
   private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
     const currentTimestamp = new Date().toISOString();
@@ -155,8 +170,8 @@ export class IncidentReportComponent implements OnInit {
         lastModifiedBy: this.loginUserName,
         lastModifiedDate: currentTimestamp,
       },
-      relatedCors: this.basicInfoComponent.relatedCORs,
-      incident: {
+      relatedCors: this.basicInfoComponent.relatedCORs ?? [],
+      report: {
         incidentKey: isUpdate ? this.incidentKey : 0,
         corKey: isUpdate ? this.corMainKey : 0,
         incidentType: this.incidentTypeKey,
@@ -302,33 +317,18 @@ export class IncidentReportComponent implements OnInit {
   // handler for duplicate COR button
   handleDupCor(message: string) {
     const originalCorNumber = this.corNumber;
-
     const createRequestBody = this.buildRequestBody('create');
 
-    console.log('Duplicating: Sending createIncident: ', createRequestBody);
+    createRequestBody.incidentCommentText = this.incidentCommentText;
+    createRequestBody.narrativeCommentText = this.narrativeCommentText;
 
-    this.reportService.createIncident(createRequestBody).subscribe(
-      (response) => {
-        const newCorNumber = response?.data?.corMain?.corNumber;
-
-        const finalMessage = message
-          .replace('%1', originalCorNumber)
-          .replace('%2', newCorNumber);
-
-        this.addNarrativeEntry(finalMessage, true);
-
-        this.basicInfoComponent.relatedCORs = [
-          ...this.basicInfoComponent.relatedCORs,
-          newCorNumber,
-        ];
-
-        const url = `http://localhost:3000/incident-report;corTypeKey=1;corNumber=${newCorNumber};isDuplicated=true;related=${originalCorNumber}`;
-        window.open(url, '_blank');
-      },
-      (error) => {
-        this.handleIncidentError('create', error);
-      }
+    sessionStorage.setItem(
+      'duplicated-cor-request',
+      JSON.stringify(createRequestBody)
     );
+
+    const url = `/incident-report?corTypeKey=${this.corTypeKey}&isDuplicated=true`;
+    window.open(url, '_blank');
   }
 
   // finding incident type name according to the incident type key
@@ -430,13 +430,21 @@ export class IncidentReportComponent implements OnInit {
   private submitIncident() {
     if (this.corNumber === 'New') {
       const createRequestBody = this.buildRequestBody('create');
-      console.log('create request body: ', createRequestBody);
-
       this.reportService.createIncident(createRequestBody).subscribe(
         (response) => {
           console.log('create response body: ', response); // print response
           this.corMainKey = response?.corMain?.corMainKey ?? 0;
           this.incidentKey = response?.incident?.incidentKey ?? 0;
+
+          this.router.navigate(['/incident-report'], {
+            queryParams: {
+              corTypeKey: this.corTypeKey,
+              corMainKey: this.corMainKey,
+              corNumber: this.corNumber,
+            },
+            replaceUrl: true,
+          });
+
           this.handleIncidentResponse(response, 'create');
         },
         (error) => this.handleIncidentError('create', error)
@@ -455,28 +463,14 @@ export class IncidentReportComponent implements OnInit {
     }
   }
 
-  searchReportData(data: any) {
-    this.corNumber = 'New';
-    this.corTypeKey = data.corType;
-    this.incidentTypeKey = data.incidenType;
-    this.previousIncidentTypeKey = data.incidenType;
-    this.incidentDateTime = data.incidentDateTime;
-    this.incidentCommentText = data.incidentDetails;
-    this.routedToSelection = data.assignedTo;
-    this.narrativesArray = data.narratives || [];
+  private populateUIFromRequestBody(request: any) {
+    const corMain = request.corMain;
+    const incident = request.incident;
 
-    this.combinedEntries = this.narrativesArray.map((n: any) => ({
-      date: this.basicInfoComponent.formatDate(this.now),
-      time: this.basicInfoComponent.formatTime(this.now),
-      user: n.createdByInitials || 'System',
-      comment: n.narrativeText,
-      type: 'narrative',
-    }));
-  }
+    this.routedToSelection = corMain.assignedTo;
+    this.basicInfoComponent.setRoutedTo(corMain.assignedTo);
 
-  getParam(url: string, key: string): string | null {
-    const pattern = new RegExp(`[;?&]${key}=([^;?&]+)`);
-    const match = url.match(pattern);
-    return match ? decodeURIComponent(match[1]) : null;
+    this.incidentTypeKey = String(incident.incidentType);
+    this.incidentDateTime = new Date(incident.incidentDate).toISOString();
   }
 }

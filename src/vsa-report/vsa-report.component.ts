@@ -3,11 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { NgFor, CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { LookupService } from '../../app/services/lookup.service';
-import { validateVsaReport } from '../../app/utils/validateFields';
-import { HeaderComponent } from '../../app/header/header.component';
-import { NarrativeComponent } from '../../app/narrative/narrative.component';
-import { BasicInformationComponent } from '../../app/basic-information/basic-information.component';
+import { LookupService } from '../app/services/lookup.service';
+import { validateVsaReport } from '../app/utils/validateFields';
+import { HeaderComponent } from '../app/header/header.component';
+import { NarrativeComponent } from '../app/narrative/narrative.component';
+import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 
 @Component({
   selector: 'app-vsa-report',
@@ -75,8 +75,10 @@ export class vsaReportComponent implements OnInit {
   }
 
   // ----------------------------ALS/VSA Report----------------------------------
-  isVSASelected = false;
-  isALSSelected = false;
+  isVSASelected: boolean = false;
+  isALSSelected: boolean = false;
+  isARSelected: boolean = false;
+  isCPRSelected: boolean = false;
 
   dnrTypeKey: string = ''; // key from the dropdown menu
   previousDnrTypeKey: string = ''; // to detect change
@@ -137,6 +139,63 @@ export class vsaReportComponent implements OnInit {
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
   isSaved: boolean = false;
+  vsaKey: string = '';
+
+  private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
+    const currentTimestamp = new Date().toISOString();
+    const isUpdate = mode !== 'create';
+  
+    const userFullName = this.loginUserName; // e.g., "29030, CASSONDRA FOERTER"
+    const userInitials = userFullName.split(',')[0]; // e.g., "29030"
+  
+    return {
+      corMain: {
+        corMainKey: isUpdate ? this.corMainKey : 0,
+        corNumber: isUpdate ? this.corNumber : '',
+        cadIncidentNum: '454-Z023046766',
+        corTypeFk: this.corTypeKey,
+        corStatusFk: this.basicInfoComponent.statusID,
+        userGroupFk: this.basicInfoComponent.groupCodeID,
+        createdBy: this.loginUserName.split(',')[0],
+        createDate: this.basicInfoComponent.fullDateTime,
+        closedBy: mode === 'close' ? this.loginUserName : '',
+        closeDate: mode === 'close' ? currentTimestamp : '',
+        lastAssignedTo: this.routedToSelection,
+        lastAssignedDate: this.basicInfoComponent.fullDateTime,
+        assignedTo: this.routedToSelection,
+        assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+        assignedDate: this.basicInfoComponent.fullDateTime,
+        dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
+        lastModifiedBy: this.loginUserName,
+        lastModifiedDate: currentTimestamp,
+      },
+      relatedCors: this.basicInfoComponent.relatedCORs ?? [],
+  
+      report: {
+        vsaKey: isUpdate ? this.vsaKey : 0,
+        corFk: isUpdate ? this.corMainKey : 0,
+        als: this.isALSSelected,
+        vsa: this.isVSASelected,
+        vsaDate: new Date(this.pronouncedDateTime).toISOString(),
+        pronounceDeadBy: this.pronouncedBy ?? '',
+        arInstGiven: this.isARSelected,
+        cprInstGiven: this.isCPRSelected,
+        validDnrFk: this.dnrTypeKey,
+        otherInfo: this.alsCommentText.trim() ?? '',
+      },
+  
+      narratives: this.narrativesArray.map((entry: any) => ({
+        narrativeKey: 0,
+        corFk: this.corMainKey || 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: entry.systemGenerated ?? true,
+        createdBy: this.loginUserName,
+        createdByInitials: this.loginUserName.split(',')[0],
+        narrativeText: entry.narrativeText || '',
+      })),
+    };
+  }
+  
 
   // save Changes button
   saveChanges() {
@@ -154,14 +213,6 @@ export class vsaReportComponent implements OnInit {
 
     const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
-    /* corNumber is generated/assigned by API.
-     *  currently ALS/VSA API isn't ready so corNumber is not being updated.
-     *  therefore, isNewReport is always true.
-     *  causing malfunctioning on ALS/VSA comments and Narrative comments
-     */
-
-    // make it const when API implemented
-
     this.combinedEntries = [...this.combinedEntries];
 
     // New - Routed To, dnr Type
@@ -172,7 +223,7 @@ export class vsaReportComponent implements OnInit {
       this.previousRoutedTo = this.routedToSelection;
 
       if(this.pronouncedBy){
-        //this.updateFields('Pronounced By: ', [this.pronouncedBy]);
+        this.updateFields('Pronounced By: ', [this.pronouncedBy]);
         this.prevPronouncedBy = this.pronouncedBy;
       }
 
@@ -218,51 +269,12 @@ export class vsaReportComponent implements OnInit {
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-    // TODO: API implementation
-    /*
-    const createRequestBody = {
-
-    }    
-    */
 
     this.alsCommentText = '';
     this.narrativeCommentText = '';
 
     // TODO: API implementation
-    /*
-    const updateRequestBody = {
 
-    }
-    */
-
-    // API call
-    /*if (this.corNumber === 'New') {
-      this.incidentService.createIncident(createRequestBody).subscribe(
-        (response) => {
-          this.incidentService.setIncidentResponse(response);
-          this.corNumber = this.incidentService.getCorNumber();
-          this.corMainKey = this.incidentService.getcorMainKey();
-
-          alert('Incident Report Successfully Created');
-        },
-        (error) => {
-          console.error('Error:', error);
-          alert('Failed to Create Incident Report');
-        }
-      );
-    } else {
-      this.incidentService.updateIncident(updateRequestBody).subscribe(
-        (response) => {
-          this.incidentService.setIncidentResponse(response);
-
-          alert('Incident Report Successfully Updated');
-        },
-        (error) => {
-          console.error('Error:', error);
-          alert('Failed to Update Incident Report');
-        }
-      );
-    }*/
 
     //--------------TEMP------------------------------
     this.isNewReport = false;

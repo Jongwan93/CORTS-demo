@@ -75,8 +75,8 @@ export class BasicInformationComponent implements OnInit {
 
     // Depend on the cor Type, it will set the COR Type value.
     // if incident-report, corType = incident
-    this.route.paramMap.subscribe((params) => {
-      const key = params.get('corTypeKey');
+    this.route.queryParams.subscribe((params) => {
+      const key = params['corTypeKey'];
       if (key) {
         this.corTypeKey = parseInt(key, 10);
         this.fetchCorTypeDisplayName();
@@ -122,7 +122,6 @@ export class BasicInformationComponent implements OnInit {
       if (foundStatus) {
         this.status = foundStatus.displayName;
         this.statusID = foundStatus.cORStatusKey;
-        console.log('StatusID: ', this.statusID);
         this.statusIDChange.emit(this.statusID);
       }
     }
@@ -284,5 +283,9 @@ export class BasicInformationComponent implements OnInit {
     return this.corType === 'ALS/VSA'
       ? 'Incident (Call) #*'
       : 'Incident (Call) #';
+  }
+
+  setRoutedTo(value: string) {
+    this.routedToSelection = value;
   }
 }

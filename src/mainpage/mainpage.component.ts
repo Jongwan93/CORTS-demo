@@ -43,31 +43,31 @@ export class MainpageComponent {
     ).value;
 
     if (radioValue === 'NewCOR') {
-      if (selectedValue === '1') {
-        this.router.navigate([
-          '/incident-report',
-          { corTypeKey: selectedValue },
-        ]);
-      } else if (selectedValue === '2') {
-        this.router.navigate(['/vsa-report', { corTypeKey: selectedValue }]);
-      } else if (selectedValue === '3') {
-        this.router.navigate([
-          '/complaint-report',
-          { corTypeKey: selectedValue },
-        ]);
-      } else if (selectedValue === '4') {
-        this.router.navigate([
-          '/cacc-equipment-failure',
-          { corTypeKey: selectedValue },
-        ]);
-      } else if (selectedValue === '5') {
-        this.router.navigate([
-          '/fleet-equipment-report',
-          { corTypeKey: selectedValue },
-        ]);
-      } else {
-        alert('Please select the correct option to proceed.');
+      let path = '';
+      switch (selectedValue) {
+        case '1':
+          path = '/incident-report';
+          break;
+        case '2':
+          path = '/vsa-report';
+          break;
+        case '3':
+          path = '/complaint-report';
+          break;
+        case '4':
+          path = '/cacc-equipment-failure';
+          break;
+        case '5':
+          path = '/fleet-equipment-report';
+          break;
+        default:
+          alert('Please select the correct option to proceed.');
+          return;
       }
+
+      this.router.navigate([path], {
+        queryParams: { corTypeKey: selectedValue },
+      });
     } else if (radioValue === 'FindCOR') {
       this.router.navigate(['/query']);
     } else if (radioValue === 'Logout') {
