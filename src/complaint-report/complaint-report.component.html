@@ -103,6 +103,7 @@
           type="text"
           id="first-name"
           [(ngModel)]="firstName"
+          (ngModelChange)="updateFullName()"
           name="firstName"
         />
       </div>
@@ -114,6 +115,7 @@
           type="text"
           id="phone"
           [(ngModel)]="phoneNumber"
+          (ngModelChange)="updateFullName()"
           name="phoneNumber"
         />
       </div>

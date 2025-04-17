@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'incident-report', component: IncidentReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'vsa-report', component: vsaReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'cacc-equipment-failure', component: caccEquipmentFailureComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
-  { path: 'complaint-report', component: ComplaintReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'complaint-inquiry', component: ComplaintReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'fleet-equipment-report', component: FleetEquipmentReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'logout', component: LogoutComponent,  canActivate: [AuthGuard], data: {title: 'you are logged out!'}},
   { path: '**', redirectTo: 'login', pathMatch: 'full' }

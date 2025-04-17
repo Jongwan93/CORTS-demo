@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { LookupService } from '../app/services/lookup.service';
+import { ReportService } from '../app/services/report.service';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
@@ -32,7 +33,6 @@ export class ComplaintReportComponent implements OnInit {
     this.statusID = this.basicInfoComponent.statusID;
     this.corType = this.basicInfoComponent.corType;
     this.corTypeKey = this.basicInfoComponent.corTypeKey;
-    this.isNewReport = this.basicInfoComponent.corNumber === 'New';
   }
 
   constructor() {
@@ -43,6 +43,7 @@ export class ComplaintReportComponent implements OnInit {
   private titleService = inject(Title);
   private lookupService = inject(LookupService);
   private router = inject(Router);
+  private reportService = inject(ReportService);
 
   //(DO NOT TOUCH)--------------------------------------------------------
   loginUserName: string = ''; // login ID                                |
@@ -57,6 +58,7 @@ export class ComplaintReportComponent implements OnInit {
   complaintTypeList: any[] = []; // to send it to html
   narrativesArray: any[] = []; // temp
   corMainKey: string = ''; // Primary key to find the exisitng report
+  complaintKey: string = ''; // for API update request
 
   ngOnInit() {
     this.loginUserName = localStorage.getItem('loginUserName') || ''; // 29030
@@ -78,10 +80,14 @@ export class ComplaintReportComponent implements OnInit {
   complaintDateTime = '';
   prevComplaintDateTime = '';
   complaintCommentText: string = '';
+
   firstName = '';
   prevFirstName = '';
   lastName = '';
   prevLastName = '';
+  fullName = '';
+  prevFullName = '';
+
   phoneNumber = '';
   prevPhoneNumber = '';
 
@@ -90,14 +96,63 @@ export class ComplaintReportComponent implements OnInit {
 
     if (this.corNumber === 'New') {
       this.previousComplaintTypeKey = this.complaintTypeKey;
+      this.prevFullName = this.fullName;
     }
   }
 
   // ------------------------------Narrative---------------------------------
   narrativeCommentText: string = ''; // narrative commnet input
   combinedEntries: any[] = [];
-  isNewReport: boolean = true;
   isSaved: boolean = false;
+
+  private buildRequestBody(mode: 'create' | 'update' | 'close'): any {
+    const currentTimestamp = new Date().toISOString();
+    const isUpdate = mode !== 'create';
+
+    return {
+      caccId: 0,
+      corMain: {
+        corMainKey: isUpdate ? this.corMainKey : 0,
+        corNumber: isUpdate ? this.corNumber : '',
+        cadIncidentNum: '454-Z023046766',
+        corTypeFk: this.corTypeKey,
+        corStatusFk: this.basicInfoComponent.statusID,
+        userGroupFk: this.basicInfoComponent.groupCodeID,
+        createdBy: this.loginUserName.split(',')[0],
+        createDate: this.basicInfoComponent.fullDateTime,
+        closedBy: mode === 'close' ? this.loginUserName : '',
+        closeDate: mode === 'close' ? currentTimestamp : '',
+        lastAssignedTo: this.routedToSelection,
+        lastAssignedDate: this.basicInfoComponent.fullDateTime,
+        assignedTo: this.routedToSelection,
+        assignedToGroup: this.basicInfoComponent.isAssignedtoGroup,
+        assignedDate: this.basicInfoComponent.fullDateTime,
+        dueDate: new Date(this.basicInfoComponent.dueDate).toISOString(),
+        lastModifiedBy: this.loginUserName,
+        lastModifiedDate: currentTimestamp,
+      },
+      relatedCors: this.basicInfoComponent.relatedCORs ?? [],
+      report: {
+        complaintKey: isUpdate ? this.complaintKey : 0,
+        corFK: isUpdate ? this.corMainKey : 0,
+        complaintTypeFK: this.complaintTypeKey,
+        lastName: this.lastName,
+        firstName: this.firstName,
+        phoneNumber: this.phoneNumber,
+        complaintDate: this.complaintDateTime,
+        complaintDetails: this.complaintCommentText.trim(),
+      },
+      narratives: this.narrativesArray.map((entry: any) => ({
+        narrativeKey: 0,
+        corFk: isUpdate ? this.corMainKey : 0,
+        timeStamp: currentTimestamp,
+        systemGenerated: entry.systemGenerated ?? true,
+        createdBy: this.routedToSelection,
+        createdByInitials: this.loginUserName.split(',')[0],
+        narrativeText: entry.narrativeText || '',
+      })),
+    };
+  }
 
   saveChanges() {
     const isValid = validateRequiredFields();
@@ -110,168 +165,78 @@ export class ComplaintReportComponent implements OnInit {
     // format the phone number (xxx)xxx-xxxx
     this.formatPhoneNumber(this.phoneNumber);
 
-    const now = new Date();
-    const currentTimestamp = now.toISOString();
+    const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
     this.combinedEntries = [...this.combinedEntries];
 
-    const addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
-      this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
-        user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
-        comment: comment,
-        type: 'narrative',
-      });
-      this.narrativesArray.push({
-        narrativeKey: 0,
-        corFk: 0,
-        timeStamp: currentTimestamp,
-        systemGenerated: systemGenerated,
-        createdBy: this.basicInfoComponent.userName,
-        createdByInitials: this.loginUserName,
-        narrativeText: comment,
-      });
-    };
+    // New - Routed To, Incident Type
+    if (isNewReport) {
+      this.updateFields('CREATE', []);
+      this.updateFields('REASSIGN', [this.routedToSelection]);
 
-    // New - Routed To, Complaint Type
-    if (this.isNewReport) {
-      const msgTemplateCreate =
-        this.lookupService.getSystemMessageByCode('CREATE');
-      const msgTemplateReassign =
-        this.lookupService.getSystemMessageByCode('REASSIGN');
-
-      // "new Complaint report created" added
-      if (msgTemplateCreate) {
-        addNarrativeEntry(msgTemplateCreate, true);
-      }
-
-      // "Routed To..." message added
-      if (msgTemplateReassign) {
-        addNarrativeEntry(
-          msgTemplateReassign.replace('%1', this.routedToSelection),
-          true
-        );
-      }
       this.previousRoutedTo = this.routedToSelection;
 
-      // show the duplicate and close COR button
+      // show duplicated and close COR buttons
       this.basicInfoComponent.isDupCloseCorButtonsVisible = true;
     }
 
-    const msgTemplateChange =
-      this.lookupService.getSystemMessageByCode('CHANGE');
-
-    // Update - when name is Changed
-    if (
-      !this.isNewReport &&
-      ((!this.prevLastName && this.lastName) ||
-        this.prevLastName !== this.lastName ||
-        (!this.prevFirstName && this.firstName) ||
-        this.prevFirstName !== this.firstName)
-    ) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Name')
-            .replace('%2', `${this.firstName} ${this.lastName}`)
-            .replace('%3', `${this.prevFirstName} ${this.prevLastName}`),
-          true
-        );
-      }
-      this.prevLastName = this.lastName;
-      this.prevFirstName = this.firstName;
-    }
-
-    // Update - when Phone number is changed
-    if (
-      !this.isNewReport &&
-      ((!this.prevPhoneNumber && this.phoneNumber) ||
-        this.prevPhoneNumber != this.phoneNumber)
-    ) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Phone Number')
-            .replace('%2', this.phoneNumber)
-            .replace('%3', this.prevPhoneNumber),
-          true
-        );
-      }
-      this.prevPhoneNumber = this.phoneNumber;
-    }
-
     // Update - when Routed To is changed
-    if (!this.isNewReport && this.previousRoutedTo !== this.routedToSelection) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Routed To')
-            .replace('%2', this.routedToSelection)
-            .replace('%3', this.previousRoutedTo),
-          true
-        );
-      }
+    if (!isNewReport && this.previousRoutedTo !== this.routedToSelection) {
+      this.updateFields('CHANGE', [
+        'Routed To',
+        this.routedToSelection,
+        this.previousRoutedTo,
+      ]);
       this.previousRoutedTo = this.routedToSelection;
     }
 
-    // Update - when complaint Type is changed
+    // Update - when Complaint Type is changed
     if (
-      !this.isNewReport &&
+      !isNewReport &&
       this.previousComplaintTypeKey !== this.complaintTypeKey
     ) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Complant Type')
-            .replace('%2', this.getComplaintTypeText(this.complaintTypeKey))
-            .replace(
-              '%3',
-              this.getComplaintTypeText(this.previousComplaintTypeKey)
-            ),
-          true
-        );
-      }
+      this.updateFields('CHANGE', [
+        'Complaint Type',
+        this.getComplaintTypeText(this.complaintTypeKey),
+        this.getComplaintTypeText(this.previousComplaintTypeKey),
+      ]);
       this.previousComplaintTypeKey = this.complaintTypeKey;
     }
 
-    // Update - complaint date time
+    // Update - when name is changed
     if (
-      !this.isNewReport &&
-      this.prevComplaintDateTime !== this.complaintDateTime
+      !isNewReport &&
+      (this.prevFirstName !== this.firstName ||
+        this.prevLastName !== this.lastName)
     ) {
-      if (msgTemplateChange) {
-        addNarrativeEntry(
-          msgTemplateChange
-            .replace('%1', 'Complaint date')
-            .replace('%2', this.complaintDateTime)
-            .replace('%3', this.prevComplaintDateTime),
-          true
-        );
-      }
-      this.prevComplaintDateTime = this.complaintDateTime;
+      this.updateFields('CHANGE', [
+        'Contact Information',
+        this.fullName,
+        this.prevFullName,
+      ]);
+      this.prevFirstName = this.firstName;
+      this.prevLastName = this.lastName;
+      this.prevFullName = this.fullName;
     }
 
-    // Update - first name or last name or phone number
+    // Update - when phone number is changed
     if (
-      this.prevFirstName !== this.firstName ||
-      this.prevLastName !== this.lastName ||
+      !isNewReport &&
       this.prevPhoneNumber !== this.phoneNumber
     ) {
-      addNarrativeEntry(
-        `Personal information is updated to [${this.firstName} ${this.lastName} #${this.phoneNumber}]`,
-        true
-      );
-      this.prevFirstName = this.firstName;
-      this.prevFirstName = this.firstName;
+      this.updateFields('CHANGE', [
+        'Phone Number',
+        this.phoneNumber,
+        this.prevPhoneNumber,
+      ]);
       this.prevPhoneNumber = this.phoneNumber;
     }
 
-    // user's Complaint comment added
+    // user's incident comment added
     if (this.complaintCommentText.trim()) {
       this.combinedEntries.unshift({
-        date: this.basicInfoComponent.formatDate(now),
-        time: this.basicInfoComponent.formatTime(now),
+        date: this.basicInfoComponent.formatDate(this.now),
+        time: this.basicInfoComponent.formatTime(this.now),
         user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
         comment: this.complaintCommentText.trim(),
         type: 'complaint',
@@ -281,23 +246,11 @@ export class ComplaintReportComponent implements OnInit {
     // user's narrative comment added
     let narrativeCommentValue = '';
     if (this.narrativeCommentText.trim()) {
-      addNarrativeEntry(this.narrativeCommentText.trim(), false);
+      this.addNarrativeEntry(this.narrativeCommentText.trim(), false);
       narrativeCommentValue = this.narrativeCommentText.trim();
     }
 
-    // TO DO: API call request and update body
-    //
-    //
-    //
-    //-------------------------Temp------------------------
-    this.isNewReport = false;
-    this.corNumber = '123';
-    //---------REMOVE WHEN API REQUEST IMPLEMENTED---------
-
-    this.complaintCommentText = '';
-    this.narrativeCommentText = '';
-
-    this.basicInfoComponent.setStatusTo('Create');
+    this.submitReport();
 
     this.isSaved = true;
   } // ++++++++end of saveChanges()
@@ -306,7 +259,7 @@ export class ComplaintReportComponent implements OnInit {
   saveChangesExit() {
     if (!this.isSaved) {
       this.saveChanges();
-      
+
       const interval = setInterval(() => {
         if (this.isSaved) {
           clearInterval(interval);
@@ -337,6 +290,10 @@ export class ComplaintReportComponent implements OnInit {
     this.statusID = newStatusID;
   }
 
+  updateFullName(): void {
+    this.fullName = `${this.firstName} ${this.lastName}`.trim();
+  }
+
   formatPhoneNumber(phoneNumber: string) {
     const cleaned = phoneNumber.replace(/\D/g, '');
 
@@ -353,5 +310,126 @@ export class ComplaintReportComponent implements OnInit {
       (type) => type.complaintTypeKey === Number(value)
     );
     return findComplaintType ? findComplaintType.displayName : 'Unknown';
+  }
+
+  now = new Date();
+  currentTimestamp = this.now.toISOString();
+
+  addNarrativeEntry = (comment: string, systemGenerated: boolean) => {
+    this.combinedEntries.unshift({
+      date: this.basicInfoComponent.formatDate(this.now),
+      time: this.basicInfoComponent.formatTime(this.now),
+      user: this.basicInfoComponent.userName.split(', ')[0] || 'Unknown',
+      comment: comment,
+      type: 'narrative',
+    });
+    this.narrativesArray.push({
+      narrativeKey: 0,
+      corFk: 0,
+      timeStamp: this.currentTimestamp,
+      systemGenerated: systemGenerated,
+      createdBy: this.basicInfoComponent.userName,
+      createdByInitials: this.loginUserName,
+      narrativeText: comment,
+    });
+  };
+
+  // reflect field changes and send messages to narrative
+  private updateFields(
+    messageCode: string,
+    values: string[],
+    systemGenerated: boolean = true
+  ) {
+    const msgTemplate = this.lookupService.getSystemMessageByCode(messageCode);
+
+    if (!msgTemplate) return;
+
+    let formattedMessage = msgTemplate;
+
+    values.forEach((val, index) => {
+      formattedMessage = formattedMessage.replace(`%${index + 1}`, val);
+    });
+
+    this.addNarrativeEntry(formattedMessage, systemGenerated);
+  }
+
+  // API request succeeded
+  private handleReportResponse(
+    response: any,
+    mode: 'create' | 'update' | 'close'
+  ) {
+    this.reportService.setIncidentResponse(response);
+
+    if (mode === 'create') {
+      this.corNumber = this.reportService.getCorNumber();
+      this.corMainKey = this.reportService.getcorMainKey();
+      this.basicInfoComponent.setStatusTo('Create');
+    }
+
+    this.complaintCommentText = '';
+    this.narrativeCommentText = '';
+
+    const messages = {
+      create: 'Complaint Report Successfully Created',
+      update: 'Complaint Report Successfully Updated',
+      close: 'Complaint Report Successfully Closed',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // when API request failed (test purpose)
+  private handleReportError(mode: 'create' | 'update' | 'close', error: any) {
+    console.error('Error:', error);
+
+    const messages = {
+      create: 'Failed to Create Complaint Report',
+      update: 'Failed to Update Complaint Report',
+      close: 'Failed to Close Complaint Report',
+    };
+
+    alert(messages[mode]);
+  }
+
+  // API call
+  private submitReport() {
+    if (this.corNumber === 'New') {
+      const createRequestBody = this.buildRequestBody('create');
+      console.log('Creatd Request Body: ', createRequestBody);
+      this.reportService
+        .createReport(createRequestBody, 'complaint-inquiry-report')
+        .subscribe(
+          (response) => {
+            console.log('create response body: ', response); // print response
+            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0;
+            this.complaintKey = response?.data?.report?.complaintKey ?? 0;
+
+            this.router.navigate(['/complaint-inquiry'], {
+              queryParams: {
+                corTypeKey: this.corTypeKey,
+                corMainKey: this.corMainKey,
+                corNumber: this.corNumber,
+              },
+              replaceUrl: true,
+            });
+
+            this.handleReportResponse(response, 'create');
+          },
+          (error) => this.handleReportError('create', error)
+        );
+    } else {
+      const updateRequestBody = this.buildRequestBody('update');
+      console.log('update request body: ', updateRequestBody);
+
+      this.reportService
+        .updateIncident(updateRequestBody, 'complaint-inquiry-report')
+        .subscribe(
+          (response) => {
+            console.log('update response body: ', response); // print response
+            this.handleReportResponse(response, 'update');
+          },
+          (error) => this.handleReportError('update', error)
+        );
+    }
   }
 }

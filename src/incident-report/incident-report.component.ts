@@ -233,8 +233,6 @@ export class IncidentReportComponent implements OnInit {
       this.previousIncidentTypeKey = this.incidentTypeKey;
     }
 
-    console.log(this.combinedEntries);
-
     // user's incident comment added
     if (this.incidentCommentText.trim()) {
       this.combinedEntries.unshift({
@@ -254,7 +252,7 @@ export class IncidentReportComponent implements OnInit {
     }
 
     //-----------------------create incident API call-------------------------
-    this.submitIncident();
+    this.submitReport();
 
     this.isSaved = true;
   } // --------- end of save changes function
@@ -430,7 +428,7 @@ export class IncidentReportComponent implements OnInit {
   }
 
   // API call
-  private submitIncident() {
+  private submitReport() {
     if (this.corNumber === 'New') {
       const createRequestBody = this.buildRequestBody('create');
       console.log('Creatd Request Body: ', createRequestBody);
@@ -439,8 +437,8 @@ export class IncidentReportComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('create response body: ', response); // print response
-            this.corMainKey = response?.corMain?.corMainKey ?? 0;
-            this.incidentKey = response?.incident?.incidentKey ?? 0;
+            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0;
+            this.incidentKey = response?.data?.report?.incidentKey ?? 0;
 
             this.router.navigate(['/incident-report'], {
               queryParams: {

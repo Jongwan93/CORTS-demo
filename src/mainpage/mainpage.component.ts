@@ -52,7 +52,7 @@ export class MainpageComponent {
           path = '/vsa-report';
           break;
         case '3':
-          path = '/complaint-report';
+          path = '/complaint-inquiry';
           break;
         case '4':
           path = '/cacc-equipment-failure';

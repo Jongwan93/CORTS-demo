@@ -211,8 +211,12 @@ export class vsaReportComponent implements OnInit {
 
       this.previousRoutedTo = this.routedToSelection;
 
-      if (this.pronouncedBy) {
-        this.updateFields('Pronounced By: ', [this.pronouncedBy]);
+      if (this.pronouncedBy !== this.prevPronouncedBy) {
+        this.updateFields('CHANGE', [
+          'Pronounced By',
+          this.pronouncedBy,
+          this.prevPronouncedBy,
+        ]);
         this.prevPronouncedBy = this.pronouncedBy;
       }
 
@@ -324,7 +328,9 @@ export class vsaReportComponent implements OnInit {
   }
 
   getDnrTypeText(value: string): string {
-    const findDnrType = this.dnrTypeList.find((type) => type.code === value);
+    const findDnrType = this.dnrTypeList.find(
+      (type) => type.dnrstatusKey === Number(value)
+    );
     return findDnrType ? findDnrType.displayName : 'Unknown';
   }
 
@@ -427,9 +433,8 @@ export class vsaReportComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('create response body: ', response); // print response
-            this.corMainKey = response?.corMain?.corMainKey ?? 0;
-            this.vsaKey = response?.incident?.incidentKey ?? 0;
-
+            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0;
+            this.vsaKey = response?.data?.report?.vsaKey ?? 0;
             this.router.navigate(['/vsa-report'], {
               queryParams: {
                 corTypeKey: this.corTypeKey,
@@ -445,8 +450,6 @@ export class vsaReportComponent implements OnInit {
         );
     } else {
       const updateRequestBody = this.buildRequestBody('update');
-      console.log('update request body: ', updateRequestBody);
-
       this.reportService
         .updateIncident(updateRequestBody, 'als-vsa-report')
         .subscribe(

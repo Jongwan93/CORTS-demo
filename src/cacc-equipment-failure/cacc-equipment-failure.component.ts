@@ -278,7 +278,7 @@ export class caccEquipmentFailureComponent implements OnInit {
     }
 
 
-    this.submitIncident();
+    this.submitReport();
 
     this.isSaved = true;
   } // +++++++++++end of saveChanges() +++++++++++
@@ -442,7 +442,7 @@ export class caccEquipmentFailureComponent implements OnInit {
   }
 
   // API call
-  private submitIncident() {
+  private submitReport() {
     if (this.corNumber === 'New') {
       const createRequestBody = this.buildRequestBody('create');
       console.log('Creatd Request Body: ', createRequestBody);
@@ -451,8 +451,8 @@ export class caccEquipmentFailureComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('create response body: ', response); // print response
-            this.corMainKey = response?.corMain?.corMainKey ?? 0;
-            this.equipmentFailureKey = response?.incident?.incidentKey ?? 0;
+            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0;
+            this.equipmentFailureKey = response?.data?.report?.equipmentFailureKey ?? 0;
 
             this.router.navigate(['/cacc-equipment-failure'], {
               queryParams: {
