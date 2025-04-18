@@ -15,7 +15,17 @@
   </header>
 
   <!-- Login Form -->
-  <form class="form-container" (ngSubmit)="login()" name="loginForm">
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Logging in... Please wait.</p>
+  </div>
+
+  <form
+    *ngIf="!isLoading"
+    class="form-container"
+    (ngSubmit)="login()"
+    name="loginForm"
+  >
     <div class="grid-container">
       <div class="grid-item">
         <label>Login as:</label>

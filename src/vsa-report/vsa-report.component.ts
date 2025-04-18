@@ -9,6 +9,7 @@ import { validateVsaReport } from '../app/utils/validateFields';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
+import { DisableIfClosed } from '../app/services/disable.service';
 
 @Component({
   selector: 'app-vsa-report',
@@ -21,6 +22,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
+    DisableIfClosed,
   ],
   templateUrl: './vsa-report.component.html',
   styleUrls: ['./vsa-report.component.css'],
@@ -302,31 +304,6 @@ export class vsaReportComponent implements OnInit {
     this.statusID = newStatusID;
   }
 
-  //handler for close COR button
-  handleCloseCor(message: string) {
-    // add message to narrative
-    this.addNarrativeEntry(message, true);
-
-    // update request body and close overwrite to close
-    const updateRequestBody = this.buildRequestBody('close');
-    updateRequestBody.closedby = this.loginUserName;
-    updateRequestBody.closeDate = new Date().toISOString();
-
-    // call API
-    this.reportService
-      .updateIncident(updateRequestBody, 'als-vsa-report')
-      .subscribe(
-        (response) => {
-          console.log('Closing: ALS-VSA report SUCCESS');
-          this.handleReportResponse(response, 'close');
-        },
-        (error) => {
-          console.log('Closing: ALS-VSA report FAILED', error);
-          this.handleReportError('close', error);
-        }
-      );
-  }
-
   getDnrTypeText(value: string): string {
     const findDnrType = this.dnrTypeList.find(
       (type) => type.dnrstatusKey === Number(value)
@@ -365,6 +342,33 @@ export class vsaReportComponent implements OnInit {
       narrativeText: comment,
     });
   };
+
+  //handler for close COR button
+  handleCloseCor(message: string) {
+    // add message to narrative
+    this.addNarrativeEntry(message, true);
+
+    // update request body and close overwrite to close
+    const updateRequestBody = this.buildRequestBody('close');
+    updateRequestBody.closedby = this.loginUserName;
+    updateRequestBody.closeDate = new Date().toISOString();
+
+    // call API
+    console.log('Closing: Sending updateIncident: ', updateRequestBody);
+
+    this.reportService
+      .updateReport(updateRequestBody, 'als-vsa-report')
+      .subscribe(
+        (response) => {
+          console.log('Closing: ALS/VSA report SUCCESS');
+          this.handleReportResponse(response, 'close');
+        },
+        (error) => {
+          console.log('Closing: ALS/VSA report FAILED', error);
+          this.handleReportError('close', error);
+        }
+      );
+  }
 
   // reflect field changes and send messages to narrative
   private updateFields(
@@ -451,7 +455,7 @@ export class vsaReportComponent implements OnInit {
     } else {
       const updateRequestBody = this.buildRequestBody('update');
       this.reportService
-        .updateIncident(updateRequestBody, 'als-vsa-report')
+        .updateReport(updateRequestBody, 'als-vsa-report')
         .subscribe(
           (response) => {
             console.log('update response body: ', response); // print response

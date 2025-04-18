@@ -1,10 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 // import { HttpClient } from '@angular/common/http';
 import { HeaderComponent } from '../app/header/header.component';
+import { ReportService } from '../app/services/report.service';
 
 @Component({
   selector: 'app-query',
@@ -14,6 +15,14 @@ import { HeaderComponent } from '../app/header/header.component';
   styleUrls: ['./query.component.css'],
 })
 export class QueryComponent implements OnInit {
+  constructor() {
+    this.titleService.setTitle('CORTS - Query');
+  }
+
+  private titleService = inject(Title);
+  private route = inject(ActivatedRoute);
+  private reportService = inject(ReportService);
+
   cortTypes: any[] = [];
   employees: any[] = [];
   statuses: any[] = [];
@@ -24,17 +33,49 @@ export class QueryComponent implements OnInit {
   sortedColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  constructor() {
-    this.titleService.setTitle('CORTS - Query');
-  }
+  dateCreatedFrom = '';
+  dateCreatedTo = '';
+  dateDue = '';
+  queryCorNumber: string = '';
+  queryIncidentCallNumber: string = '';
+  queryCreator: string = '';
+  queryCorType: string = '';
+  queryCorStatus: string = '';
+  queryRoutedTo: string = '';
+  searchText: string = '';
 
-  private titleService = inject(Title);
+  isAllDatesCreated: boolean = false;
+  isAllDatesDueDate: boolean = false;
 
   ngOnInit() {
     this.displayCortsType();
     this.displayCreator();
     this.displayStatus();
     this.displayRoutes();
+
+    const source = this.route.snapshot.queryParams['source'];
+    if (source === 'mainpage') {
+      const raw = localStorage.getItem('search-results');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            this.data = parsed.map((item: any) => ({
+              dateTime: this.formatDate(item.createDate),
+              type: this.getCorTypeName(item.corTypeFk),
+              incident: item.cadIncidentNum || 'N/A',
+              cor: item.corNumber,
+              creator: item.createdBy,
+              routedTo: item.assignedTo || '—',
+              dateDue: this.formatDate(item.dueDate),
+              status: this.getStatusName(item.corStatusFk),
+            }));
+          }
+        } catch (e) {
+          console.error('Failed to parse search-results:', e);
+        }
+      }
+    }
   }
 
   // display corts type
@@ -143,9 +184,53 @@ export class QueryComponent implements OnInit {
       ?.toggleAttribute('disabled', isChecked);
   }
 
-  SetDirection(direction: string) {
-    console.log(`Direction: ${direction}`);
+  // =================================Search Result==================================
+
+  currentPage = 1;
+  itemsPerPage = 20;
+  itemsPerPageOptions = [20, 50, 100];
+
+  get currentPageData() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.data.slice(start, end);
   }
+
+  get totalPages() {
+    return Math.ceil(this.data.length / this.itemsPerPage);
+  }
+
+  // update page number according to next, prev button
+  SetDirection(direction: string) {
+    if (direction === 'Next' && this.currentPage < this.totalPages) {
+      this.currentPage++;
+    } else if (direction === 'Prev' && this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  // change number of items displayed per page
+  onItemsPerPageChange(event: any) {
+    this.itemsPerPage = +event.target.value;
+    this.currentPage = 1;
+  }
+
+  searchCORs() {
+    this.currentPage = 1;
+
+    if (this.isAllDatesCreated) {
+      this.dateCreatedFrom = '';
+      this.dateCreatedTo = '';
+    }
+
+    if (this.isAllDatesDueDate) {
+      this.dateDue = '';
+    }
+
+    this.submitSearch();
+  }
+
+  //================================UTILITY=========================================
 
   // sorting algorithm
   sortTable(column: string) {
@@ -155,20 +240,78 @@ export class QueryComponent implements OnInit {
       this.sortedColumn = column;
       this.sortDirection = 'asc';
     }
-  
+
     this.data.sort((a, b) => {
       let valA = a[column];
       let valB = b[column];
-      
+
       if (column.toLowerCase().includes('date')) {
         valA = new Date(valA);
         valB = new Date(valB);
       }
-  
+
       if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }
-  
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return (
+      d.toLocaleDateString() +
+      ' ' +
+      d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    );
+  }
+
+  getCorTypeName(corTypeKey: number): string {
+    const match = this.cortTypes.find((t) => t.cORTypeKey === corTypeKey);
+    return match?.displayName || 'Unknown';
+  }
+
+  getStatusName(statusKey: number): string {
+    const match = this.statuses.find((s) => s.cORStatusKey === statusKey);
+    return match?.displayName || 'Unknown';
+  }
+
+  // API call
+  private submitSearch() {
+    const searchCorBody = {
+      corNumber: this.queryCorNumber,
+      cadIncidentNum: this.queryIncidentCallNumber,
+      createdBy: this.queryCreator,
+      routedTo: this.queryRoutedTo,
+      corStatus: this.queryCorStatus,
+      corType: this.queryCorType,
+      dueDate: this.dateDue,
+      createDateFrom: this.dateCreatedFrom,
+      createDateTo: this.dateCreatedTo,
+      text: this.searchText,
+    };
+
+    this.reportService.searchReport(searchCorBody).subscribe({
+      next: (res) => {
+        console.log('Search result:', res);
+        const rawResults = res?.data || [];
+
+        this.data = rawResults.map((item: any) => ({
+          dateTime: this.formatDate(item.createDate),
+          type: this.getCorTypeName(item.corTypeFk),
+          incident: item.cadIncidentNum || 'N/A',
+          cor: item.corNumber,
+          creator: item.createdBy,
+          routedTo: item.assignedTo || '—',
+          dateDue: this.formatDate(item.dueDate),
+          status: this.getStatusName(item.corStatusFk),
+        }));
+
+        localStorage.setItem('search-results', JSON.stringify(rawResults));
+      },
+      error: (err) => {
+        console.error('Search failed:', err);
+      },
+    });
+  }
 }

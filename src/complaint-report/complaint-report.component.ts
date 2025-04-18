@@ -9,6 +9,7 @@ import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
 import { validateRequiredFields } from '../app/utils/validateFields';
+import { DisableIfClosed } from '../app/services/disable.service';
 
 @Component({
   selector: 'app-complaint-report',
@@ -21,6 +22,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
     HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
+    DisableIfClosed,
   ],
   templateUrl: './complaint-report.component.html',
   styleUrls: ['./complaint-report.component.css'],
@@ -93,11 +95,6 @@ export class ComplaintReportComponent implements OnInit {
 
   complaintTypeChange(newComplaintTypeKey: string) {
     this.complaintTypeKey = newComplaintTypeKey;
-
-    if (this.corNumber === 'New') {
-      this.previousComplaintTypeKey = this.complaintTypeKey;
-      this.prevFullName = this.fullName;
-    }
   }
 
   // ------------------------------Narrative---------------------------------
@@ -162,12 +159,15 @@ export class ComplaintReportComponent implements OnInit {
       return;
     }
 
-    // format the phone number (xxx)xxx-xxxx
-    this.formatPhoneNumber(this.phoneNumber);
-
     const isNewReport = this.basicInfoComponent.corNumber === 'New';
 
     this.combinedEntries = [...this.combinedEntries];
+
+    if (this.corNumber === 'New') {
+      this.previousComplaintTypeKey = this.complaintTypeKey;
+      this.prevFullName = this.fullName;
+      this.prevPhoneNumber = this.phoneNumber;
+    }
 
     // New - Routed To, Incident Type
     if (isNewReport) {
@@ -226,8 +226,8 @@ export class ComplaintReportComponent implements OnInit {
     ) {
       this.updateFields('CHANGE', [
         'Phone Number',
-        this.phoneNumber,
-        this.prevPhoneNumber,
+        this.formatPhoneNumber(this.phoneNumber),
+        this.formatPhoneNumber(this.prevPhoneNumber),
       ]);
       this.prevPhoneNumber = this.phoneNumber;
     }
@@ -310,6 +310,33 @@ export class ComplaintReportComponent implements OnInit {
       (type) => type.complaintTypeKey === Number(value)
     );
     return findComplaintType ? findComplaintType.displayName : 'Unknown';
+  }
+
+  //handler for close COR button
+  handleCloseCor(message: string) {
+    // add message to narrative
+    this.addNarrativeEntry(message, true);
+
+    // update request body and close overwrite to close
+    const updateRequestBody = this.buildRequestBody('close');
+    updateRequestBody.closedby = this.loginUserName;
+    updateRequestBody.closeDate = new Date().toISOString();
+
+    // call API
+    console.log('Closing: Sending updateIncident: ', updateRequestBody);
+
+    this.reportService
+      .updateReport(updateRequestBody, 'incident-report')
+      .subscribe(
+        (response) => {
+          console.log('Closing: Incident report SUCCESS');
+          this.handleReportResponse(response, 'close');
+        },
+        (error) => {
+          console.log('Closing: Incident report FAILED', error);
+          this.handleReportError('close', error);
+        }
+      );
   }
 
   now = new Date();
@@ -422,7 +449,7 @@ export class ComplaintReportComponent implements OnInit {
       console.log('update request body: ', updateRequestBody);
 
       this.reportService
-        .updateIncident(updateRequestBody, 'complaint-inquiry-report')
+        .updateReport(updateRequestBody, 'complaint-inquiry-report')
         .subscribe(
           (response) => {
             console.log('update response body: ', response); // print response

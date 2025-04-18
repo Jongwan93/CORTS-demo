@@ -33,6 +33,7 @@
             type="checkbox"
             id="als"
             (change)="toggleReportType('als', $event)"
+            appDisableIf
           />
           ALS Intervention
         </label>
@@ -42,6 +43,7 @@
             type="checkbox"
             id="vsa"
             (change)="toggleReportType('vsa', $event)"
+            appDisableIf
           />
           VSA
         </label>
@@ -59,6 +61,7 @@
           [disabled]="!isVSASelected"
           [(ngModel)]="pronouncedBy"
           name="pronouncedBy"
+          appDisableIf
         />
       </div>
 
@@ -73,6 +76,7 @@
           [(ngModel)]="pronouncedDateTime"
           name="pronouncedDateTime"
           [disabled]="!pronouncedBy.trim()"
+          appDisableIf
         />
       </div>
 
@@ -84,6 +88,7 @@
           [(ngModel)]="dnrTypeKey"
           name="dnrTypeKey"
           (change)="dnrTypeChange(dnrTypeKey)"
+          appDisableIf
           required
         >
           <option value="">-- Select DNR --</option>
@@ -102,6 +107,7 @@
           [(ngModel)]="alsCommentText"
           name="alsCommentText"
           (input)="isSaved = false"
+          appDisableIf
           required
         ></textarea>
       </div>
@@ -114,6 +120,7 @@
             id="ar-instructions"
             [(ngModel)]="isARSelected"
             name="arInstructions"
+            appDisableIf
           />
           A/R Instructions Given
         </label>
@@ -123,6 +130,7 @@
             id="cpr-instructions"
             [(ngModel)]="isCPRSelected"
             name="cprInstructions"
+            appDisableIf
           />
           CPR Instructions Given
         </label>

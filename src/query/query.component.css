@@ -11,10 +11,15 @@
   width: auto;
   padding: 0.5em;
   border-radius: 0.3em;
-  text-align: center;
 }
 
 .pagination {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+
+.pagination-bar {
   display: flex;
   justify-content: center;
   gap: 1em;
@@ -68,3 +73,36 @@ th:hover {
   transition: background-color 0.2s;
   cursor: pointer;
 }
+
+/* search result section */
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.results-title {
+  margin: 0;
+  font-size: 24px;
+  flex: 1;
+  text-align: center;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 5px;
+  font-size: 14px;
+  margin-left: auto;
+}
+
+.pagination-controls select {
+  width: 70px;
+  padding: 2px 6px;
+  font-size: 14px;
+}
+
+
+
+
+

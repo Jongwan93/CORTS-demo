@@ -32,6 +32,7 @@
           [(ngModel)]="equipmentTypeKey"
           name="equipmentType"
           (change)="equipmentTypeChange(equipmentTypeKey)"
+          appDisableIf
           required
         >
           <option value="">-- Select Equipment Type --</option>
@@ -47,6 +48,7 @@
           rows="6"
           [(ngModel)]="equipmentDesc"
           name="equipmentDesc"
+          appDisableIf
         ></textarea>
       </div>
 
@@ -57,6 +59,7 @@
           [(ngModel)]="locationKey"
           name="locationKey"
           (change)="equipmentLocationChange(locationKey)"
+          appDisableIf
           required
         >
           <option value="">-- Select Equipment Location</option>
@@ -72,6 +75,7 @@
           rows="6"
           [(ngModel)]="locationDesc"
           name="locationDesc"
+          appDisableIf
         ></textarea>
       </div>
 
@@ -85,6 +89,7 @@
           [(ngModel)]="failureDateTime"
           name="failureDateTime"
           (change)="failureDateTimeChange(failureDateTime)"
+          appDisableIf
           required
         />
       </div>
@@ -92,39 +97,42 @@
       <!-- Service Request To -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Request To</label>
-        <input type="text" [(ngModel)]="requestTo" name="requestTo" />
+        <input type="text" [(ngModel)]="requestTo" name="requestTo" appDisableIf/>
         <input
           type="datetime-local"
           id="pronouncedDateTime"
           [(ngModel)]="requestDateTime"
           name="requestDateTime"
           (change)="requestDateTimeChange(requestDateTime)"
+          appDisableIf
         />
       </div>
 
       <!-- Service Responded By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Responded By</label>
-        <input type="text" [(ngModel)]="respondBy" name="respondBy" />
+        <input type="text" [(ngModel)]="respondBy" name="respondBy" appDisableIf/>
         <input
           type="datetime-local"
           id="pronouncedDateTime"
           [(ngModel)]="respondDateTime"
           name="respondDateTime"
           (change)="respondedDateTimeChange(respondDateTime)"
+          appDisableIf
         />
       </div>
 
       <!-- Service Completed By -->
       <div class="grid-item">
         <label for="pronouncedDateTime">Service Completed By</label>
-        <input type="text" [(ngModel)]="completedBy" name="completedBy" />
+        <input type="text" [(ngModel)]="completedBy" name="completedBy" appDisableIf/>
         <input
           type="datetime-local"
           id="pronouncedDateTime"
           [(ngModel)]="completedDateTime"
           name="completedDateTime"
           (change)="completedDateTimeChange(completedDateTime)"
+          appDisableIf
         />
       </div>
 
@@ -136,6 +144,7 @@
           [(ngModel)]="failureCommentText"
           name="failureCommentText"
           (input)="isSaved = false"
+          appDisableIf
           required
         ></textarea>
       </div>
@@ -151,6 +160,7 @@
             name="delayTime"
             [(ngModel)]="isDelaySelected"
             (change)="toggleDelayTime()"
+            appDisableIf
           />
           <input
             type="number"
@@ -163,6 +173,7 @@
             [(ngModel)]="delayHours"
             [disabled]="!isDelaySelected"
             (change)="updateResponseDelay()"
+            appDisableIf
           />
           <p>:</p>
           <input
@@ -176,6 +187,7 @@
             [(ngModel)]="delayMinutes"
             [disabled]="!isDelaySelected"
             (change)="updateResponseDelay()"
+            appDisableIf
           />
         </div>
       </div>

@@ -16,14 +16,31 @@
         <label>Date Created</label>
         <div class="date-field">
           <label class="date-label">From:</label>
-          <input type="date" id="objDateFrom" name="objDateFrom" />
+          <input
+            type="datetime-local"
+            id="objDateFrom"
+            name="objDateFrom"
+            [(ngModel)]="dateCreatedFrom"
+            name="dateCreatedFrom"
+          />
         </div>
         <div class="date-field">
           <label class="date-label">To:</label>
-          <input type="date" id="objDateTo" name="objDateTo" />
+          <input
+            type="datetime-local"
+            id="objDateTo"
+            name="objDateTo"
+            [(ngModel)]="dateCreatedTo"
+            name="dateCreatedTo"
+          />
         </div>
         <div class="inline-checkbox">
-          <input type="checkbox" (click)="EnableDate('objDate')" />
+          <input
+            type="checkbox"
+            (click)="EnableDate('objDate')"
+            [(ngModel)]="isAllDatesCreated"
+            name="isAllDatesCreated"
+          />
           <span>All Dates</span>
         </div>
       </div>
@@ -32,15 +49,20 @@
       <div class="grid-item">
         <label>Date Due</label>
         <div class="date-field">
-          <label class="date-label">From:</label>
-          <input type="date" id="objDateDueFrom" name="objDateDueFrom" />
-        </div>
-        <div class="date-field">
-          <label class="date-label">To:</label>
-          <input type="date" id="objDateDueTo" name="objDateDueTo" />
+          <input
+            type="datetime-local"
+            id="objDateDueFrom"
+            name="objDateDueFrom"
+            [(ngModel)]="dateDue"
+          />
         </div>
         <div class="inline-checkbox">
-          <input type="checkbox" (click)="EnableDate('objDateDue')" />
+          <input
+            type="checkbox"
+            (click)="EnableDate('objDateDue')"
+            [(ngModel)]="isAllDatesDueDate"
+            name="isAllDatesDueDate"
+          />
           <span>All Dates</span>
         </div>
       </div>
@@ -48,19 +70,37 @@
       <!-- COR# -->
       <div class="grid-item">
         <label>COR #</label>
-        <input type="text" name="txtCorNum" maxlength="7" />
+        <input
+          type="text"
+          name="txtCorNum"
+          maxlength="7"
+          [(ngModel)]="queryCorNumber"
+          name="queryCorNumber"
+        />
       </div>
 
       <!-- Incident (Call) # -->
       <div class="grid-item">
         <label>Incident (Call) #</label>
-        <input type="text" name="txtIncidentNum" maxlength="16" />
+        <input
+          type="text"
+          name="txtIncidentNum"
+          maxlength="16"
+          [(ngModel)]="queryIncidentCallNumber"
+          name="queryIncidentCallNumber"
+        />
       </div>
 
       <!-- Creator -->
       <div class="grid-item">
         <label>Creator</label>
-        <select name="drpCreator" class="CTSR" multiple>
+        <select
+          name="drpCreator"
+          [size]="10"
+          class="CTSR"
+          [(ngModel)]="queryCreator"
+          name="queryCreator"
+        >
           <option value="">(All)</option>
           <option
             *ngFor="let employee of employees"
@@ -75,7 +115,13 @@
       <!-- COR Type -->
       <div class="grid-item">
         <label>Type</label>
-        <select name="drpType" class="CTSR" multiple>
+        <select
+          name="drpType"
+          [size]="10"
+          class="CTSR"
+          [(ngModel)]="queryCorType"
+          name="queryCorType"
+        >
           <option value="">(All)</option>
           <option
             *ngFor="let type of cortTypes"
@@ -90,7 +136,13 @@
       <!-- Status -->
       <div class="grid-item">
         <label>Status</label>
-        <select name="drpStatus" class="CTSR" multiple>
+        <select
+          name="drpStatus"
+          [size]="10"
+          class="CTSR"
+          [(ngModel)]="queryCorStatus"
+          name="queryCorStatus"
+        >
           <option value="">(All)</option>
           <option
             *ngFor="let status of statuses"
@@ -105,7 +157,13 @@
       <!-- Routed To -->
       <div class="grid-item">
         <label>Routed To</label>
-        <select name="drpAssign" class="CTSR" multiple>
+        <select
+          name="drpAssign"
+          [size]="10"
+          class="CTSR"
+          [(ngModel)]="queryRoutedTo"
+          name="queryRoutedTo"
+        >
           <option value="" class="All">(All)</option>
           <ng-container *ngFor="let route of routes">
             <option [value]="'group-' + route.code" class="group-option">
@@ -125,17 +183,28 @@
 
   <hr />
 
-   <!-- Full Text Search -->
-   <div class="grid-container-2c">
+  <!-- Full Text  -->
+  <div class="grid-container-2c">
     <div class="grid-item">
       <label>Full Text Search</label>
-      <input type="text" name="txtFulltext" placeholder="Enter search text" />
+      <input
+        type="text"
+        name="txtFulltext"
+        placeholder="Enter search text"
+        [(ngModel)]="searchText"
+        name="searchText"
+      />
     </div>
   </div>
 
   <!-- Search Button -->
   <div class="form-actions" align="center">
-    <button mat-raised-button color="primary" type="submit">
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      (click)="searchCORs()"
+    >
       Search for CORs
     </button>
   </div>
@@ -144,7 +213,22 @@
 <div class="container">
   <!-- Search Results -->
   <div class="results">
-    <h1>Search Results</h1>
+    <div class="result-header">
+      <h1 class="results-title">Search Results</h1>
+
+      <div class="pagination-controls">
+        <label for="itemsPerPage">Items per page:</label>
+        <select id="itemsPerPage" (change)="onItemsPerPageChange($event)">
+          <option
+            *ngFor="let option of itemsPerPageOptions"
+            [value]="option"
+            [selected]="option === itemsPerPage"
+          >
+            {{ option }}
+          </option>
+        </select>
+      </div>
+    </div>
     <table width="100%">
       <thead>
         <tr>
@@ -200,7 +284,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let item of data">
+        <tr *ngFor="let item of currentPageData">
           <td>{{ item.dateTime }}</td>
           <td>{{ item.type }}</td>
           <td>{{ item.incident }}</td>
@@ -219,11 +303,19 @@
     </table>
 
     <!-- Pagination -->
+    <div class="pagination-bar">
+      <span
+        ><b>Page {{ currentPage }} of {{ totalPages }}</b></span
+      >
+    </div>
     <div class="pagination">
-      <button [disabled]="true" (click)="SetDirection('Prev')">
+      <button [disabled]="currentPage === 1" (click)="SetDirection('Prev')">
         Prev Page
       </button>
-      <button [disabled]="true" (click)="SetDirection('Next')">
+      <button
+        [disabled]="currentPage === totalPages"
+        (click)="SetDirection('Next')"
+      >
         Next Page
       </button>
     </div>

@@ -24,6 +24,17 @@ export function validateRequiredFields(
   return true;
 }
 
+// Incident(Call)# validation
+export function validateIncidentCallNumber(
+  context: VsaValidationContext
+): boolean {
+  if (!context.incidentCallNumber || context.incidentCallNumber.trim() === '') {
+    alert('Please enter incident(Call)#');
+    return false;
+  }
+  return true;
+}
+
 // ALS or VSA selected?
 export function validateVsaTypeSelection(
   context: VsaValidationContext
@@ -34,17 +45,6 @@ export function validateVsaTypeSelection(
     alert('You must select either ALS, VSA or both.');
     return false;
   }
-}
-
-// Incident(Call)# validation
-export function validateIncidentCallNumber(
-  context: VsaValidationContext
-): boolean {
-  if (!context.incidentCallNumber || context.incidentCallNumber.trim() === '') {
-    alert('Please enter incident(Call)#');
-    return false;
-  }
-  return true;
 }
 
 // when VSA is selected, check if "pronounced by" is filled
@@ -68,6 +68,5 @@ export function validateVsaReport(context: VsaValidationContext): boolean {
 
   return requiredValid && callNumberValid && typeSelectionValid && pronouncedByValid;
 }
-
 
 

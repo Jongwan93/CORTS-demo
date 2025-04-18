@@ -15,7 +15,7 @@
   
       <!-- Navigation Buttons -->
       <div name="nav" *ngIf="!isLogoutPage()">
-        <button class="navBtn" routerLink="/mainpage">Start Page</button>
+        <button class="navBtn" (click)="findCorNumber()">Start Page</button>
         <button class="navBtn" routerLink="/query" *ngIf="!isQueryPage()">Search</button>
         <button class="navBtn" routerLink="/logout">Logout</button>
       </div>

@@ -302,7 +302,7 @@ export class IncidentReportComponent implements OnInit {
     console.log('Closing: Sending updateIncident: ', updateRequestBody);
 
     this.reportService
-      .updateIncident(updateRequestBody, 'incident-report')
+      .updateReport(updateRequestBody, 'incident-report')
       .subscribe(
         (response) => {
           console.log('Closing: Incident report SUCCESS');
@@ -458,7 +458,7 @@ export class IncidentReportComponent implements OnInit {
       console.log('update request body: ', updateRequestBody);
 
       this.reportService
-        .updateIncident(updateRequestBody, 'incident-report')
+        .updateReport(updateRequestBody, 'incident-report')
         .subscribe(
           (response) => {
             console.log('update response body: ', response); // print response

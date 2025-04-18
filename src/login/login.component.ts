@@ -1,16 +1,18 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule, NavigationStart } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../app/services/auth.service';
 import { LookupService } from '../app/services/lookup.service';
 import { firstValueFrom } from 'rxjs';
+import { ReportService } from '../app/services/report.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
@@ -18,6 +20,7 @@ export class LoginComponent implements OnInit {
   username: string = '';
   password: string = '';
   caccId: number = 401; // hard coded for now
+  isLoading: boolean = false;
 
   private hasConfirmedNavigation = false;
 
@@ -26,6 +29,7 @@ export class LoginComponent implements OnInit {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private lookupService = inject(LookupService);
+  private reportService = inject(ReportService);
 
   constructor() {
     this.titleService.setTitle('CORTS - Login');
@@ -56,6 +60,8 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
+    this.isLoading = true;
+
     const loginData = {
       username: this.username,
       password: this.password,
@@ -98,10 +104,35 @@ export class LoginComponent implements OnInit {
 
       await this.lookupService.fetchAndStoreLookups();
 
+      const userData = JSON.parse(localStorage.getItem('user-data') || '{}');
+      const routedTo = userData?.personnel.name || '';
+
+      const searchCorBody = {
+        corNumber: '',
+        cadIncidentNum: '',
+        createdBy: '',
+        routedTo: routedTo,
+        corStatus: 0,
+        corType: 0,
+        dueDate: '',
+        createDateFrom: '',
+        createDateTo: '',
+        text: '',
+      };
+
+      const corResponse: any = await firstValueFrom(
+        this.reportService.getNumberOfRoutedCOR(JSON.stringify(searchCorBody))
+      );
+
+      localStorage.setItem('mainpage-message', corResponse.message);
+      localStorage.setItem('search-results', JSON.stringify(corResponse.data));
+
       await this.router.navigate(['/mainpage']);
     } catch (err) {
       alert('Login failed');
       console.error('Login error:', err);
+    } finally {
+      this.isLoading = false;
     }
   }
 }

@@ -9,6 +9,7 @@ import { validateRequiredFields } from '../app/utils/validateFields';
 import { HeaderComponent } from '../app/header/header.component';
 import { NarrativeComponent } from '../app/narrative/narrative.component';
 import { BasicInformationComponent } from '../app/basic-information/basic-information.component';
+import { DisableIfClosed } from '../app/services/disable.service';
 
 @Component({
   selector: 'app-cacc-equipment-failure-report',
@@ -21,6 +22,7 @@ import { BasicInformationComponent } from '../app/basic-information/basic-inform
     HeaderComponent,
     NarrativeComponent,
     BasicInformationComponent,
+    DisableIfClosed,
   ],
   templateUrl: './cacc-equipment-failure.component.html',
   styleUrls: ['./cacc-equipment-failure.component.css'],
@@ -384,6 +386,33 @@ export class caccEquipmentFailureComponent implements OnInit {
     });
   };
 
+   //handler for close COR button
+   handleCloseCor(message: string) {
+    // add message to narrative
+    this.addNarrativeEntry(message, true);
+
+    // update request body and close overwrite to close
+    const updateRequestBody = this.buildRequestBody('close');
+    updateRequestBody.closedby = this.loginUserName;
+    updateRequestBody.closeDate = new Date().toISOString();
+
+    // call API
+    console.log('Closing: Sending updateIncident: ', updateRequestBody);
+
+    this.reportService
+      .updateReport(updateRequestBody, 'cacc-equipment-failure-report')
+      .subscribe(
+        (response) => {
+          console.log('Closing: cacc-equipment-failure report SUCCESS');
+          this.handleReportResponse(response, 'close');
+        },
+        (error) => {
+          console.log('Closing: cacc-equipment-failure report FAILED', error);
+          this.handleReportError('close', error);
+        }
+      );
+  }
+
   // reflect field changes and send messages to narrative
   private updateFields(
     messageCode: string,
@@ -472,7 +501,7 @@ export class caccEquipmentFailureComponent implements OnInit {
       console.log('update request body: ', updateRequestBody);
 
       this.reportService
-        .updateIncident(updateRequestBody, 'cacc-equipment-failure-report')
+        .updateReport(updateRequestBody, 'cacc-equipment-failure-report')
         .subscribe(
           (response) => {
             console.log('update response body: ', response); // print response

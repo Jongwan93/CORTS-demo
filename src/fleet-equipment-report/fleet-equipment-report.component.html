@@ -10,7 +10,6 @@
   method="post"
   action="COR.ASP?WCI=tpl_cor&amp;WCE=Submit&amp;WCU="
   target="_top"
-  onsubmit="beforeSubmit()"
 >
   <!-- Basic Information -->
   <app-basic-information
@@ -34,7 +33,14 @@
       <!-- Breakdown Type* -->
       <div class="grid-item">
         <label class="req-input">Breakdown Type*</label>
-        <select id="VehicleFailure_BreakDownType_FK" required>
+        <select
+          id="VehicleFailure_BreakDownType_FK"
+          [(ngModel)]="breakDownTypeKey"
+          name="breakDownType"
+          (change)="breakDownTypeChange(breakDownTypeKey)"
+          appDisableIf
+          required
+        >
           <option value="">-- Select a Breakdown Type --</option>
           <option
             *ngFor="let type of breakDownTypeList"
@@ -47,6 +53,7 @@
           rows="5"
           [(ngModel)]="breakDownCommentText"
           name="breakDownCommentText"
+          appDisableIf
         ></textarea>
       </div>
 
@@ -56,6 +63,9 @@
         <input
           type="datetime-local"
           id="VehicleFailure_FailureDate_Date"
+          [(ngModel)]="failureDateTime"
+          name="failureDateTime"
+          appDisableIf
           required
         />
       </div>
@@ -63,7 +73,15 @@
       <!-- Service/Station* -->
       <div class="grid-item">
         <label class="req-input">Service/Station*</label>
-        <input type="text" id="VehicleFailure_ServiceInfo" required />
+        <input
+          type="text"
+          id="VehicleFailure_ServiceInfo"
+          [(ngModel)]="serviceStation"
+          name="serviceStation"
+          maxlength="5"
+          appDisableIf
+          required
+        />
       </div>
 
       <!-- Failure Details or Other Info* -->
@@ -74,6 +92,7 @@
           rows="5"
           [(ngModel)]="failureCommentText"
           name="failureCommentText"
+          appDisableIf
           required
         ></textarea>
       </div>
@@ -81,7 +100,15 @@
       <!-- Unit ID -->
       <div class="grid-item">
         <label>Unit ID</label>
-        <input type="text" id="VehicleFailure_VehicleNum" />
+        <input
+          type="text"
+          id="VehicleFailure_VehicleNum"
+          [(ngModel)]="unitID"
+          name="unitID"
+          maxlength="5"
+          appDisableIf
+          required
+        />
       </div>
 
       <!-- Container for Checkbox Fields. Wraps Fields as screen size changes -->
@@ -90,7 +117,12 @@
         <div class="grid-item">
           <label for="pronouncedDateTime">Response Delay:</label>
           <div class="time-duration-container">
-            <input type="checkbox" id="delay" (change)="toggleDelayTime()" />
+            <input
+              type="checkbox"
+              id="delay"
+              (change)="toggleDelayTime()"
+              appDisableIf
+            />
             <!-- Hours -->
             <input
               type="number"
@@ -98,19 +130,24 @@
               min="0"
               max="99"
               step="1"
-              value="00"
+              [(ngModel)]="delayHours"
+              (ngModelChange)="updateResponseDelay()"
               [disabled]="!isDelaySelected"
+              name="delayHours"
+              appDisableIf
             />
             <p>:</p>
-            <!-- Minutes -->
             <input
               type="number"
               id="delay-minutes"
               min="0"
               max="59"
               step="1"
-              value="00"
+              [(ngModel)]="delayMinutes"
+              (ngModelChange)="updateResponseDelay()"
               [disabled]="!isDelaySelected"
+              name="delayHours"
+              appDisableIf
             />
           </div>
         </div>
@@ -118,7 +155,13 @@
         <!-- Patient on Board -->
         <div class="grid-item">
           <label>Patient on Board:</label>
-          <input type="checkbox" id="VehicleFailure_PatientOnBoard" />
+          <input
+            type="checkbox"
+            id="VehicleFailure_PatientOnBoard"
+            [(ngModel)]="isPatientOnBoard"
+            name="isPatientOnBoard"
+            appDisableIf
+          />
         </div>
       </div>
       <!-- End of container-flow -->
@@ -129,18 +172,18 @@
 
   <!----------------------------------------------------------------->
 
- <!-- Narrative -->
- <div class="container">
-  <h4>Narrative:</h4>
-  <hr />
+  <!-- Narrative -->
+  <div class="container">
+    <h4>Narrative:</h4>
+    <hr />
 
-  <app-narrative
-    [combinedEntries]="combinedEntries"
-    [(narrativeCommentText)]="narrativeCommentText"
-    (saveChanges)="saveChanges()"
-    (saveChangesExit)="saveChangesExit()"
-    (reload)="reload()"
-  ></app-narrative>
-</div>
+    <app-narrative
+      [combinedEntries]="combinedEntries"
+      [(narrativeCommentText)]="narrativeCommentText"
+      (saveChanges)="saveChanges()"
+      (saveChangesExit)="saveChangesExit()"
+      (reload)="reload()"
+    ></app-narrative>
+  </div>
   <!-- End of Narrative (White Card)-->
 </form>

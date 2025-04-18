@@ -29,15 +29,20 @@ export class ReportService {
   }
 
   // update incident
-  updateIncident(updateRequestBody: any, reportType: string): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/${reportType}/update`, updateRequestBody, {
-      headers: this.getHeaders(),
-    });
+  updateReport(updateRequestBody: any, reportType: string): Observable<any> {
+    return this.http.post(
+      `${this.apiBaseUrl}/${reportType}/update`,
+      updateRequestBody,
+      {
+        headers: this.getHeaders(),
+      }
+    );
   }
 
   // search incident
-  searchIncident(updateRequestBody: any): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/search`, updateRequestBody, {
+  searchReport(searchRequestBody: any): Observable<any> {
+    console.log("searchCorBody: ", searchRequestBody);
+    return this.http.post(`${this.apiBaseUrl}/cormain/search`, searchRequestBody, {
       headers: this.getHeaders(),
     });
   }
@@ -49,7 +54,11 @@ export class ReportService {
       headers: this.getHeaders(),
     });
   }
-  
+
+  getNumberOfRoutedCOR(searchCorBody: string) {
+    const url = `${this.apiBaseUrl}/cormain/search`;
+    return this.http.post(url, searchCorBody, { headers: this.getHeaders() });
+  }
 
   // store the response
   setIncidentResponse(response: any) {

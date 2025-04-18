@@ -4,6 +4,7 @@ import { NgFor, CommonModule } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../app/services/auth.service';
 import { LookupService } from '../app/services/lookup.service';
+import { ReportService } from '../app/services/report.service';
 
 @Component({
   selector: 'app-mainpage',
@@ -19,9 +20,13 @@ export class MainpageComponent {
 
   private authService = inject(AuthService);
   private lookupService = inject(LookupService);
+  private reportService = inject(ReportService);
 
   userName: string = ''; // user name for the mainpage
   cortsTypeList: any[] = [];
+
+  loginMessage: string = '';
+  corCount: number = 0;
 
   ngOnInit() {
     // set user name for mainpage
@@ -31,7 +36,18 @@ export class MainpageComponent {
     if (cortsTypeData && cortsTypeData.data) {
       this.cortsTypeList = cortsTypeData.data;
     }
-  }
+
+    this.loginMessage = localStorage.getItem('mainpage-message') || '';
+
+    const raw = localStorage.getItem('search-results');
+    if (raw) {
+      const corList = JSON.parse(raw);
+      this.corCount = corList.length;
+    }
+
+    const userData = JSON.parse(localStorage.getItem('user-data') || '{}');
+    this.userName = userData?.personnel?.name || '';
+  } // =<<<<<<<<<<<<<<<<<<<<end of ngOnInit()
 
   onProceed(): void {
     const selectedValue = (
@@ -58,7 +74,7 @@ export class MainpageComponent {
           path = '/cacc-equipment-failure';
           break;
         case '5':
-          path = '/fleet-equipment-report';
+          path = '/fleet-equipment-failure-vehicle-breakdown';
           break;
         default:
           alert('Please select the correct option to proceed.');

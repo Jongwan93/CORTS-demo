@@ -39,6 +39,7 @@
             [(ngModel)]="complaintTypeKey"
             name="complaintType"
             (change)="complaintTypeChange(complaintTypeKey)"
+            appDisableIf
             required
           >
             <option value="">-- Select Complaint Type --</option>
@@ -61,6 +62,7 @@
             id="complaint-date"
             [(ngModel)]="complaintDateTime"
             name="complaintDateTime"
+            appDisableIf
             required
           />
         </div>
@@ -75,6 +77,7 @@
           [(ngModel)]="complaintCommentText"
           name="complaintCommentText"
           (input)="isSaved = false"
+          appDisableIf
           required
         ></textarea>
       </div>
@@ -93,6 +96,7 @@
           id="last-name"
           [(ngModel)]="lastName"
           name="lastName"
+          appDisableIf
         />
       </div>
 
@@ -105,6 +109,7 @@
           [(ngModel)]="firstName"
           (ngModelChange)="updateFullName()"
           name="firstName"
+          appDisableIf
         />
       </div>
 
@@ -117,6 +122,8 @@
           [(ngModel)]="phoneNumber"
           (ngModelChange)="updateFullName()"
           name="phoneNumber"
+          maxlength="10"
+          appDisableIf
         />
       </div>
     </div>
