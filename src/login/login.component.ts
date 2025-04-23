@@ -19,7 +19,7 @@ import { ReportService } from '../app/services/report.service';
 export class LoginComponent implements OnInit {
   username: string = '';
   password: string = '';
-  caccId: number = 401; // hard coded for now
+  caccId: string = '';
   isLoading: boolean = false;
 
   private hasConfirmedNavigation = false;
@@ -134,5 +134,11 @@ export class LoginComponent implements OnInit {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  //===============================UTILITY===============================
+  onCaccChange(value: string) {
+    this.caccId = value.substring(0, 3);
+    console.log("caccID refined: ", this.caccId);
   }
 }

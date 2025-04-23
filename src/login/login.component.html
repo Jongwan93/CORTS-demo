@@ -4,13 +4,16 @@
   <!-- Headder -->
   <header align="center">
     <!-- Ontario Logo -->
-    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo">
+    <img class="logo" src="OntarioMOH.png" alt="Ontario MOH Logo" />
 
     <div name="title">
-      <h1>CORTS - CACC Operational <br> Reports Tracking System</h1>
+      <h1>
+        CORTS - CACC Operational <br />
+        Reports Tracking System
+      </h1>
       <h3>454 - MIS CACC</h3>
     </div>
-    <hr>
+    <hr />
     <h2>Login Page</h2>
   </header>
 
@@ -29,15 +32,37 @@
     <div class="grid-container">
       <div class="grid-item">
         <label>Login as:</label>
-        <input type="text" [(ngModel)]="username" name="username">
+        <input type="text" [(ngModel)]="username" name="username" />
       </div>
       <div class="grid-item">
         <label>Password:</label>
-        <input type="password" [(ngModel)]="password" name="password">
+        <input type="password" [(ngModel)]="password" name="password" />
       </div>
       <div class="grid-item">
-        <label>CAD:</label> 
-        <input type="number" [(ngModel)]="caccId" name="caccId">
+        <label>CACC:</label>
+        <select id="CACC-ID" [(ngModel)]="caccId" (ngModelChange)="onCaccChange($event)" name="caccId">
+          <option>454 - MIS CACC</option>
+          <option>940 - Ottawa CACC</option>
+          <option>930 - Georgian CACC</option>
+          <option>934 - Lindsay CACC</option>
+          <option>931 - Oshawa CACC</option>
+          <option>942 - Kingstone CACC</option>
+          <option>941 - Renfrew CACC</option>
+          <option>961 - Kenora CACC</option>
+          <option>960 - Thunder Bay CACC</option>
+          <option>950 - Sudbury CACC</option>
+          <option>952 - Timmins CACC</option>
+          <option>951 - Sue St Marie CACC</option>
+          <option>953 - North Bay CACC</option>
+          <option>958 - Muskoka ACS</option>
+          <option>959 - Parry Sound ACS</option>
+          <option>920 - HAMILTON CACC</option>
+          <option>921 - Cambridge CACC</option>
+          <option>910 - London CACC</option>
+          <option>911 - Wallaceburg CACC</option>
+          <option>912 - Windsor CACC</option>
+          <option>401</option>  <!-- Dummy Cacc Number. Erase later -->
+        </select>
       </div>
     </div>
 
@@ -46,5 +71,7 @@
         <button type="submit">Login</button>
       </div>
     </div>
-  </form> <!-- End of Login Form -->
-</div> <!-- End of Container-->
+  </form>
+  <!-- End of Login Form -->
+</div>
+<!-- End of Container-->

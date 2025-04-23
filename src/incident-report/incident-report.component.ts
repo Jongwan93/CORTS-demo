@@ -437,8 +437,8 @@ export class IncidentReportComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('create response body: ', response); // print response
-            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0;
-            this.incidentKey = response?.data?.report?.incidentKey ?? 0;
+            this.corMainKey = response?.data?.corMain?.corMainKey ?? 0; // show error message from response if corMainKey is empty
+            this.incidentKey = response?.data?.report?.incidentKey ?? 0; // show error message from response if incidentKey is empty
 
             this.router.navigate(['/incident-report'], {
               queryParams: {
