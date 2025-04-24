@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { LookupService } from '../services/lookup.service';
@@ -20,13 +21,19 @@ import { DisableIfClosed } from '../services/disable.service';
 @Component({
   selector: 'app-basic-information',
   standalone: true,
-  imports: [CommonModule, FormsModule, DisableIfClosed],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DisableIfClosed,
+    RouterModule,
+  ],
   templateUrl: './basic-information.component.html',
   styleUrls: ['./basic-information.component.css'],
 })
 export class BasicInformationComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private lookupService = inject(LookupService);
   private corStatusService = inject(CorStateService);
 

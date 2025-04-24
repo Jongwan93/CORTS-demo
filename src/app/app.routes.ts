@@ -9,6 +9,7 @@ import { FleetEquipmentReportComponent } from '../fleet-equipment-report/fleet-e
 import { LoginComponent } from '../login/login.component';
 import { LogoutComponent } from '../logout/logout.component';
 import { AuthGuard } from './services/auth.guard';
+import { CADIncidentDetailComponent } from '../cad-incident-detail/cad-incident-detail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'cacc-equipment-failure', component: caccEquipmentFailureComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'complaint-inquiry', component: ComplaintReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
   { path: 'fleet-equipment-failure-vehicle-breakdown', component: FleetEquipmentReportComponent,  canActivate: [AuthGuard], data: {title: 'CORTS - COR entry (new)'} },
+  { path: 'cad-incident-detail', component: CADIncidentDetailComponent, canActivate: [AuthGuard], data: {title: 'CORTS - CAD Incident Detail'} },
   { path: 'logout', component: LogoutComponent,  canActivate: [AuthGuard], data: {title: 'you are logged out!'}},
   { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
